@@ -20,12 +20,26 @@ namespace Evoflare.API
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Swagger;
+    using Evoflare.API.Models;
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// <see cref="IServiceCollection"/> extension methods which extend ASP.NET Core services.
     /// </summary>
     public static class CustomServiceCollectionExtensions
     {
+
+        public static IServiceCollection AddMSSqlDatabase(this IServiceCollection services, IConfiguration configuration)
+        {
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            services.AddDbContext<TechnicalEvaluationContext>(
+                options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), 
+                // start migration
+                optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
+                );
+            return services;
+        }
+
         public static IServiceCollection AddCorrelationIdFluent(this IServiceCollection services)
         {
             services.AddCorrelationId();

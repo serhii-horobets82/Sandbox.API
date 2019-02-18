@@ -1,0 +1,3 @@
+```
+dotnet ef dbcontext info
+```

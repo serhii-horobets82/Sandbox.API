@@ -9,6 +9,7 @@ namespace Evoflare.API
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
+    using Newtonsoft.Json.Serialization;
 
     public static class MvcCoreBuilderExtensions
     {
@@ -39,6 +40,9 @@ namespace Evoflare.API
             builder.AddJsonOptions(
                 options =>
                 {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
                     if (hostingEnvironment.IsDevelopment())
                     {
                         // Pretty print the JSON in development for easier debugging.

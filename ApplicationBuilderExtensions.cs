@@ -9,6 +9,9 @@ namespace Evoflare.API
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.DependencyInjection;
+    using Evoflare.API.Models;
+    using Microsoft.EntityFrameworkCore.Migrations;
+    using Evoflare.API.Data;
 
     public static partial class ApplicationBuilderExtensions
     {
@@ -49,30 +52,49 @@ namespace Evoflare.API
                     });
         }
 
+        /// <summary>
+        /// Creating new Database 
+        /// </summary>
+        /// <param name="application"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application)
+        {
+            var context = application
+                .ApplicationServices
+                .GetRequiredService<TechnicalEvaluationContext>();
+            // Check and create, if not exist 
+            context.Database.EnsureCreated();
+
+            // Seed data
+            DbInitializer.Initialize(context);
+
+            return application;
+        }
+
 
         public static IApplicationBuilder UseCustomSwaggerUI(this IApplicationBuilder application) =>
-            application.UseSwaggerUI(
-                options =>
-                {
-                    // Set the Swagger UI browser document title.
-                    options.DocumentTitle = typeof(Startup)
-                        .Assembly
-                        .GetCustomAttribute<AssemblyProductAttribute>()
-                        .Product;
-                    // Set the Swagger UI to render at '/'.
-                    options.RoutePrefix = string.Empty;
-                    // Show the request duration in Swagger UI.
-                    options.DisplayRequestDuration();
+        application.UseSwaggerUI(
+            options =>
+            {
+                // Set the Swagger UI browser document title.
+                options.DocumentTitle = typeof(Startup)
+                .Assembly
+                .GetCustomAttribute<AssemblyProductAttribute>()
+                .Product;
+                // Set the Swagger UI to render at '/'.
+                options.RoutePrefix = string.Empty;
+                // Show the request duration in Swagger UI.
+                options.DisplayRequestDuration();
 
-                    var provider = application.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
-                    foreach (var apiVersionDescription in provider
-                        .ApiVersionDescriptions
-                        .OrderByDescending(x => x.ApiVersion))
-                    {
-                        options.SwaggerEndpoint(
-                            $"/swagger/{apiVersionDescription.GroupName}/swagger.json",
-                            $"Version {apiVersionDescription.ApiVersion}");
-                    }
-                });
+                var provider = application.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
+                foreach (var apiVersionDescription in provider
+                    .ApiVersionDescriptions
+                    .OrderByDescending(x => x.ApiVersion))
+                {
+                    options.SwaggerEndpoint(
+                        $"/swagger/{apiVersionDescription.GroupName}/swagger.json",
+                        $"Version {apiVersionDescription.ApiVersion}");
+                }
+            });
     }
 }
