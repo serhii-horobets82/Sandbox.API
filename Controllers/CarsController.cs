@@ -12,7 +12,7 @@ namespace Evoflare.API.Controllers
     using Swashbuckle.AspNetCore.Annotations;
 
     [Route("[controller]")]
-    [ApiController]
+    //[ApiController]
     [ApiVersion("1.0")]
     public class CarsController : ControllerBase
     {

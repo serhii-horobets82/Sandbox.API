@@ -1,29 +1,29 @@
-﻿using Evoflare.API.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Evoflare.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace NetApp.Controllers
+namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CompetencesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _db;
+        private readonly TechnicalEvaluationContext db;
 
         public CompetencesController(TechnicalEvaluationContext db)
         {
-            _db = db;
+            this.db = db;
         }
 
         [HttpGet("", Name = "GetCompetences")]
         [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<Competence>))]
         public async Task<List<Competence>> Get()
         {
-            return await _db.Competence
+            return await db.Competence
                 .Include(level => level.CompetenceLevel)
                 .ToListAsync();
         }
@@ -34,7 +34,7 @@ namespace NetApp.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "A Competence with the specified unique identifier could not be found.")]
         public async Task<Competence> Get(string id)
         {
-            return await _db.Competence
+            return await db.Competence
                 .Include(level => level.CompetenceLevel)
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
