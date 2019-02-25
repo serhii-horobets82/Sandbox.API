@@ -20,22 +20,22 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet("", Name = "GetCompetences")]
-        [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<Competence>))]
-        public async Task<List<Competence>> Get()
+        [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<EcfCompetence>))]
+        public async Task<List<EcfCompetence>> Get()
         {
-            return await db.Competence
-                .Include(level => level.CompetenceLevel)
+            return await db.EcfCompetence
+                .Include(level => level.EcfCompetenceLevel)
                 .ToListAsync();
         }
 
         [HttpGet("{id}", Name = "GetCompetence")]
-        [SwaggerResponse(StatusCodes.Status200OK, "The Competence with the specified unique identifier.", typeof(Competence))]
+        [SwaggerResponse(StatusCodes.Status200OK, "The Competence with the specified unique identifier.", typeof(EcfCompetence))]
         [SwaggerResponse(StatusCodes.Status304NotModified, "The Competence has not changed since the date given in the If-Modified-Since HTTP header.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "A Competence with the specified unique identifier could not be found.")]
-        public async Task<Competence> Get(string id)
+        public async Task<EcfCompetence> Get(string id)
         {
-            return await db.Competence
-                .Include(level => level.CompetenceLevel)
+            return await db.EcfCompetence
+                .Include(level => level.EcfCompetenceLevel)
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
     }

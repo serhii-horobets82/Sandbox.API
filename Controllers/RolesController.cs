@@ -20,19 +20,19 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet("", Name = "GetRoles")]
-        [SwaggerResponse(StatusCodes.Status200OK, "List of all roles.", typeof(List<Role>))]
-        public async Task<List<Role>> Get()
+        [SwaggerResponse(StatusCodes.Status200OK, "List of all roles.", typeof(List<EcfRole>))]
+        public async Task<List<EcfRole>> Get()
         {
-            return await db.Role.ToListAsync();
+            return await db.EcfRole.ToListAsync();
         }
 
         [HttpGet("{id}", Name = "GetRole")]
-        [SwaggerResponse(StatusCodes.Status200OK, "The Role with the specified unique identifier.", typeof(Role))]
+        [SwaggerResponse(StatusCodes.Status200OK, "The Role with the specified unique identifier.", typeof(EcfRole))]
         [SwaggerResponse(StatusCodes.Status304NotModified, "The Role has not changed since the date given in the If-Modified-Since HTTP header.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "A Role with the specified unique identifier could not be found.")]
-        public async Task<Role> Get(int id)
+        public async Task<EcfRole> Get(int id)
         {
-            return await db.Role.FirstOrDefaultAsync(i => i.Id == id);
+            return await db.EcfRole.FirstOrDefaultAsync(i => i.Id == id);
         }
     }
 }
