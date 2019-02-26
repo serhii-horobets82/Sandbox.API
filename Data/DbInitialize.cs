@@ -13,7 +13,7 @@ namespace Evoflare.API.Data
     public static class DbInitializer
     {
 
-        public static void Initialize(BaseAppContext context)
+        public static bool Initialize(BaseAppContext context)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             var currentVersion = assemblyInfo.Version.ToString();
@@ -48,14 +48,17 @@ namespace Evoflare.API.Data
                 if (ex.Number == 208) // "Invalid object name 'AppVersion'."
                 {
                     purgeDB();
+                    return true;
                 }
             }
 
             // check version in database, if old - recreate database 
-            if (recordsCount == 0 || context.AppVersion.FirstOrDefault().Version != currentVersion)
+            if (recordsCount == 0 || context.AppVersion.AsNoTracking().FirstOrDefault().Version != currentVersion)
             {
                 purgeDB();
+                return true;
             }
+            return false;
         }
 
         public static void Initialize(TechnicalEvaluationContext context)
@@ -81,7 +84,7 @@ namespace Evoflare.API.Data
                     {
                         command.ExecuteNonQuery();
                     }
-                    catch(SqlException ex)
+                    catch (SqlException ex)
                     {
                         var number = ex.Number;
                         if (ex.Number != 2714) // "There is already an object named ..

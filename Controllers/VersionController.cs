@@ -21,14 +21,14 @@ namespace Evoflare.API.Controllers
             this.db = db;
         }
 
-        [HttpGet("", Name = "GetAssemblyVersion")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Version of application.", typeof(string))]
-        public string Get()
-        {
-            return Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        }
+        //[HttpGet(Name = "GetAssemblyVersion")]
+        //[SwaggerResponse(StatusCodes.Status200OK, "Version of application.", typeof(string))]
+        //public string Get()
+        //{
+        //    return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        //}
 
-        [HttpGet("", Name = "GetAppVersion")]
+        [HttpGet(Name = "GetAppVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(string))]
         public async Task<CoreAppVersion> GetAppVersion()
         {

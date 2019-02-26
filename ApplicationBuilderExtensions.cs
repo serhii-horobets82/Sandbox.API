@@ -65,16 +65,16 @@ namespace Evoflare.API
                 .ApplicationServices
                 .GetRequiredService<BaseAppContext>();
 
-            DbInitializer.Initialize(baseContext);
+            // Basic seed data, return true, if database was recreated
+            if (DbInitializer.Initialize(baseContext))
+            {
+                var context = application
+                    .ApplicationServices
+                    .GetRequiredService<TechnicalEvaluationContext>();
 
-            var context = application
-                .ApplicationServices
-                .GetRequiredService<TechnicalEvaluationContext>();
-            // Check and create, if not exist 
-            //context.Database.EnsureCreated();
-
-            // Seed data
-            DbInitializer.Initialize(context);
+                // Seed data for TechnicalEvaluation
+                DbInitializer.Initialize(context);
+            }
 
             return application;
         }

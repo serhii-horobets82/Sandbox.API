@@ -27,7 +27,5 @@ namespace Evoflare.API.Models
         public string Version { get; set; }
 
         public DateTime CreationDate { get; set; }
-
-        public DateTime ModifiedDate { get; set; }
     }
 }
