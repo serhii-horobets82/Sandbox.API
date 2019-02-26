@@ -24,7 +24,11 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public IEnumerable<Position> GetPosition()
         {
-            return _context.Position;
+            return _context.Position
+                .Include(position => position.PositionRole)
+                    .ThenInclude(positionRole => positionRole.Role)
+                    .ThenInclude(role => role.EcfRoleCompetence)
+                    .ThenInclude(roleCompetence => roleCompetence.Competence);
         }
 
         // GET: api/Positions/5
@@ -90,6 +94,12 @@ namespace Evoflare.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            //position.CreatedDate = DateTime.UtcNow;
+            position.CreatedBy = 1;
+            foreach(var positionRole in position.PositionRole)
+            {
+                //positionRole.DateTime = DateTime.UtcNow;
+            }
             _context.Position.Add(position);
             await _context.SaveChangesAsync();
 

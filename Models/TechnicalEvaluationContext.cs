@@ -95,10 +95,23 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<EcfRoleCompetence>(entity =>
             {
-                entity.Property(e => e.Competence)
+                entity.Property(e => e.CompetenceId)
                     .IsRequired()
                     .HasMaxLength(3)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.EcfRoleCompetence)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfRoleCompetence_EcfCompetence");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.EcfRoleCompetence)
+                    .HasPrincipalKey(p => p.RoleId)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfRoleCompetence_EcfRole");
             });
 
             modelBuilder.Entity<Employee>(entity =>
@@ -133,11 +146,29 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<EmployeePosition>(entity =>
             {
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.EmployeePosition)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeePosition_Employee");
+
                 entity.HasOne(d => d.Organization)
                     .WithMany(p => p.EmployeePosition)
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeePosition_Organization");
+
+                entity.HasOne(d => d.Position)
+                    .WithMany(p => p.EmployeePosition)
+                    .HasForeignKey(d => d.PositionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeePosition_Position");
+
+                entity.HasOne(d => d.Relation)
+                    .WithMany(p => p.EmployeePosition)
+                    .HasForeignKey(d => d.RelationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeePosition_EmployeeRelations");
             });
 
             modelBuilder.Entity<EmployeeRelations>(entity =>
@@ -186,7 +217,9 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<Position>(entity =>
             {
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -208,7 +241,21 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<PositionRole>(entity =>
             {
-                entity.Property(e => e.DateTime).HasColumnType("datetime");
+                entity.Property(e => e.DateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
+
+                entity.HasOne(d => d.Position)
+                    .WithMany(p => p.PositionRole)
+                    .HasForeignKey(d => d.PositionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PositionRole_Position");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.PositionRole)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PositionRole_EcfRole");
             });
 
             modelBuilder.Entity<Project>(entity =>

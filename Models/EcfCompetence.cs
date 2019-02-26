@@ -8,6 +8,7 @@ namespace Evoflare.API.Models
         public EcfCompetence()
         {
             EcfCompetenceLevel = new HashSet<EcfCompetenceLevel>();
+            EcfRoleCompetence = new HashSet<EcfRoleCompetence>();
         }
 
         public string Id { get; set; }
@@ -15,5 +16,6 @@ namespace Evoflare.API.Models
         public string Summary { get; set; }
 
         public virtual ICollection<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
+        public virtual ICollection<EcfRoleCompetence> EcfRoleCompetence { get; set; }
     }
 }

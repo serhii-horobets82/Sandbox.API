@@ -63,7 +63,7 @@ namespace Evoflare.API
                 .ApplicationServices
                 .GetRequiredService<TechnicalEvaluationContext>();
             // Check and create, if not exist 
-            context.Database.EnsureCreated();
+            //context.Database.EnsureCreated();
 
             // Seed data
             //DbInitializer.Initialize(context);

@@ -27,6 +27,12 @@ namespace Evoflare.API.Controllers
             return _context.Employee;
         }
 
+        [HttpGet("managers")]
+        public IEnumerable<Employee> GetManagers()
+        {
+            return _context.Employee.Where(e => e.IsManager);
+        }
+
         [HttpGet("type")]
         public IEnumerable<EmployeeType> GetEmployeeTypes()
         {

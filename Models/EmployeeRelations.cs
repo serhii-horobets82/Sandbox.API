@@ -5,6 +5,11 @@ namespace Evoflare.API.Models
 {
     public partial class EmployeeRelations
     {
+        public EmployeeRelations()
+        {
+            EmployeePosition = new HashSet<EmployeePosition>();
+        }
+
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public int? ManagerId { get; set; }
@@ -17,5 +22,6 @@ namespace Evoflare.API.Models
         public virtual Organization Organization { get; set; }
         public virtual Project Project { get; set; }
         public virtual Team Team { get; set; }
+        public virtual ICollection<EmployeePosition> EmployeePosition { get; set; }
     }
 }

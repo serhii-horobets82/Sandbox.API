@@ -7,6 +7,7 @@ namespace Evoflare.API.Models
     {
         public Employee()
         {
+            EmployeePosition = new HashSet<EmployeePosition>();
             EmployeeRelationsEmployee = new HashSet<EmployeeRelations>();
             EmployeeRelationsManager = new HashSet<EmployeeRelations>();
             PositionCreatedByNavigation = new HashSet<Position>();
@@ -22,6 +23,7 @@ namespace Evoflare.API.Models
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
+        public virtual ICollection<EmployeePosition> EmployeePosition { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelationsEmployee { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelationsManager { get; set; }
         public virtual ICollection<Position> PositionCreatedByNavigation { get; set; }

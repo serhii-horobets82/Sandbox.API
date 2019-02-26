@@ -1,18 +1,11 @@
 USE [master]
 GO
-/****** Object:  Database [TechnicalEvaluation]    Script Date: 2/22/2019 7:25:08 AM ******/
+/****** Object:  Database [TechnicalEvaluation]    Script Date: 26.02.2019 23:04:53 ******/
 CREATE DATABASE [TechnicalEvaluation]
 GO
-
-IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
-begin
-EXEC [TechnicalEvaluation].[dbo].[sp_fulltext_database] @action = 'enable'
-end
-GO
-
 USE [TechnicalEvaluation]
 GO
-/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -27,7 +20,7 @@ CREATE TABLE [dbo].[EcfCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -43,7 +36,7 @@ CREATE TABLE [dbo].[EcfCompetenceLevel](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -59,7 +52,7 @@ CREATE TABLE [dbo].[EcfEvaluation](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRole]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EcfRole]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -76,7 +69,7 @@ CREATE TABLE [dbo].[EcfRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -84,7 +77,7 @@ GO
 CREATE TABLE [dbo].[EcfRoleCompetence](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[RoleId] [int] NOT NULL,
-	[Competence] [char](3) NOT NULL,
+	[CompetenceId] [char](3) NOT NULL,
 	[CompetenceLevel] [int] NOT NULL,
  CONSTRAINT [PK_RoleCompetence] PRIMARY KEY CLUSTERED 
 (
@@ -92,7 +85,7 @@ CREATE TABLE [dbo].[EcfRoleCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Employee]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[Employee]    Script Date: 26.02.2019 23:04:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -110,7 +103,7 @@ CREATE TABLE [dbo].[Employee](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -127,7 +120,7 @@ CREATE TABLE [dbo].[EmployeeEvaluation](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeePosition]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EmployeePosition]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -144,7 +137,7 @@ CREATE TABLE [dbo].[EmployeePosition](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -162,7 +155,7 @@ CREATE TABLE [dbo].[EmployeeRelations](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeType]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[EmployeeType]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -176,7 +169,7 @@ CREATE TABLE [dbo].[EmployeeType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Organization]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[Organization]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -190,7 +183,7 @@ CREATE TABLE [dbo].[Organization](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Position]    Script Date: 2/22/2019 7:25:09 AM ******/
+/****** Object:  Table [dbo].[Position]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -210,7 +203,7 @@ CREATE TABLE [dbo].[Position](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PositionRole]    Script Date: 2/22/2019 7:25:10 AM ******/
+/****** Object:  Table [dbo].[PositionRole]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -226,7 +219,7 @@ CREATE TABLE [dbo].[PositionRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Project]    Script Date: 2/22/2019 7:25:10 AM ******/
+/****** Object:  Table [dbo].[Project]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -241,7 +234,7 @@ CREATE TABLE [dbo].[Project](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Team]    Script Date: 2/22/2019 7:25:10 AM ******/
+/****** Object:  Table [dbo].[Team]    Script Date: 26.02.2019 23:04:55 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -619,289 +612,289 @@ SET IDENTITY_INSERT [dbo].[EcfRole] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EcfRoleCompetence] ON 
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (1, 1, N'D5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (1, 1, N'D5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (2, 1, N'D6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (2, 1, N'D6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (3, 1, N'D7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (3, 1, N'D7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (4, 1, N'E1 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (4, 1, N'E1 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (5, 1, N'E4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (5, 1, N'E4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (6, 2, N'A1 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (6, 2, N'A1 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (7, 2, N'A3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (7, 2, N'A3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (8, 2, N'D10', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (8, 2, N'D10', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (9, 2, N'D11', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (9, 2, N'D11', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (10, 2, N'E5 ', 1)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (10, 2, N'E5 ', 1)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (11, 3, N'A1 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (11, 3, N'A1 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (12, 3, N'A3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (12, 3, N'A3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (13, 3, N'E4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (13, 3, N'E4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (14, 3, N'E7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (14, 3, N'E7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (15, 3, N'E9 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (15, 3, N'E9 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (16, 4, N'A1 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (16, 4, N'A1 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (17, 4, N'A3 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (17, 4, N'A3 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (18, 4, N'E2 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (18, 4, N'E2 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (19, 4, N'E4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (19, 4, N'E4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (20, 4, N'E9 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (20, 4, N'E9 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (21, 5, N'B1 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (21, 5, N'B1 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (22, 5, N'B2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (22, 5, N'B2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (23, 5, N'C2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (23, 5, N'C2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (24, 5, N'D10', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (24, 5, N'D10', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (25, 5, N'E8 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (25, 5, N'E8 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (26, 6, N'B1 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (26, 6, N'B1 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (27, 6, N'B2 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (27, 6, N'B2 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (28, 6, N'B3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (28, 6, N'B3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (29, 6, N'B5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (29, 6, N'B5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (30, 6, N'C4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (30, 6, N'C4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (31, 7, N'A6 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (31, 7, N'A6 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (32, 7, N'B1 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (32, 7, N'B1 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (33, 7, N'B3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (33, 7, N'B3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (34, 7, N'B4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (34, 7, N'B4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (35, 7, N'D12', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (35, 7, N'D12', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (36, 8, N'A1 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (36, 8, N'A1 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (37, 8, N'A3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (37, 8, N'A3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (38, 8, N'A5 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (38, 8, N'A5 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (39, 8, N'A7 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (39, 8, N'A7 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (40, 8, N'E8 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (40, 8, N'E8 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (41, 9, N'A7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (41, 9, N'A7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (42, 9, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (42, 9, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (43, 9, N'D11', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (43, 9, N'D11', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (44, 9, N'E3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (44, 9, N'E3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (45, 9, N'E7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (45, 9, N'E7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (46, 10, N'D9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (46, 10, N'D9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (47, 10, N'E2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (47, 10, N'E2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (48, 10, N'E3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (48, 10, N'E3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (49, 10, N'E6 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (49, 10, N'E6 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (50, 10, N'E8 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (50, 10, N'E8 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (51, 11, N'A7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (51, 11, N'A7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (52, 11, N'D1 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (52, 11, N'D1 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (53, 11, N'E3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (53, 11, N'E3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (54, 11, N'E8 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (54, 11, N'E8 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (55, 11, N'E9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (55, 11, N'E9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (56, 12, N'A7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (56, 12, N'A7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (57, 12, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (57, 12, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (58, 12, N'D1 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (58, 12, N'D1 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (59, 12, N'D3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (59, 12, N'D3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (60, 12, N'E3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (60, 12, N'E3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (61, 13, N'B5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (61, 13, N'B5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (62, 13, N'D3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (62, 13, N'D3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (63, 13, N'D9 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (63, 13, N'D9 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (64, 13, N'E2 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (64, 13, N'E2 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (65, 14, N'A6 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (65, 14, N'A6 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (66, 14, N'B2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (66, 14, N'B2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (67, 14, N'B4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (67, 14, N'B4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (68, 14, N'C4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (68, 14, N'C4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (69, 14, N'E8 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (69, 14, N'E8 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (70, 15, N'A4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (70, 15, N'A4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (71, 15, N'E2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (71, 15, N'E2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (72, 15, N'E3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (72, 15, N'E3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (73, 15, N'E4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (73, 15, N'E4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (74, 15, N'E7 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (74, 15, N'E7 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (75, 16, N'D2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (75, 16, N'D2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (76, 16, N'E3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (76, 16, N'E3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (77, 16, N'E5 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (77, 16, N'E5 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (78, 16, N'E6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (78, 16, N'E6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (79, 17, N'C1 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (79, 17, N'C1 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (80, 17, N'C2 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (80, 17, N'C2 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (81, 17, N'C3 ', 1)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (81, 17, N'C3 ', 1)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (82, 17, N'C4 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (82, 17, N'C4 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (83, 18, N'A2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (83, 18, N'A2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (84, 18, N'C3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (84, 18, N'C3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (85, 18, N'C4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (85, 18, N'C4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (86, 18, N'D8 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (86, 18, N'D8 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (87, 18, N'D9 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (87, 18, N'D9 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (88, 19, N'B2 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (88, 19, N'B2 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (89, 19, N'B3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (89, 19, N'B3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (90, 19, N'C2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (90, 19, N'C2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (91, 19, N'C4 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (91, 19, N'C4 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (92, 19, N'E8 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (92, 19, N'E8 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (93, 20, N'A5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (93, 20, N'A5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (94, 20, N'B5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (94, 20, N'B5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (95, 20, N'B6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (95, 20, N'B6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (96, 20, N'E5 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (96, 20, N'E5 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (97, 21, N'A5 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (97, 21, N'A5 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (98, 21, N'A7 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (98, 21, N'A7 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (99, 21, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (99, 21, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (100, 21, N'B2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (100, 21, N'B2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (101, 21, N'B6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (101, 21, N'B6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (102, 22, N'C2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (102, 22, N'C2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (103, 22, N'C3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (103, 22, N'C3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (104, 22, N'C4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (104, 22, N'C4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (105, 22, N'E3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (105, 22, N'E3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (106, 22, N'E6 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (106, 22, N'E6 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (107, 23, N'B2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (107, 23, N'B2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (109, 23, N'B3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (109, 23, N'B3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (110, 23, N'B4 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (110, 23, N'B4 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (111, 23, N'B5 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (111, 23, N'B5 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (112, 23, N'E3 ', 2)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (112, 23, N'E3 ', 2)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (113, 24, N'A6 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (113, 24, N'A6 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (114, 24, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (114, 24, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (115, 24, N'D10', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (115, 24, N'D10', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (116, 24, N'D11', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (116, 24, N'D11', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (117, 25, N'A3 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (117, 25, N'A3 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (118, 25, N'A5 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (118, 25, N'A5 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (119, 25, N'A9 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (119, 25, N'A9 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (120, 25, N'E7 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (120, 25, N'E7 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (121, 25, N'E9 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (121, 25, N'E9 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (122, 26, N'B1 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (122, 26, N'B1 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (123, 26, N'B2 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (123, 26, N'B2 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (124, 26, N'B3 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (124, 26, N'B3 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (125, 26, N'B4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (125, 26, N'B4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (126, 26, N'C2 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (126, 26, N'C2 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (127, 27, N'A7 ', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (127, 27, N'A7 ', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (128, 27, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (128, 27, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (129, 27, N'D10', 5)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (129, 27, N'D10', 5)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (130, 27, N'D11', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (130, 27, N'D11', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (131, 27, N'E1 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (131, 27, N'E1 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (132, 28, N'A6 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (132, 28, N'A6 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (133, 28, N'D10', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (133, 28, N'D10', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (134, 28, N'E6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (134, 28, N'E6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (135, 28, N'E8 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (135, 28, N'E8 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (136, 29, N'B3 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (136, 29, N'B3 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (137, 29, N'B6 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (137, 29, N'B6 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (138, 29, N'D9 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (138, 29, N'D9 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (139, 29, N'E4 ', 3)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (139, 29, N'E4 ', 3)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (140, 30, N'A4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (140, 30, N'A4 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (141, 30, N'A9 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (141, 30, N'A9 ', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (142, 30, N'D11', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (142, 30, N'D11', 4)
 GO
-INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [Competence], [CompetenceLevel]) VALUES (143, 30, N'E4 ', 4)
+INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLevel]) VALUES (143, 30, N'E4 ', 4)
 GO
 SET IDENTITY_INSERT [dbo].[EcfRoleCompetence] OFF
 GO
@@ -959,6 +952,34 @@ INSERT [dbo].[Organization] ([Id], [Name]) VALUES (1, N'Smart CORP')
 GO
 SET IDENTITY_INSERT [dbo].[Organization] OFF
 GO
+SET IDENTITY_INSERT [dbo].[Position] ON 
+GO
+INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (1, N'First position', 0, CAST(N'2019-02-26T18:14:57.683' AS DateTime), 1, NULL, NULL, 0)
+GO
+INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (2, N'Developer 1', 0, CAST(N'2019-02-26T19:18:03.260' AS DateTime), 1, NULL, NULL, 0)
+GO
+INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (3, N'Developer 2', 0, CAST(N'2019-02-26T19:19:59.907' AS DateTime), 1, NULL, NULL, 0)
+GO
+SET IDENTITY_INSERT [dbo].[Position] OFF
+GO
+SET IDENTITY_INSERT [dbo].[PositionRole] ON 
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (1, 1, 1, CAST(N'2019-02-26T18:14:57.717' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (2, 1, 3, CAST(N'2019-02-26T18:14:57.723' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (3, 2, 1, CAST(N'2019-02-26T19:18:03.293' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (4, 2, 24, CAST(N'2019-02-26T19:18:03.300' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (5, 3, 2, CAST(N'2019-02-26T19:19:59.943' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (6, 3, 27, CAST(N'2019-02-26T19:19:59.960' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (7, 3, 22, CAST(N'2019-02-26T19:19:59.967' AS DateTime))
+GO
+SET IDENTITY_INSERT [dbo].[PositionRole] OFF
+GO
 SET IDENTITY_INSERT [dbo].[Project] ON 
 GO
 INSERT [dbo].[Project] ([Id], [Name], [OrganizationId]) VALUES (1, N'Smart product 1', 1)
@@ -977,13 +998,17 @@ INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (3, N'U
 GO
 SET IDENTITY_INSERT [dbo].[Team] OFF
 GO
-/****** Object:  Index [IX_Role]    Script Date: 2/22/2019 7:25:11 AM ******/
+/****** Object:  Index [IX_Role]    Script Date: 26.02.2019 23:04:55 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Role] ON [dbo].[EcfRole]
 (
 	[RoleId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
+ALTER TABLE [dbo].[Position] ADD  CONSTRAINT [DF_Position_CreatedDate]  DEFAULT (getutcdate()) FOR [CreatedDate]
+GO
 ALTER TABLE [dbo].[Position] ADD  CONSTRAINT [DF_Position_IsDeleted]  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[PositionRole] ADD  CONSTRAINT [DF_PositionRole_DateTime]  DEFAULT (getutcdate()) FOR [DateTime]
 GO
 ALTER TABLE [dbo].[EcfCompetenceLevel]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceLevel_Competence] FOREIGN KEY([CompetenceId])
 REFERENCES [dbo].[EcfCompetence] ([Id])
@@ -995,6 +1020,16 @@ REFERENCES [dbo].[EmployeeEvaluation] ([Id])
 GO
 ALTER TABLE [dbo].[EcfEvaluation] CHECK CONSTRAINT [FK_EcfEvaluation_EmployeeEvaluation]
 GO
+ALTER TABLE [dbo].[EcfRoleCompetence]  WITH CHECK ADD  CONSTRAINT [FK_EcfRoleCompetence_EcfCompetence] FOREIGN KEY([CompetenceId])
+REFERENCES [dbo].[EcfCompetence] ([Id])
+GO
+ALTER TABLE [dbo].[EcfRoleCompetence] CHECK CONSTRAINT [FK_EcfRoleCompetence_EcfCompetence]
+GO
+ALTER TABLE [dbo].[EcfRoleCompetence]  WITH CHECK ADD  CONSTRAINT [FK_EcfRoleCompetence_EcfRole] FOREIGN KEY([RoleId])
+REFERENCES [dbo].[EcfRole] ([RoleId])
+GO
+ALTER TABLE [dbo].[EcfRoleCompetence] CHECK CONSTRAINT [FK_EcfRoleCompetence_EcfRole]
+GO
 ALTER TABLE [dbo].[Employee]  WITH CHECK ADD  CONSTRAINT [FK_Employee_EmployeeType] FOREIGN KEY([EmployeeTypeId])
 REFERENCES [dbo].[EmployeeType] ([Id])
 GO
@@ -1005,10 +1040,25 @@ REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[Employee] CHECK CONSTRAINT [FK_Employee_Organization]
 GO
+ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_Employee] FOREIGN KEY([EmployeeId])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_Employee]
+GO
+ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_EmployeeRelations] FOREIGN KEY([RelationId])
+REFERENCES [dbo].[EmployeeRelations] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_EmployeeRelations]
+GO
 ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_Organization]
+GO
+ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_Position] FOREIGN KEY([PositionId])
+REFERENCES [dbo].[Position] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_Position]
 GO
 ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRelations_Employee] FOREIGN KEY([EmployeeId])
 REFERENCES [dbo].[Employee] ([Id])
@@ -1045,10 +1095,15 @@ REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[Position] CHECK CONSTRAINT [FK_Position_EmployeeUpdatedBy]
 GO
-ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_PositionRole] FOREIGN KEY([Id])
-REFERENCES [dbo].[PositionRole] ([Id])
+ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_EcfRole] FOREIGN KEY([RoleId])
+REFERENCES [dbo].[EcfRole] ([Id])
 GO
-ALTER TABLE [dbo].[PositionRole] CHECK CONSTRAINT [FK_PositionRole_PositionRole]
+ALTER TABLE [dbo].[PositionRole] CHECK CONSTRAINT [FK_PositionRole_EcfRole]
+GO
+ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_Position] FOREIGN KEY([PositionId])
+REFERENCES [dbo].[Position] ([Id])
+GO
+ALTER TABLE [dbo].[PositionRole] CHECK CONSTRAINT [FK_PositionRole_Position]
 GO
 ALTER TABLE [dbo].[Team]  WITH CHECK ADD  CONSTRAINT [FK_Team_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
