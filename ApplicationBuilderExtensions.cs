@@ -11,6 +11,8 @@ namespace Evoflare.API
     using Microsoft.Extensions.DependencyInjection;
     using Evoflare.API.Models;
     using Microsoft.EntityFrameworkCore.Migrations;
+    using Evoflare.API.Data;
+
     //using Evoflare.API.Data;
 
     public static partial class ApplicationBuilderExtensions
@@ -59,6 +61,12 @@ namespace Evoflare.API
         /// <returns></returns>
         public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application)
         {
+            var baseContext = application
+                .ApplicationServices
+                .GetRequiredService<BaseAppContext>();
+
+            DbInitializer.Initialize(baseContext);
+
             var context = application
                 .ApplicationServices
                 .GetRequiredService<TechnicalEvaluationContext>();
@@ -66,7 +74,7 @@ namespace Evoflare.API
             //context.Database.EnsureCreated();
 
             // Seed data
-            //DbInitializer.Initialize(context);
+            DbInitializer.Initialize(context);
 
             return application;
         }
