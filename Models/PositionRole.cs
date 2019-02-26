@@ -9,5 +9,8 @@ namespace Evoflare.API.Models
         public int PositionId { get; set; }
         public int RoleId { get; set; }
         public DateTime DateTime { get; set; }
+
+        public virtual Position Position { get; set; }
+        public virtual EcfRole Role { get; set; }
     }
 }
