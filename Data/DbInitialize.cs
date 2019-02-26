@@ -1,13 +1,73 @@
-﻿using Evoflare.API.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Data;
 using System.Linq;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using Evoflare.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Data
 {
     public static class DbInitializer
     {
+
+        public static void Initialize(BaseAppContext context)
+        {
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+
+            context.Database.EnsureCreated();
+            if (!context.AppVersion.Any())
+            {
+                context.AppVersion.Add(new CoreAppVersion()
+                {
+                    Name = assemblyName.Name,
+                    Version =  assemblyName.Version.ToString(),
+                    CreationDate = DateTime.Now
+                });
+                context.SaveChanges();
+            }
+        }
+
         public static void Initialize(TechnicalEvaluationContext context)
         {
+            var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
+            if (!Directory.Exists(baseDir)) return;
+
+            //context.Database.Migrate();
+
+            foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
+            {
+                using (var connection = context.Database.GetDbConnection())
+                {
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandText = File.ReadAllText(file, Encoding.UTF8);
+                    command.CommandText = command.CommandText.Replace("CREATE DATABASE", "--");
+                    command.CommandText = command.CommandText.Replace("GO\r\n", "\r\n");
+                    command.CommandText = command.CommandText.Replace("[TechnicalEvaluation]", $"[{connection.Database}]");
+                    command.ExecuteNonQuery();
+                    command.Dispose();
+                }
+
+                //var sqlContentLines = File.ReadAllLines(file, Encoding.UTF8);
+
+                //context.Database.BeginTransaction();
+
+                ////sqlContent.Replace("[TechnicalEvaluation]", $"[{currentDB}]");
+
+                //var insertStatements  = sqlContentLines.Where(e => 
+                //    e.StartsWith("INSERT") ||
+                //    e.Contains("IDENTITY_INSERT"));
+
+                //insertStatements.ToList().ForEach(line => context.Database.ExecuteSqlCommand(line));
+
+                //context.Database.CommitTransaction();
+
+            }
+            /*
             // Look for any Compenetce
             if (!context.Competence.Any())
             {
@@ -210,6 +270,7 @@ namespace Evoflare.API.Data
                 context.Role.AddRange(rolesList);
                 context.SaveChanges();
             }
+            */
         }
     }
 }

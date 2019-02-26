@@ -33,10 +33,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\DbInitialize.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="wwwroot\.well-known\security.txt">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -63,7 +59,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <None Update="Database\init.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

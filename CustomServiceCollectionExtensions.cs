@@ -1,27 +1,26 @@
 namespace Evoflare.API
 {
-    using System;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Reflection;
-    using Evoflare.API.OperationFilters;
-    using Evoflare.API.Options;
     using Boxed.AspNetCore;
     using Boxed.AspNetCore.Swagger;
     using Boxed.AspNetCore.Swagger.OperationFilters;
     using Boxed.AspNetCore.Swagger.SchemaFilters;
     using CorrelationId;
+    using Models;
+    using Evoflare.API.OperationFilters;
+    using Evoflare.API.Options;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.ResponseCompression;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Swagger;
-    using Evoflare.API.Models;
-    using Microsoft.EntityFrameworkCore;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// <see cref="IServiceCollection"/> extension methods which extend ASP.NET Core services.
@@ -29,9 +28,11 @@ namespace Evoflare.API
     public static class CustomServiceCollectionExtensions
     {
 
-        public static IServiceCollection AddMSSqlDatabase(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDatabaseContexts(this IServiceCollection services, IConfiguration configuration)
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            services.AddDbContext<BaseAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<TechnicalEvaluationContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), 
                 // start migration

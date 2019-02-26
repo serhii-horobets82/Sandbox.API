@@ -41,7 +41,7 @@ namespace Evoflare.API
         /// </summary>
         public IServiceProvider ConfigureServices(IServiceCollection services) =>
             services
-                .AddMSSqlDatabase(this.configuration)
+                .AddDatabaseContexts(this.configuration)
                 .AddCorrelationIdFluent()
                 .AddCustomCaching()
                 .AddCustomOptions(this.configuration)
