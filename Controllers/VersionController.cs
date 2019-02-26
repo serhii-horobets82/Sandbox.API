@@ -13,15 +13,26 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
-        public VersionController()
+
+        private readonly BaseAppContext db;
+
+        public VersionController(BaseAppContext db)
         {
+            this.db = db;
         }
 
-        [HttpGet("", Name = "GetVersion")]
+        [HttpGet("", Name = "GetAssemblyVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application.", typeof(string))]
         public string Get()
         {
             return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
+
+        [HttpGet("", Name = "GetAppVersion")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(string))]
+        public async Task<CoreAppVersion> GetAppVersion()
+        {
+            return await db.AppVersion.FirstOrDefaultAsync();
         }
     }
 }
