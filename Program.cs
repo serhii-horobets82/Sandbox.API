@@ -72,9 +72,7 @@ namespace Evoflare.API
             configurationBuilder
                 // Add configuration from the appsettings.json file.
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                // Add configuration from an optional appsettings.development.json, appsettings.staging.json or
-                // appsettings.production.json file, depending on the environment. These settings override the ones in
-                // the appsettings.json file.
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 // This reads the configuration keys from the secret store. This allows you to store connection strings
                 // and other sensitive settings, so you don't have to check them into your source control provider.

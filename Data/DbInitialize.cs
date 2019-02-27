@@ -5,7 +5,9 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using Evoflare.API.Models;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Data
@@ -18,45 +20,56 @@ namespace Evoflare.API.Data
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             var currentVersion = assemblyInfo.Version.ToString();
 
-            // always try creatr empty db
+            // always try to create empty db 
             context.Database.EnsureCreated();
 
             // recreate database - inline function
-            void purgeDB()
+            bool PurgeDb()
             {
                 context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-
-                // initial insert
-                context.AppVersion.Add(new CoreAppVersion()
+                try
                 {
-                    Name = assemblyInfo.Name,
-                    Version = currentVersion,
-                    CreationDate = DateTime.Now
-                });
-                context.SaveChanges();
+                    context.Database.EnsureCreated();
+                }
+                catch
+                {
+                    // Azure issue - need more time to restore :(
+                    Thread.Sleep(60000);
+                    context.Database.EnsureCreated();
+                }
+
+                using (var connection = context.Database.GetDbConnection())
+                {
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
+                    // initial insert
+                    context.AppVersion.Add(new CoreAppVersion()
+                    {
+                        Name = assemblyInfo.Name,
+                        Version = currentVersion,
+                        CreationDate = DateTime.Now,
+                        Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
+                    });
+                    context.SaveChanges();
+                }
+                return true;
             }
 
-            var recordsCount = 0;
-            // check table existance 
+            // check table existence and compare ve
             try
             {
-                recordsCount = context.AppVersion.Count();
+                var databaseVersion = context.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
+                if (databaseVersion != currentVersion)
+                {
+                    return PurgeDb();
+                }
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 208) // "Invalid object name 'AppVersion'."
+                if (ex.Number == 208 || ex.Number == 207) // "Invalid object name 'AppVersion'." or "Invalid column name 'Database'."
                 {
-                    purgeDB();
-                    return true;
+                    return PurgeDb();
                 }
-            }
-
-            // check version in database, if old - recreate database 
-            if (recordsCount == 0 || context.AppVersion.AsNoTracking().FirstOrDefault().Version != currentVersion)
-            {
-                purgeDB();
-                return true;
             }
             return false;
         }
@@ -77,6 +90,7 @@ namespace Evoflare.API.Data
                     var sql = File.ReadAllText(file, Encoding.UTF8);
                     sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
                     sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
+                    sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
                     sql = sql.Replace("[TechnicalEvaluation]", $"[{connection.Database}]"); // replace database name 
 
                     command.CommandText = sql;
