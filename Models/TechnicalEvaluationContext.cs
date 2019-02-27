@@ -15,6 +15,7 @@ namespace Evoflare.API.Models
         {
         }
 
+        public virtual DbSet<AppVersion> AppVersion { get; set; }
         public virtual DbSet<EcfCompetence> EcfCompetence { get; set; }
         public virtual DbSet<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
         public virtual DbSet<EcfEvaluation> EcfEvaluation { get; set; }
@@ -42,6 +43,13 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+
+            modelBuilder.Entity<AppVersion>(entity =>
+            {
+                entity.HasKey(e => e.Name);
+
+                entity.Property(e => e.Name).ValueGeneratedNever();
+            });
 
             modelBuilder.Entity<EcfCompetence>(entity =>
             {
@@ -176,7 +184,6 @@ namespace Evoflare.API.Models
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.EmployeeRelationsEmployee)
                     .HasForeignKey(d => d.EmployeeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeeRelations_Employee");
 
                 entity.HasOne(d => d.Manager)

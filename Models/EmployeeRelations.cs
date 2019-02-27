@@ -11,7 +11,7 @@ namespace Evoflare.API.Models
         }
 
         public int Id { get; set; }
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
         public int? ManagerId { get; set; }
         public int? TeamId { get; set; }
         public int? ProjectId { get; set; }
