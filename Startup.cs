@@ -1,3 +1,5 @@
+using Evoflare.API.Auth;
+
 namespace Evoflare.API
 {
     using System;
@@ -52,6 +54,8 @@ namespace Evoflare.API
                 .AddCustomHealthChecks()
                 .AddCustomSwagger()
                 .AddHttpContextAccessor()
+                // Add JSON Web Token factory
+                .AddSingleton<IJwtFactory, JwtFactory>()
                 // Add useful interface for accessing the ActionContext outside a controller.
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
                 // Add useful interface for accessing the IUrlHelper outside a controller.
@@ -60,6 +64,7 @@ namespace Evoflare.API
                     .GetUrlHelper(x.GetRequiredService<IActionContextAccessor>().ActionContext))
                 .AddCustomApiVersioning()
                 .AddVersionedApiExplorer(x => x.GroupNameFormat = "'v'VVV") // Version format: 'v'major[.minor][-status]
+                .AddCustomAuthentication(this.configuration)
                 .AddMvcCore()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                     .AddApiExplorer()

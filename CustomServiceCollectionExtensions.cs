@@ -1,46 +1,135 @@
+using System;
+using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using Boxed.AspNetCore;
+using Boxed.AspNetCore.Swagger;
+using Boxed.AspNetCore.Swagger.OperationFilters;
+using Boxed.AspNetCore.Swagger.SchemaFilters;
+using CorrelationId;
+using Evoflare.API.Auth;
+using Evoflare.API.Auth.Models;
+using Evoflare.API.Models;
+using Evoflare.API.OperationFilters;
+using Evoflare.API.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
+
 namespace Evoflare.API
 {
-    using Boxed.AspNetCore;
-    using Boxed.AspNetCore.Swagger;
-    using Boxed.AspNetCore.Swagger.OperationFilters;
-    using Boxed.AspNetCore.Swagger.SchemaFilters;
-    using CorrelationId;
-    using Models;
-    using Evoflare.API.OperationFilters;
-    using Evoflare.API.Options;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.AspNetCore.ResponseCompression;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Caching.Distributed;
-    using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-    using Swashbuckle.AspNetCore.Swagger;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Reflection;
-
     /// <summary>
-    /// <see cref="IServiceCollection"/> extension methods which extend ASP.NET Core services.
+    ///     <see cref="IServiceCollection" /> extension methods which extend ASP.NET Core services.
     /// </summary>
     public static class CustomServiceCollectionExtensions
     {
-
-        public static IServiceCollection AddDatabaseContexts(this IServiceCollection services, IConfiguration configuration, string connectionName = "DefaultConnection")
+        public static IServiceCollection AddDatabaseContexts(this IServiceCollection services,
+            IConfiguration configuration, string connectionName = "DefaultConnection")
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName();
-            services.AddDbContext<BaseAppContext>(options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
+
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+                configuration.GetConnectionString(connectionName),
                 sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
 
             services.AddDbContext<TechnicalEvaluationContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
-                // start migration
-                optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
-                );
+                    // start migration
+                    optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
+            );
             return services;
         }
+
+        //AddCustomAuthentication
+
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
+            const string secretKey = "SecretKey"; 
+            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+
+            // Configure JwtIssuerOptions
+            services.Configure<JwtIssuerOptions>(options =>
+            {
+                options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
+                options.SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            });
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
+
+                ValidateAudience = true,
+                ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = signingKey,
+
+                RequireExpirationTime = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(configureOptions =>
+            {
+                configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                configureOptions.TokenValidationParameters = tokenValidationParameters;
+                configureOptions.SaveToken = true;
+            });
+
+            // api user claim policy
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Auth.Constants.Strings.JwtClaimIdentifiers.Rol, Auth.Constants.Strings.JwtClaims.ApiAccess));
+            });
+
+            // add identity
+            //var builder = services.AddIdentityCore<ApplicationUser>(o =>
+            //{
+            //    // configure identity options
+            //    o.Password.RequireDigit = false;
+            //    o.Password.RequireLowercase = false;
+            //    o.Password.RequireUppercase = false;
+            //    o.Password.RequireNonAlphanumeric = false;
+            //    o.Password.RequiredLength = 6;
+            //});
+            //builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
+            //builder.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+                {
+                    // configure identity options
+                    o.Password.RequireDigit = false;
+                    o.Password.RequireLowercase = false;
+                    o.Password.RequireUppercase = false;
+                    o.Password.RequireNonAlphanumeric = false;
+                    o.Password.RequiredLength = 6;
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            return services;
+        }
+
 
         public static IServiceCollection AddCorrelationIdFluent(this IServiceCollection services)
         {
@@ -49,19 +138,21 @@ namespace Evoflare.API
         }
 
         /// <summary>
-        /// Configures caching for the application. Registers the <see cref="IDistributedCache"/> and
-        /// <see cref="IMemoryCache"/> types with the services collection or IoC container. The
-        /// <see cref="IDistributedCache"/> is intended to be used in cloud hosted scenarios where there is a shared
-        /// cache, which is shared between multiple instances of the application. Use the <see cref="IMemoryCache"/>
-        /// otherwise.
+        ///     Configures caching for the application. Registers the <see cref="IDistributedCache" /> and
+        ///     <see cref="IMemoryCache" /> types with the services collection or IoC container. The
+        ///     <see cref="IDistributedCache" /> is intended to be used in cloud hosted scenarios where there is a shared
+        ///     cache, which is shared between multiple instances of the application. Use the <see cref="IMemoryCache" />
+        ///     otherwise.
         /// </summary>
-        public static IServiceCollection AddCustomCaching(this IServiceCollection services) =>
-            services
+        public static IServiceCollection AddCustomCaching(this IServiceCollection services)
+        {
+            return services
                 // Adds IMemoryCache which is a simple in-memory cache.
                 .AddMemoryCache()
                 // Adds IDistributedCache which is a distributed cache shared between multiple servers. This adds a
                 // default implementation of IDistributedCache which is not distributed. See below:
                 .AddDistributedMemoryCache();
+        }
         // Uncomment the following line to use the Redis implementation of IDistributedCache. This will
         // override any previously registered IDistributedCache service.
         // Redis is a very fast cache provider and the recommended distributed cache provider.
@@ -78,60 +169,70 @@ namespace Evoflare.API
         //     });
 
         /// <summary>
-        /// Configures the settings by binding the contents of the appsettings.json file to the specified Plain Old CLR
-        /// Objects (POCO) and adding <see cref="IOptions{T}"/> objects to the services collection.
+        ///     Configures the settings by binding the contents of the appsettings.json file to the specified Plain Old CLR
+        ///     Objects (POCO) and adding <see cref="IOptions{TOptions}" /> objects to the services collection.
         /// </summary>
         public static IServiceCollection AddCustomOptions(
             this IServiceCollection services,
-            IConfiguration configuration) =>
-            services
+            IConfiguration configuration)
+        {
+            return services
                 // ConfigureSingleton registers IOptions<T> and also T as a singleton to the services collection.
                 .ConfigureAndValidateSingleton<ApplicationOptions>(configuration)
-                .ConfigureAndValidateSingleton<CompressionOptions>(configuration.GetSection(nameof(ApplicationOptions.Compression)))
-                .ConfigureAndValidateSingleton<ForwardedHeadersOptions>(configuration.GetSection(nameof(ApplicationOptions.ForwardedHeaders)))
-                .ConfigureAndValidateSingleton<CacheProfileOptions>(configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)));
+                .ConfigureAndValidateSingleton<CompressionOptions>(
+                    configuration.GetSection(nameof(ApplicationOptions.Compression)))
+                .ConfigureAndValidateSingleton<ForwardedHeadersOptions>(
+                    configuration.GetSection(nameof(ApplicationOptions.ForwardedHeaders)))
+                .ConfigureAndValidateSingleton<CacheProfileOptions>(
+                    configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)));
+        }
 
         /// <summary>
-        /// Adds dynamic response compression to enable GZIP compression of responses. This is turned off for HTTPS
-        /// requests by default to avoid the BREACH security vulnerability.
+        ///     Adds dynamic response compression to enable GZIP compression of responses. This is turned off for HTTPS
+        ///     requests by default to avoid the BREACH security vulnerability.
         /// </summary>
-        public static IServiceCollection AddCustomResponseCompression(this IServiceCollection services) =>
-            services
+        public static IServiceCollection AddCustomResponseCompression(this IServiceCollection services)
+        {
+            return services
                 .AddResponseCompression(
                     options =>
                     {
                         // Add additional MIME types (other than the built in defaults) to enable GZIP compression for.
                         var customMimeTypes = services
-                            .BuildServiceProvider()
-                            .GetRequiredService<CompressionOptions>()
-                            .MimeTypes ?? Enumerable.Empty<string>();
+                                                  .BuildServiceProvider()
+                                                  .GetRequiredService<CompressionOptions>()
+                                                  .MimeTypes ?? Enumerable.Empty<string>();
                         options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(customMimeTypes);
                     })
                 .Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+        }
 
         /// <summary>
-        /// Add custom routing settings which determines how URL's are generated.
+        ///     Add custom routing settings which determines how URL's are generated.
         /// </summary>
-        public static IServiceCollection AddCustomRouting(this IServiceCollection services) =>
-            services.AddRouting(
+        public static IServiceCollection AddCustomRouting(this IServiceCollection services)
+        {
+            return services.AddRouting(
                 options =>
                 {
                     // All generated URL's should be lower-case.
                     options.LowercaseUrls = true;
                 });
+        }
 
         /// <summary>
-        /// Adds the Strict-Transport-Security HTTP header to responses. This HTTP header is only relevant if you are
-        /// using TLS. It ensures that content is loaded over HTTPS and refuses to connect in case of certificate
-        /// errors and warnings.
-        /// See https://developer.mozilla.org/en-US/docs/Web/Security/HTTP_strict_transport_security and
-        /// http://www.troyhunt.com/2015/06/understanding-http-strict-transport.html
-        /// Note: Including subdomains and a minimum maxage of 18 weeks is required for preloading.
-        /// Note: You can refer to the following article to clear the HSTS cache in your browser:
-        /// http://classically.me/blogs/how-clear-hsts-settings-major-browsers
+        ///     Adds the Strict-Transport-Security HTTP header to responses. This HTTP header is only relevant if you are
+        ///     using TLS. It ensures that content is loaded over HTTPS and refuses to connect in case of certificate
+        ///     errors and warnings.
+        ///     See https://developer.mozilla.org/en-US/docs/Web/Security/HTTP_strict_transport_security and
+        ///     http://www.troyhunt.com/2015/06/understanding-http-strict-transport.html
+        ///     Note: Including subdomains and a minimum maxage of 18 weeks is required for preloading.
+        ///     Note: You can refer to the following article to clear the HSTS cache in your browser:
+        ///     http://classically.me/blogs/how-clear-hsts-settings-major-browsers
         /// </summary>
-        public static IServiceCollection AddCustomStrictTransportSecurity(this IServiceCollection services) =>
-            services
+        public static IServiceCollection AddCustomStrictTransportSecurity(this IServiceCollection services)
+        {
+            return services
                 .AddHsts(
                     options =>
                     {
@@ -140,26 +241,32 @@ namespace Evoflare.API
                         // options.MaxAge = TimeSpan.FromSeconds(31536000); // 1 Year
                         // options.Preload = true;
                     });
+        }
 
-        public static IServiceCollection AddCustomHealthChecks(this IServiceCollection services) =>
-            services
+        public static IServiceCollection AddCustomHealthChecks(this IServiceCollection services)
+        {
+            return services
                 .AddHealthChecks()
                 // Add health checks for external dependencies here. See https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
                 .Services;
+        }
 
-        public static IServiceCollection AddCustomApiVersioning(this IServiceCollection services) =>
-            services.AddApiVersioning(
+        public static IServiceCollection AddCustomApiVersioning(this IServiceCollection services)
+        {
+            return services.AddApiVersioning(
                 options =>
                 {
                     options.AssumeDefaultVersionWhenUnspecified = true;
                     options.ReportApiVersions = true;
                 });
+        }
 
         /// <summary>
-        /// Adds Swagger services and configures the Swagger services.
+        ///     Adds Swagger services and configures the Swagger services.
         /// </summary>
-        public static IServiceCollection AddCustomSwagger(this IServiceCollection services) =>
-            services.AddSwaggerGen(
+        public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
+        {
+            return services.AddSwaggerGen(
                 options =>
                 {
                     var assembly = typeof(Startup).Assembly;
@@ -185,17 +292,17 @@ namespace Evoflare.API
                     var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
                     foreach (var apiVersionDescription in provider.ApiVersionDescriptions)
                     {
-                        var info = new Info()
+                        var info = new Info
                         {
                             Title = assemblyProduct,
-                            Description = apiVersionDescription.IsDeprecated ?
-                                $"{assemblyDescription} This API version has been deprecated." :
-                                assemblyDescription,
-                            Version = apiVersionDescription.ApiVersion.ToString(),
+                            Description = apiVersionDescription.IsDeprecated
+                                ? $"{assemblyDescription} This API version has been deprecated."
+                                : assemblyDescription,
+                            Version = apiVersionDescription.ApiVersion.ToString()
                         };
                         options.SwaggerDoc(apiVersionDescription.GroupName, info);
                     }
                 });
-
+        }
     }
 }

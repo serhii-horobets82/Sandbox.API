@@ -1,3 +1,5 @@
+using Evoflare.API.Auth.Models;
+
 namespace Evoflare.API
 {
     using System;
@@ -61,12 +63,15 @@ namespace Evoflare.API
         /// <returns></returns>
         public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application)
         {
-            var baseContext = application
-                .ApplicationServices
-                .GetRequiredService<BaseAppContext>();
+            // Application context
+            DbInitializer.Initialize(application.ApplicationServices);
+
+            //var baseContext = application
+            //    .ApplicationServices
+            //    .GetRequiredService<BaseAppContext>();
 
             // Basic seed data, return true, if database was recreated
-            if (DbInitializer.Initialize(baseContext))
+            //if (DbInitializer.Initialize(baseContext))
             {
                 var context = application
                     .ApplicationServices
@@ -75,6 +80,8 @@ namespace Evoflare.API
                 // Seed data for TechnicalEvaluation
                 DbInitializer.Initialize(context);
             }
+
+            
 
             return application;
         }
