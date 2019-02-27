@@ -28,13 +28,14 @@ namespace Evoflare.API
     public static class CustomServiceCollectionExtensions
     {
 
-        public static IServiceCollection AddDatabaseContexts(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDatabaseContexts(this IServiceCollection services, IConfiguration configuration, string connectionName = "DefaultConnection")
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName();
-            services.AddDbContext<BaseAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BaseAppContext>(options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
+                sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
 
             services.AddDbContext<TechnicalEvaluationContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), 
+                options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
                 // start migration
                 optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
                 );
