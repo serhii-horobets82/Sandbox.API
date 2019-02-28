@@ -130,7 +130,7 @@ namespace Evoflare.API.Data
                 catch
                 {
                     // Azure issue - need more time to restore :(
-                    Thread.Sleep(30000);
+                    Thread.Sleep(60000);
                     applicationContext.Database.EnsureCreated();
                 }
             }
