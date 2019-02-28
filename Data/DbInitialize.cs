@@ -89,48 +89,82 @@ namespace Evoflare.API.Data
         public static void Initialize(IServiceProvider serviceProvider)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            // version of assembly, format x.y.z.w  
             var currentVersion = assemblyInfo.Version.ToString();
+            // version in database table AppVersion
+            var previousVersion = string.Empty;
 
+            // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
+            // check database for existence and initial creation
             applicationContext.Database.EnsureCreated();
 
-            
-
-            if (!applicationContext.Roles.Any())
+            var updateMode = false;
+            var recreateDatabase = false;
+            // check core table for records, if exist - get previous version  
+            try
             {
-                CreateRole(serviceProvider, AdminRoleName);
-                CreateRole(serviceProvider, ManagerRoleName);
+                updateMode = applicationContext.AppVersion.Any();
+                if (updateMode)
+                    previousVersion = applicationContext.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
+            }
+            catch
+            {
+                // if smth wrong - init database from scatch
+                recreateDatabase = true;
             }
 
-            if (!applicationContext.Users.Any())
+            if (!recreateDatabase)
             {
-                var userEmail = "admin@evoflare.com";
-                var userFirstName = "Super";
-                var userLastName = "Admin";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName);
+                // check for roles
+                if (!applicationContext.Roles.Any())
+                {
+                    CreateRole(serviceProvider, AdminRoleName);
+                    CreateRole(serviceProvider, ManagerRoleName);
+                }
 
-                userEmail = "manager@evoflare.com";
-                userFirstName = "Local";
-                userLastName = "Manager";
+                // check for users
+                if (!applicationContext.Users.Any())
+                {
+                    var userEmail = "admin@evoflare.com";
+                    var userFirstName = "Super";
+                    var userLastName = "Admin";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName, userLastName);
+                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName);
 
-                userEmail = "user@evoflare.com";
-                userFirstName = "Typical";
-                userLastName = "User";
+                    userEmail = "manager@evoflare.com";
+                    userFirstName = "Local";
+                    userLastName = "Manager";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName);
+                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName,
+                        userLastName);
+
+                    userEmail = "user@evoflare.com";
+                    userFirstName = "Typical";
+                    userLastName = "User";
+
+                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName);
+                }
             }
-
-            // Finish action
-            if (!applicationContext.AppVersion.Any())
+            // if version different - recreate business data with sql 
+            if (previousVersion != currentVersion)
             {
+                //var dataContext = serviceProvider.GetRequiredService<TechnicalEvaluationContext>();
                 using (var connection = applicationContext.Database.GetDbConnection())
                 {
                     if (connection.State != ConnectionState.Open)
                         connection.Open();
+                    var command = connection.CreateCommand();
+
+                    if (recreateDatabase)
+                    {
+                        // drop schema 
+                        command.CommandText = "DROP SCHEMA IF EXISTS dbo";
+                        command.ExecuteNonQuery();
+                    }
+
                     // initial insert
                     applicationContext.AppVersion.Add(new AppVersion
                     {
@@ -140,6 +174,36 @@ namespace Evoflare.API.Data
                         Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
                     });
                     applicationContext.SaveChanges();
+
+                    #region  Process with sql files
+
+                    // directory with sql files (copied to release folder)
+                    var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
+
+                    foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
+                    {
+                        
+
+                        
+
+                        var sql = File.ReadAllText(file, Encoding.UTF8);
+                        sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
+                        sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
+                        sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
+                        sql = sql.Replace("[TechnicalEvaluation]", $"[{connection.Database}]"); // replace database name 
+
+                        command.CommandText = sql;
+                        try
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                        catch (SqlException ex)
+                        {
+                            if (ex.Number != 2714) // "There is already an object named ..
+                                throw;
+                        }
+                    }
+                    #endregion
                 }
             }
         }
@@ -188,7 +252,7 @@ namespace Evoflare.API.Data
             // check table existence and compare ve
             try
             {
-                var databaseVersion = "";//context.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
+                var databaseVersion = ""; //context.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
                 if (databaseVersion != currentVersion) return PurgeDb();
             }
             catch (SqlException ex)

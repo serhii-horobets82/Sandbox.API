@@ -20,6 +20,9 @@ namespace Evoflare.API.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Configure default schema
+            modelBuilder.HasDefaultSchema("core");
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<AppVersion>()
