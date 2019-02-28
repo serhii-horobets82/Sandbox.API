@@ -24,7 +24,7 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public IEnumerable<Employee> GetEmployee()
         {
-            return _context.Employee;
+            return _context.Employee.Include(e => e.EmployeeType);
         }
 
         [HttpGet("managers")]
@@ -48,7 +48,9 @@ namespace Evoflare.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var employee = await _context.Employee.FindAsync(id);
+            var employee = await _context.Employee
+                .Include(e => e.EmployeeType)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
             if (employee == null)
             {
@@ -72,6 +74,7 @@ namespace Evoflare.API.Controllers
                 return BadRequest();
             }
 
+            employee.IsManager = employee.EmployeeTypeId == 6;
             _context.Entry(employee).State = EntityState.Modified;
 
             try
@@ -102,6 +105,8 @@ namespace Evoflare.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            employee.IsManager = employee.EmployeeTypeId == 6;
+            employee.OrganizationId = 1;
             _context.Employee.Add(employee);
             await _context.SaveChangesAsync();
 

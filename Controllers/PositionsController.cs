@@ -64,6 +64,8 @@ namespace Evoflare.API.Controllers
                 return BadRequest();
             }
 
+            position.UpdatedBy = 1;
+            position.UpdatedDate = DateTime.UtcNow;
             _context.Entry(position).State = EntityState.Modified;
 
             try

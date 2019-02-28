@@ -91,6 +91,8 @@ namespace Evoflare.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            project.OrganizationId = 1;
+            
             _context.Project.Add(project);
             await _context.SaveChangesAsync();
 

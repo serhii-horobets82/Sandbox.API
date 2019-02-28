@@ -81,6 +81,8 @@ namespace Evoflare.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
+            team.OrganizationId = 1;
+           
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 
