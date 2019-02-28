@@ -171,12 +171,6 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.PositionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeePosition_Position");
-
-                entity.HasOne(d => d.Relation)
-                    .WithMany(p => p.EmployeePosition)
-                    .HasForeignKey(d => d.RelationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmployeePosition_EmployeeRelations");
             });
 
             modelBuilder.Entity<EmployeeRelations>(entity =>
@@ -196,6 +190,11 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeeRelations_Organization");
+
+                entity.HasOne(d => d.Position)
+                    .WithMany(p => p.EmployeeRelations)
+                    .HasForeignKey(d => d.PositionId)
+                    .HasConstraintName("FK_EmployeeRelations_Position");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.EmployeeRelations)

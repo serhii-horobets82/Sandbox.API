@@ -1,11 +1,11 @@
 USE [master]
 GO
-/****** Object:  Database [TechnicalEvaluation]    Script Date: 27.02.2019 11:07:36 ******/
+/****** Object:  Database [TechnicalEvaluation]    Script Date: 01.03.2019 0:12:04 ******/
 CREATE DATABASE [TechnicalEvaluation]
 GO
 USE [TechnicalEvaluation]
 GO
-/****** Object:  Table [dbo].[AppVersion]    Script Date: 27.02.2019 11:07:36 ******/
+/****** Object:  Table [dbo].[AppVersion]    Script Date: 01.03.2019 0:12:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,7 +20,7 @@ CREATE TABLE [dbo].[AppVersion](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,7 +35,7 @@ CREATE TABLE [dbo].[EcfCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -51,7 +51,7 @@ CREATE TABLE [dbo].[EcfCompetenceLevel](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -67,7 +67,7 @@ CREATE TABLE [dbo].[EcfEvaluation](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRole]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EcfRole]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -84,7 +84,7 @@ CREATE TABLE [dbo].[EcfRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -100,7 +100,7 @@ CREATE TABLE [dbo].[EcfRoleCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Employee]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[Employee]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -118,7 +118,7 @@ CREATE TABLE [dbo].[Employee](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -135,7 +135,7 @@ CREATE TABLE [dbo].[EmployeeEvaluation](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeePosition]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EmployeePosition]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -152,7 +152,7 @@ CREATE TABLE [dbo].[EmployeePosition](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -163,6 +163,7 @@ CREATE TABLE [dbo].[EmployeeRelations](
 	[ManagerId] [int] NULL,
 	[TeamId] [int] NULL,
 	[ProjectId] [int] NULL,
+	[PositionId] [int] NULL,
 	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_EmployeeRelations] PRIMARY KEY CLUSTERED 
 (
@@ -170,7 +171,7 @@ CREATE TABLE [dbo].[EmployeeRelations](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeType]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[EmployeeType]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -184,7 +185,7 @@ CREATE TABLE [dbo].[EmployeeType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Organization]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[Organization]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -198,7 +199,7 @@ CREATE TABLE [dbo].[Organization](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Position]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[Position]    Script Date: 01.03.2019 0:12:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -218,7 +219,7 @@ CREATE TABLE [dbo].[Position](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PositionRole]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[PositionRole]    Script Date: 01.03.2019 0:12:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -234,7 +235,7 @@ CREATE TABLE [dbo].[PositionRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Project]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[Project]    Script Date: 01.03.2019 0:12:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -249,7 +250,7 @@ CREATE TABLE [dbo].[Project](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Team]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Table [dbo].[Team]    Script Date: 01.03.2019 0:12:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -945,13 +946,23 @@ INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [Organiz
 GO
 INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp]) VALUES (18, NULL, 0, 2, 1, N'Mila Developer')
 GO
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp]) VALUES (21, NULL, 0, 2, 1, N'Alex Took')
+GO
 SET IDENTITY_INSERT [dbo].[Employee] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeRelations] ON 
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [OrganizationId]) VALUES (1, NULL, 1, 1, 1, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (1, NULL, 1, 1, 1, NULL, 1)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [OrganizationId]) VALUES (2, 6, NULL, 1, 1, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (2, 6, NULL, 1, 1, NULL, 1)
+GO
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (3, 21, NULL, 4, 1, 2, 1)
+GO
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (4, 12, NULL, 4, 1, 1, 1)
+GO
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (5, NULL, 10, 5, 2, NULL, 1)
+GO
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (6, 18, NULL, 5, 2, 2, 1)
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeRelations] OFF
 GO
@@ -1021,9 +1032,13 @@ INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (2, N'S
 GO
 INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (3, N'Usual team 1', 2, 1)
 GO
+INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (4, N'First ui team', 1, 1)
+GO
+INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (5, N'Second ui team', 2, 1)
+GO
 SET IDENTITY_INSERT [dbo].[Team] OFF
 GO
-/****** Object:  Index [IX_Role]    Script Date: 27.02.2019 11:07:37 ******/
+/****** Object:  Index [IX_Role]    Script Date: 01.03.2019 0:12:06 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Role] ON [dbo].[EcfRole]
 (
 	[RoleId] ASC
@@ -1070,11 +1085,6 @@ REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_Employee]
 GO
-ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_EmployeeRelations] FOREIGN KEY([RelationId])
-REFERENCES [dbo].[EmployeeRelations] ([Id])
-GO
-ALTER TABLE [dbo].[EmployeePosition] CHECK CONSTRAINT [FK_EmployeePosition_EmployeeRelations]
-GO
 ALTER TABLE [dbo].[EmployeePosition]  WITH CHECK ADD  CONSTRAINT [FK_EmployeePosition_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
 GO
@@ -1099,6 +1109,11 @@ ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRe
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeRelations] CHECK CONSTRAINT [FK_EmployeeRelations_Organization]
+GO
+ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRelations_Position] FOREIGN KEY([PositionId])
+REFERENCES [dbo].[Position] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeRelations] CHECK CONSTRAINT [FK_EmployeeRelations_Position]
 GO
 ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRelations_Project] FOREIGN KEY([ProjectId])
 REFERENCES [dbo].[Project] ([Id])

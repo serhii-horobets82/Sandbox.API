@@ -32,11 +32,12 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<Team>> GetTeam(int id)
         {
             var team = await _context.Team
-                .Include(t => t.EmployeeRelations).ThenInclude(r => r.Manager)
-                .Include(t => t.EmployeeRelations).ThenInclude(r => r.Employee)
                 .Include(t => t.EmployeeRelations)
-                    .ThenInclude(r => r.EmployeePosition)
-                        .ThenInclude(ep => ep.Position)
+                //.Include(t => t.EmployeeRelations).ThenInclude(r => r.Manager)
+                //.Include(t => t.EmployeeRelations).ThenInclude(r => r.Employee)
+                //.Include(t => t.EmployeeRelations)
+                //    .ThenInclude(r => r.EmployeePosition)
+                //        .ThenInclude(ep => ep.Position)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (team == null)
@@ -56,7 +57,19 @@ namespace Evoflare.API.Controllers
                 return BadRequest();
             }
 
+            team.OrganizationId = 1;
+            foreach (var item in team.EmployeeRelations)
+            {
+                item.OrganizationId = 1;
+            }
             _context.Entry(team).State = EntityState.Modified;
+            //foreach (var item in team.EmployeeRelations)
+            //{
+            //    if (item.Id != 0)
+            //    {
+
+            //    }
+            //}
 
             try
             {
@@ -82,7 +95,10 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
             team.OrganizationId = 1;
-           
+            foreach (var item in team.EmployeeRelations)
+            {
+                item.OrganizationId = 1;
+            }
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 

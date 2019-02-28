@@ -14,6 +14,5 @@ namespace Evoflare.API.Models
         public virtual Employee Employee { get; set; }
         public virtual Organization Organization { get; set; }
         public virtual Position Position { get; set; }
-        public virtual EmployeeRelations Relation { get; set; }
     }
 }

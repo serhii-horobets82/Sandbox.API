@@ -22,7 +22,66 @@ namespace Evoflare.API.Controllers
 
         // GET: api/Positions
         [HttpGet]
-        public IEnumerable<Position> GetPosition()
+        public async Task<IEnumerable<Position>> GetPosition()
+        {
+            var positions = await _context.Position
+                .Select(p => new Position
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    PositionRole = p.PositionRole.Select(pr => new PositionRole
+                    {
+                        Id = pr.Id,
+                        RoleId = pr.RoleId,
+                        Role = new EcfRole
+                        {
+                            Id = pr.Role.Id,
+                            Name = pr.Role.Name,
+                            Summary = pr.Role.Summary,
+                            Description = pr.Role.Description,
+                            EcfRoleCompetence = pr.Role.EcfRoleCompetence.Select(c => new EcfRoleCompetence
+                            {
+                                Id = c.Id,
+                                CompetenceId = c.CompetenceId,
+                                CompetenceLevel = c.CompetenceLevel,
+                                Competence = new EcfCompetence
+                                {
+                                    Id = c.Competence.Id,
+                                    Name = c.Competence.Name,
+                                    Summary = c.Competence.Summary
+                                }
+                            }).ToList()
+                        }
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            //var positions = await _context.Position
+            //    .Include(position => position.PositionRole)
+            //        .ThenInclude(positionRole => positionRole.Role)
+            //    .ToListAsync();
+
+            //var roleCompetence = await _context.EcfRoleCompetence
+            //    .Include(role => role.Competence)
+            //    .ToListAsync();
+            //positions.ForEach(position =>
+            //{
+            //    foreach (var role in position.PositionRole)
+            //    {
+            //        role.
+            //    }
+            //});
+            
+            return positions;
+            //return _context.Position
+            //    .Include(position => position.PositionRole)
+            //        .ThenInclude(positionRole => positionRole.Role)
+            //        .ThenInclude(role => role.EcfRoleCompetence)
+            //        .ThenInclude(roleCompetence => roleCompetence.Competence);
+        }
+
+        [HttpGet("/simple")]
+        public IEnumerable<Position> GetPositionSimple()
         {
             return _context.Position
                 .Include(position => position.PositionRole)
