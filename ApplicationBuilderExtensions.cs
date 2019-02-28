@@ -1,17 +1,16 @@
 namespace Evoflare.API
 {
+    using Boxed.AspNetCore;
+    using Evoflare.API.Constants;
+    using Evoflare.API.Data;
+    using Evoflare.API.Options;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Linq;
     using System.Reflection;
-    using Evoflare.API.Constants;
-    using Evoflare.API.Options;
-    using Boxed.AspNetCore;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.Extensions.DependencyInjection;
-    using Evoflare.API.Models;
-    using Microsoft.EntityFrameworkCore.Migrations;
-    using Evoflare.API.Data;
 
     //using Evoflare.API.Data;
 
@@ -58,23 +57,11 @@ namespace Evoflare.API
         /// Creating new Database 
         /// </summary>
         /// <param name="application"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application)
+        public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application, IConfiguration configuration)
         {
-            var baseContext = application
-                .ApplicationServices
-                .GetRequiredService<BaseAppContext>();
-
-            // Basic seed data, return true, if database was recreated
-            if (DbInitializer.Initialize(baseContext))
-            {
-                var context = application
-                    .ApplicationServices
-                    .GetRequiredService<TechnicalEvaluationContext>();
-
-                // Seed data for TechnicalEvaluation
-                DbInitializer.Initialize(context);
-            }
+            DbInitializer.Initialize(application.ApplicationServices, configuration);
 
             return application;
         }

@@ -13,10 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
+        private readonly ApplicationDbContext db;
 
-        private readonly BaseAppContext db;
-
-        public VersionController(BaseAppContext db)
+        public VersionController(ApplicationDbContext db)
         {
             this.db = db;
         }
@@ -30,7 +29,7 @@ namespace Evoflare.API.Controllers
 
         [HttpGet(Name = "GetAppVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(string))]
-        public async Task<CoreAppVersion> GetAppVersion()
+        public async Task<AppVersion> GetAppVersion()
         {
             return await db.AppVersion.FirstOrDefaultAsync();
         }
