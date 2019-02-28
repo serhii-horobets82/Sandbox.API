@@ -10,6 +10,7 @@ using Evoflare.API.Auth.Models;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evoflare.API.Data
@@ -86,7 +87,7 @@ namespace Evoflare.API.Data
             }
         }
 
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             // version of assembly, format x.y.z.w  
@@ -100,71 +101,80 @@ namespace Evoflare.API.Data
             // check database for existence and initial creation
             applicationContext.Database.EnsureCreated();
 
-            var updateMode = false;
-            var recreateDatabase = false;
+            var recreateDatabase = configuration.GetValue("Common:RecreatDbOnStart", false);
             // check core table for records, if exist - get previous version  
             try
             {
-                updateMode = applicationContext.AppVersion.Any();
-                if (updateMode)
+                if (applicationContext.AppVersion.Any())
                     previousVersion = applicationContext.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
             }
             catch
             {
-                // if smth wrong - init database from scatch
+                // if something wrong - init database from scatch
                 recreateDatabase = true;
             }
 
-            if (!recreateDatabase)
+            if (recreateDatabase)
             {
-
-                // check for roles
-                if (!applicationContext.Roles.Any())
+                // drop database
+                applicationContext.Database.EnsureDeleted();
+                try
                 {
-                    CreateRole(serviceProvider, AdminRoleName);
-                    CreateRole(serviceProvider, ManagerRoleName);
+                    // and create again
+                    applicationContext.Database.EnsureCreated();
                 }
-
-                // check for users
-                if (!applicationContext.Users.Any())
+                catch
                 {
-                    var userEmail = "admin@evoflare.com";
-                    var userFirstName = "Super";
-                    var userLastName = "Admin";
-
-                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName);
-
-                    userEmail = "manager@evoflare.com";
-                    userFirstName = "Local";
-                    userLastName = "Manager";
-
-                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName,
-                        userLastName);
-
-                    userEmail = "user@evoflare.com";
-                    userFirstName = "Typical";
-                    userLastName = "User";
-
-                    AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName);
+                    // Azure issue - need more time to restore :(
+                    Thread.Sleep(30000);
+                    applicationContext.Database.EnsureCreated();
                 }
             }
-            // if version different - recreate business data with sql 
-            if (previousVersion != currentVersion)
+
+            // check for roles
+            if (!applicationContext.Roles.Any())
             {
-                //var dataContext = serviceProvider.GetRequiredService<TechnicalEvaluationContext>();
+                CreateRole(serviceProvider, AdminRoleName);
+                CreateRole(serviceProvider, ManagerRoleName);
+            }
+
+            // check for users
+            if (!applicationContext.Users.Any())
+            {
+                var userEmail = "admin@evoflare.com";
+                var userFirstName = "Super";
+                var userLastName = "Admin";
+
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName);
+
+                userEmail = "manager@evoflare.com";
+                userFirstName = "Local";
+                userLastName = "Manager";
+
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName,
+                    userLastName);
+
+                userEmail = "user@evoflare.com";
+                userFirstName = "Typical";
+                userLastName = "User";
+
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName);
+            }
+
+            // if version different - recreate business data with sql 
+            if (previousVersion != currentVersion || recreateDatabase)  
+            {
                 using (var connection = applicationContext.Database.GetDbConnection())
                 {
                     if (connection.State != ConnectionState.Open)
                         connection.Open();
                     var command = connection.CreateCommand();
 
-                    if (recreateDatabase)
-                    {
-                        // drop schema 
-                        command.CommandText = "DROP SCHEMA IF EXISTS dbo";
-                        command.ExecuteNonQuery();
-                    }
+                    // drop tables in 
+                    //command.CommandText = "drop table if exists dbo";
+                    //command.ExecuteNonQuery();
 
+                    applicationContext.AppVersion.RemoveRange();
                     // initial insert
                     applicationContext.AppVersion.Add(new AppVersion
                     {
@@ -182,10 +192,6 @@ namespace Evoflare.API.Data
 
                     foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
                     {
-                        
-
-                        
-
                         var sql = File.ReadAllText(file, Encoding.UTF8);
                         sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
                         sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 

@@ -1,13 +1,18 @@
 ﻿using Evoflare.API.Auth.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Evoflare.API.Models
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        private readonly IConfiguration configuration;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, [FromServices]IConfiguration configuration) : base(options)
         {
+            this.configuration = configuration;
         }
 
         // user groups
@@ -21,7 +26,8 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Configure default schema
-            modelBuilder.HasDefaultSchema("core");
+            var coreSchema = configuration.GetValue("Common:DbCoreSchema", "core");
+            modelBuilder.HasDefaultSchema(coreSchema);
 
             base.OnModelCreating(modelBuilder);
 

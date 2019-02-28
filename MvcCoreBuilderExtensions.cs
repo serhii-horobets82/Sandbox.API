@@ -1,15 +1,15 @@
 namespace Evoflare.API
 {
-    using System.Linq;
+    using Boxed.AspNetCore;
     using Evoflare.API.Constants;
     using Evoflare.API.Options;
-    using Boxed.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
+    using System.Linq;
 
     public static class MvcCoreBuilderExtensions
     {

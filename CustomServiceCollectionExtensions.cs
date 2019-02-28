@@ -57,7 +57,7 @@ namespace Evoflare.API
             IConfiguration configuration)
         {
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
-            const string secretKey = "SecretKey"; 
+            const string secretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH";
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 
             // Configure JwtIssuerOptions

@@ -106,6 +106,6 @@ namespace Evoflare.API
                 .UseMvc()
                 .UseSwagger()
                 .UseCustomSwaggerUI()
-                .UseDbSeed();
+                .UseDbSeed(this.configuration);
     }
 }
