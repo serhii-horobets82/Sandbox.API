@@ -273,6 +273,14 @@ namespace Evoflare.API
                     var assemblyProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>().Product;
                     var assemblyDescription = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
 
+                    options.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = "header",
+                        Type = "apiKey"
+                    });
+
                     options.DescribeAllEnumsAsStrings();
                     options.DescribeAllParametersInCamelCase();
                     options.DescribeStringEnumsInCamelCase();

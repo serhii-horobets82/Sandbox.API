@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Evoflare.API.Data
 {
@@ -87,6 +89,34 @@ namespace Evoflare.API.Data
             }
         }
 
+        private static void RecreateDatabase(DbContext context, int timeout)
+        {
+            // drop database
+            Log.Information("Deleting database - start");
+            if (context.Database.EnsureDeleted())
+            {
+                Log.Logger.Information("Deleting database - finish");
+            }
+            try
+            {
+                // and create again
+                Log.Information("Creating database - start");
+                context.Database.EnsureCreated();
+                Log.Information("Creating database - finish");
+            }
+            catch(Exception ex)
+            {
+                Log.Error(ex, "Error creating database");
+                Log.Information($"Start sleep for {timeout} sec");
+
+                // Azure issue - need more time to restore :(
+                Thread.Sleep(timeout);
+                Log.Information("Creating database - start retry");
+                context.Database.EnsureCreated();
+                Log.Information("Creating database - finish retry");
+            }
+        }
+
         public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
@@ -94,45 +124,35 @@ namespace Evoflare.API.Data
             var currentVersion = assemblyInfo.Version.ToString();
             // version in database table AppVersion
             var previousVersion = string.Empty;
+            
+            // flag from config - recreate DB on application starts (if true) 
+            var recreateDatabase = configuration.GetValue("Common:RecreateDbOnStart", false);
+            var retryTimeout = configuration.GetValue("Common:RetryTimeout", 60) * 1000;
 
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // check database for existence and initial creation
-            applicationContext.Database.EnsureCreated();
-
-            var recreateDatabase = configuration.GetValue("Common:RecreatDbOnStart", false);
-            AppVersion av = null;
-            // check core table for records, if exist - get previous version  
+            if(recreateDatabase)
+                RecreateDatabase(applicationContext, retryTimeout);
+            else
+            {
+                // check database for existence and initial creation
+                applicationContext.Database.EnsureCreated();
+            }
+            
             try
             {
+                // check core table AppVersion for records
                 if (applicationContext.AppVersion.Any())
                 {
-                    av = applicationContext.AppVersion.AsNoTracking().FirstOrDefault();
-                    previousVersion = av?.Version;
+                    previousVersion = applicationContext.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
                 }
             }
             catch
             {
-                // if something wrong - init database from scatch
+                // if something wrong - init database from scratch
+                RecreateDatabase(applicationContext, retryTimeout);
                 recreateDatabase = true;
-            }
-
-            if (recreateDatabase)
-            {
-                // drop database
-                applicationContext.Database.EnsureDeleted();
-                try
-                {
-                    // and create again
-                    applicationContext.Database.EnsureCreated();
-                }
-                catch
-                {
-                    // Azure issue - need more time to restore :(
-                    Thread.Sleep(60000);
-                    applicationContext.Database.EnsureCreated();
-                }
             }
 
             // check for roles
@@ -166,7 +186,7 @@ namespace Evoflare.API.Data
             }
 
             // if version different - recreate business data with sql 
-            if (previousVersion != currentVersion || recreateDatabase)  
+            if (previousVersion != currentVersion)  
             {
                 using (var connection = applicationContext.Database.GetDbConnection())
                 {
@@ -174,20 +194,25 @@ namespace Evoflare.API.Data
                         connection.Open();
                     var command = connection.CreateCommand();
 
-                    // drop tables in 
                     //command.CommandText = "drop table if exists dbo";
                     //command.ExecuteNonQuery();
 
-                    //if (av != null)
-                    //   applicationContext.AppVersion.Remove(av);
-                    // initial insert
-                    applicationContext.AppVersion.Add(new AppVersion
+                    var appAppVersion = new AppVersion
                     {
                         Name = assemblyInfo.Name,
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
                         Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
-                    });
+                    };
+
+                    // initial insert
+                    if (recreateDatabase)
+                    {
+                        applicationContext.AppVersion.Add(appAppVersion);
+                    }
+                    else
+                        applicationContext.AppVersion.Update(appAppVersion);
+
                     applicationContext.SaveChanges();
 
                     #region  Process with sql files
@@ -210,7 +235,23 @@ namespace Evoflare.API.Data
                         }
                         catch (SqlException ex)
                         {
-                            if (ex.Number != 2714) // "There is already an object named ..
+                            if (ex.Number == 3726) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
+                            {
+                                // TODO: temporary solution for deleting all table retry 3 times
+                                var retryExecution = 2;
+                                do
+                                {
+                                    try
+                                    {
+                                        command.ExecuteNonQuery();
+                                    }
+                                    catch
+                                    {
+                                        // ignored
+                                    }
+                                } while (retryExecution-- > 0);
+                            }
+                            else if (ex.Number != 2714) // "There is already an object named ..
                                 throw;
                         }
                     }
