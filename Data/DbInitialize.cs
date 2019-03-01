@@ -206,7 +206,7 @@ namespace Evoflare.API.Data
                     };
 
                     // initial insert
-                    if (recreateDatabase)
+                    if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
                     {
                         applicationContext.AppVersion.Add(appAppVersion);
                     }
