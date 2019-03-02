@@ -23,7 +23,6 @@ namespace Evoflare.API.Models
         public virtual DbSet<EcfRoleCompetence> EcfRoleCompetence { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
         public virtual DbSet<EmployeeEvaluation> EmployeeEvaluation { get; set; }
-        public virtual DbSet<EmployeePosition> EmployeePosition { get; set; }
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
@@ -81,7 +80,14 @@ namespace Evoflare.API.Models
             {
                 entity.Property(e => e.Competence)
                     .IsRequired()
-                    .HasMaxLength(3);
+                    .HasMaxLength(3)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.CompetenceNavigation)
+                    .WithMany(p => p.EcfEvaluation)
+                    .HasForeignKey(d => d.Competence)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfEvaluation_EcfCompetence");
 
                 entity.HasOne(d => d.Evaluation)
                     .WithMany(p => p.EcfEvaluation)
@@ -145,32 +151,32 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<EmployeeEvaluation>(entity =>
             {
-                entity.Property(e => e.DateTime).HasColumnType("datetime");
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Ecf).HasColumnName("ECF");
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
 
-                entity.Property(e => e._360degree).HasColumnName("360Degree");
-            });
-
-            modelBuilder.Entity<EmployeePosition>(entity =>
-            {
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.EmployeePosition)
+                    .WithMany(p => p.EmployeeEvaluationEmployee)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmployeePosition_Employee");
+                    .HasConstraintName("FK_EmployeeEvaluation_Employee");
+
+                entity.HasOne(d => d.EndedByNavigation)
+                    .WithMany(p => p.EmployeeEvaluationEndedByNavigation)
+                    .HasForeignKey(d => d.EndedBy)
+                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeEnded");
 
                 entity.HasOne(d => d.Organization)
-                    .WithMany(p => p.EmployeePosition)
+                    .WithMany(p => p.EmployeeEvaluation)
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmployeePosition_Organization");
+                    .HasConstraintName("FK_EmployeeEvaluation_Organization");
 
-                entity.HasOne(d => d.Position)
-                    .WithMany(p => p.EmployeePosition)
-                    .HasForeignKey(d => d.PositionId)
+                entity.HasOne(d => d.StartedByNavigation)
+                    .WithMany(p => p.EmployeeEvaluationStartedByNavigation)
+                    .HasForeignKey(d => d.StartedBy)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmployeePosition_Position");
+                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeStarted");
             });
 
             modelBuilder.Entity<EmployeeRelations>(entity =>

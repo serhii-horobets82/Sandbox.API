@@ -10,6 +10,7 @@ namespace Evoflare.API.Models
         public string Competence { get; set; }
         public int? CompetenceLevel { get; set; }
 
+        public virtual EcfCompetence CompetenceNavigation { get; set; }
         public virtual EmployeeEvaluation Evaluation { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Evoflare.API.Models
         public Organization()
         {
             Employee = new HashSet<Employee>();
-            EmployeePosition = new HashSet<EmployeePosition>();
+            EmployeeEvaluation = new HashSet<EmployeeEvaluation>();
             EmployeeRelations = new HashSet<EmployeeRelations>();
             Team = new HashSet<Team>();
         }
@@ -17,7 +17,7 @@ namespace Evoflare.API.Models
         public string Name { get; set; }
 
         public virtual ICollection<Employee> Employee { get; set; }
-        public virtual ICollection<EmployeePosition> EmployeePosition { get; set; }
+        public virtual ICollection<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual ICollection<Team> Team { get; set; }
     }
