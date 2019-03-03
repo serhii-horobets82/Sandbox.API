@@ -22,9 +22,14 @@ namespace Evoflare.API.Controllers
 
         // GET: api/Employees
         [HttpGet]
-        public IEnumerable<Employee> GetEmployee()
+        public IEnumerable<Employee> GetEmployees([FromQuery] int? typeId)
         {
-            return _context.Employee.Include(e => e.EmployeeType);
+            var employees = _context.Employee.Include(e => e.EmployeeType);
+            if (typeId.HasValue)
+            {
+                return employees.Where(e => e.EmployeeTypeId == typeId.Value);
+            }
+            return employees;
         }
 
         [HttpGet("managers")]
@@ -33,7 +38,13 @@ namespace Evoflare.API.Controllers
             return _context.Employee.Where(e => e.IsManager);
         }
 
-        [HttpGet("type")]
+        [HttpGet("type/:typeId")]
+        public IEnumerable<Employee> GetEmployeesByType(int employeeType)
+        {
+            return _context.Employee.Where(e => e.EmployeeTypeId == employeeType);
+        }
+
+        [HttpGet("types")]
         public IEnumerable<EmployeeType> GetEmployeeTypes()
         {
             return _context.EmployeeType;

@@ -29,19 +29,57 @@ namespace Evoflare.API.Controllers
                 .ToListAsync();
         }
 
+        // GET: api/EmployeeEvaluations/5/whom-evaluate
+        [HttpGet("{employeeId}/whom-evaluate")]
+        public async Task<ActionResult<IEnumerable<EmployeeEvaluation>>> GetWhomEvaluate(int employeeId, [FromQuery] bool? history)
+        {
+            var employeeEvaluation = _context.EmployeeEvaluation
+                .Where(e => e.TechnicalEvaluatorId == employeeId);
+
+            if (!history.HasValue || (history.HasValue && !history.Value))
+            {
+                employeeEvaluation = employeeEvaluation.Where(e => !e.Archived);
+            }
+
+            return await employeeEvaluation
+                .Include(e => e.Employee)
+                .ToListAsync();
+        }
+        
         // GET: api/EmployeeEvaluations/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<EmployeeEvaluation>> GetEmployeeEvaluation(int id)
-        //{
-        //    var employeeEvaluation = await _context.EmployeeEvaluation.FindAsync(id);
+        [HttpGet("{employeeId}")]
+        public async Task<ActionResult<IEnumerable<EmployeeEvaluation>>> GetEvaluations(int employeeId)
+        {
+            var employeeEvaluation = await _context.EmployeeEvaluation
+                .Where(e => e.EmployeeId == employeeId)
+                .ToListAsync();
 
-        //    if (employeeEvaluation == null)
-        //    {
-        //        return NotFound();
-        //    }
+            return employeeEvaluation;
+        }
 
-        //    return employeeEvaluation;
-        //}
+        // GET: api/EmployeeEvaluations/ecf-evaluation/1
+        [HttpGet("ecf-evaluation/{evaluationId}")]
+        public async Task<ActionResult<EmployeeEvaluation>> GetEvaluationById(int evaluationId)
+        {
+            var employeeEvaluation = await _context.EmployeeEvaluation
+                .Include(e => e.Employee)
+                .Include(e => e.EcfEvaluation)
+                    .ThenInclude(e => e.CompetenceNavigation)
+                        .ThenInclude(c => c.EcfCompetenceLevel)
+                .FirstOrDefaultAsync(e => e.Id == evaluationId);
+
+            return employeeEvaluation;
+        }
+
+        // POST: api/EmployeeEvaluations/5
+        [HttpPost("ecf-evaluation/{evaluationId}")]
+        public async Task<ActionResult<EcfEvaluation>> DeleteEmployeeEvaluation(int evaluationId, EcfEvaluation ecfEvaluation)
+        {
+            _context.Entry(ecfEvaluation).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return ecfEvaluation;
+        }
 
         // PUT: api/EmployeeEvaluations/5
         //[HttpPut("{id}")]
@@ -80,7 +118,7 @@ namespace Evoflare.API.Controllers
             employeeEvaluation.Archived = false;
             employeeEvaluation.OrganizationId = 1;
             employeeEvaluation.StartDate = DateTime.UtcNow;
-            employeeEvaluation.StartedBy = 11;
+            employeeEvaluation.StartedById = 11;
             
             var lastEvaluation = await _context.EmployeeEvaluation
                 .Include(e => e.EcfEvaluation)

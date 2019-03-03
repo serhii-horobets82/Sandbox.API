@@ -161,9 +161,9 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeeEvaluation_Employee");
 
-                entity.HasOne(d => d.EndedByNavigation)
-                    .WithMany(p => p.EmployeeEvaluationEndedByNavigation)
-                    .HasForeignKey(d => d.EndedBy)
+                entity.HasOne(d => d.EndedBy)
+                    .WithMany(p => p.EmployeeEvaluationEndedBy)
+                    .HasForeignKey(d => d.EndedById)
                     .HasConstraintName("FK_EmployeeEvaluation_EmployeeEnded");
 
                 entity.HasOne(d => d.Organization)
@@ -172,9 +172,9 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeeEvaluation_Organization");
 
-                entity.HasOne(d => d.StartedByNavigation)
-                    .WithMany(p => p.EmployeeEvaluationStartedByNavigation)
-                    .HasForeignKey(d => d.StartedBy)
+                entity.HasOne(d => d.StartedBy)
+                    .WithMany(p => p.EmployeeEvaluationStartedBy)
+                    .HasForeignKey(d => d.StartedById)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EmployeeEvaluation_EmployeeStarted");
             });
