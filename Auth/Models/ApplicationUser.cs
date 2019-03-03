@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Evoflare.API.Auth.Models
@@ -20,5 +21,8 @@ namespace Evoflare.API.Auth.Models
 
         [Display(Name = "Profile picture url")]
         public string PictureUrl { get; set; }
+
+        [NotMapped]
+        public string Token { get; set; }
     }
 }

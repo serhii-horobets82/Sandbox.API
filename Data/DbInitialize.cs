@@ -126,8 +126,8 @@ namespace Evoflare.API.Data
             var previousVersion = string.Empty;
             
             // flag from config - recreate DB on application starts (if true) 
-            var recreateDatabase = configuration.GetValue("Common:RecreateDbOnStart", false);
-            var retryTimeout = configuration.GetValue("Common:RetryTimeout", 60) * 1000;
+            var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
+            var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
 
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<ApplicationDbContext>();

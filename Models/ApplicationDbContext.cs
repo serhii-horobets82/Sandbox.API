@@ -26,7 +26,7 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Configure default schema
-            var coreSchema = configuration.GetValue("Common:DbCoreSchema", "core");
+            var coreSchema = configuration.GetValue("AppSettings:DbCoreSchema", "core");
             modelBuilder.HasDefaultSchema(coreSchema);
 
             base.OnModelCreating(modelBuilder);

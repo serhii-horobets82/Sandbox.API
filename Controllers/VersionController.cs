@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Evoflare.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +20,6 @@ namespace Evoflare.API.Controllers
         {
             this.db = db;
         }
-
-        //[HttpGet(Name = "GetAssemblyVersion")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Version of application.", typeof(string))]
-        //public string Get()
-        //{
-        //    return Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        //}
 
         [HttpGet(Name = "GetAppVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(string))]

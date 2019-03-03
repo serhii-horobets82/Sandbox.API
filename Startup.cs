@@ -89,7 +89,7 @@ namespace Evoflare.API
             application
                 // Pass a GUID in a X-Correlation-ID HTTP header to set the HttpContext.TraceIdentifier.
                 // UpdateTraceIdentifier must be false due to a bug. See https://github.com/aspnet/AspNetCore/issues/5144
-                .UseCorrelationId(new CorrelationIdOptions() { UpdateTraceIdentifier = false })
+                .UseCorrelationId(new CorrelationIdOptions() {UpdateTraceIdentifier = false})
                 .UseForwardedHeaders()
                 .UseResponseCaching()
                 .UseResponseCompression()
@@ -101,8 +101,9 @@ namespace Evoflare.API
                     this.hostingEnvironment.IsDevelopment(),
                     x => x.UseDeveloperErrorPages())
                 .UseHealthChecks("/status")
-                .UseHealthChecks("/status/self", new HealthCheckOptions() { Predicate = _ => false })
+                .UseHealthChecks("/status/self", new HealthCheckOptions() {Predicate = _ => false})
                 .UseStaticFilesWithCacheControl()
+                .UseAuthentication()
                 .UseMvc()
                 .UseSwagger()
                 .UseCustomSwaggerUI()

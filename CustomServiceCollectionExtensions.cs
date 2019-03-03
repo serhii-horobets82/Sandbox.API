@@ -10,9 +10,11 @@ using Boxed.AspNetCore.Swagger.SchemaFilters;
 using CorrelationId;
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Configuration;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
+using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -56,9 +58,11 @@ namespace Evoflare.API
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
             IConfiguration configuration)
         {
+            var appSettings = configuration.GetSection<AppSettings>();
+            var secretKey = Encoding.ASCII.GetBytes(appSettings.Secret);
+
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
-            const string secretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH";
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+            var signingKey = new SymmetricSecurityKey(secretKey);
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -91,10 +95,22 @@ namespace Evoflare.API
 
             }).AddJwtBearer(configureOptions =>
             {
+                //configureOptions.RequireHttpsMetadata = false;
+                //configureOptions.SaveToken = true;
+                //configureOptions.TokenValidationParameters = new TokenValidationParameters
+                //{
+                //    ValidateIssuerSigningKey = true,
+                //    IssuerSigningKey = signingKey,
+                //    ValidateIssuer = false,
+                //    ValidateAudience = false
+                //};
+
                 configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
                 configureOptions.TokenValidationParameters = tokenValidationParameters;
                 configureOptions.SaveToken = true;
             });
+
+            services.AddScoped<IUserService, UserService>();
 
             // api user claim policy
             services.AddAuthorization(options =>
@@ -103,18 +119,6 @@ namespace Evoflare.API
             });
 
             // add identity
-            //var builder = services.AddIdentityCore<ApplicationUser>(o =>
-            //{
-            //    // configure identity options
-            //    o.Password.RequireDigit = false;
-            //    o.Password.RequireLowercase = false;
-            //    o.Password.RequireUppercase = false;
-            //    o.Password.RequireNonAlphanumeric = false;
-            //    o.Password.RequiredLength = 6;
-            //});
-            //builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
-            //builder.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
             services.AddIdentity<ApplicationUser, IdentityRole>(o =>
                 {
                     // configure identity options
@@ -184,7 +188,9 @@ namespace Evoflare.API
                 .ConfigureAndValidateSingleton<ForwardedHeadersOptions>(
                     configuration.GetSection(nameof(ApplicationOptions.ForwardedHeaders)))
                 .ConfigureAndValidateSingleton<CacheProfileOptions>(
-                    configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)));
+                    configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
+                .ConfigureAndValidateSingleton<AppSettings>(
+                    configuration.GetSection(nameof(AppSettings)));
         }
 
         /// <summary>
