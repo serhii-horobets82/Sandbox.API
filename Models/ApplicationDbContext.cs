@@ -15,6 +15,9 @@ namespace Evoflare.API.Models
             this.configuration = configuration;
         }
 
+        // user profile
+        public DbSet<UserProfile> Profile { get; set; }
+
         // user groups
         public DbSet<Group> Groups { get; set; }
 
@@ -26,7 +29,7 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Configure default schema
-            var coreSchema = configuration.GetValue("Common:DbCoreSchema", "core");
+            var coreSchema = configuration.GetValue("AppSettings:DbCoreSchema", "core");
             modelBuilder.HasDefaultSchema(coreSchema);
 
             base.OnModelCreating(modelBuilder);

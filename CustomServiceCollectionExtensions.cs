@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
@@ -10,11 +11,14 @@ using Boxed.AspNetCore.Swagger.SchemaFilters;
 using CorrelationId;
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Configuration;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
+using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -23,6 +27,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
@@ -56,9 +61,16 @@ namespace Evoflare.API
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
             IConfiguration configuration)
         {
+            var appSettings = configuration.GetSection<AppSettings>();
+            var secretKey = Encoding.ASCII.GetBytes(appSettings.Secret);
+
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
-            const string secretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH";
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+            var signingKey = new SymmetricSecurityKey(secretKey);
+
+            services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+            // Register the ConfigurationBuilder instance of FacebookAuthSettings
+            services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -88,7 +100,6 @@ namespace Evoflare.API
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
             }).AddJwtBearer(configureOptions =>
             {
                 configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
@@ -99,30 +110,22 @@ namespace Evoflare.API
             // api user claim policy
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Auth.Constants.Strings.JwtClaimIdentifiers.Rol, Auth.Constants.Strings.JwtClaims.ApiAccess));
+                options.AddPolicy("ApiUser",
+                    policy => policy.RequireClaim(Auth.Constants.Strings.JwtClaimIdentifiers.Rol,
+                        Auth.Constants.Strings.JwtClaims.ApiAccess));
             });
 
             // add identity
-            //var builder = services.AddIdentityCore<ApplicationUser>(o =>
-            //{
-            //    // configure identity options
-            //    o.Password.RequireDigit = false;
-            //    o.Password.RequireLowercase = false;
-            //    o.Password.RequireUppercase = false;
-            //    o.Password.RequireNonAlphanumeric = false;
-            //    o.Password.RequiredLength = 6;
-            //});
-            //builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
-            //builder.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     // configure identity options
-                    o.Password.RequireDigit = false;
-                    o.Password.RequireLowercase = false;
-                    o.Password.RequireUppercase = false;
-                    o.Password.RequireNonAlphanumeric = false;
-                    o.Password.RequiredLength = 6;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequiredLength = 6;
+
+                    options.SignIn.RequireConfirmedEmail = true;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -184,7 +187,9 @@ namespace Evoflare.API
                 .ConfigureAndValidateSingleton<ForwardedHeadersOptions>(
                     configuration.GetSection(nameof(ApplicationOptions.ForwardedHeaders)))
                 .ConfigureAndValidateSingleton<CacheProfileOptions>(
-                    configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)));
+                    configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
+                .ConfigureAndValidateSingleton<AppSettings>(
+                    configuration.GetSection(nameof(AppSettings)));
         }
 
         /// <summary>
@@ -271,14 +276,23 @@ namespace Evoflare.API
                 {
                     var assembly = typeof(Startup).Assembly;
                     var assemblyProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>().Product;
+                    var assemblyVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
                     var assemblyDescription = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
+
+                    options.SwaggerDoc("v1.0",
+                        new Info {Title = $"Evoflare API v{assemblyVersion}", Version = assemblyVersion});
 
                     options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                     {
-                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Description = "JWT Authorization header using the Bearer scheme",
                         Name = "Authorization",
                         In = "header",
                         Type = "apiKey"
+                    });
+
+                    options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                    {
+                        {"Bearer", Enumerable.Empty<string>()}
                     });
 
                     options.DescribeAllEnumsAsStrings();
