@@ -1,11 +1,88 @@
 USE [master]
 GO
-/****** Object:  Database [TechnicalEvaluation]    Script Date: 02.03.2019 15:56:41 ******/
+/****** Object:  Database [TechnicalEvaluation]    Script Date: 04.03.2019 21:53:04 ******/
 CREATE DATABASE [TechnicalEvaluation]
 GO
 USE [TechnicalEvaluation]
 GO
-/****** Object:  Table [dbo].[AppVersion]    Script Date: 02.03.2019 15:56:41 ******/
+/****** Object:  Table [dbo].[360EmployeeEvaluation]    Script Date: 04.03.2019 21:53:04 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360EmployeeEvaluation](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EvaluatorEmployeeId] [int] NOT NULL,
+	[EvaluationId] [int] NOT NULL,
+	[StartDate] [datetime] NOT NULL,
+	[EndDate] [datetime] NULL,
+ CONSTRAINT [PK_360EmployeeEvaluation] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[360Evaluation]    Script Date: 04.03.2019 21:53:04 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360Evaluation](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EvaluationId] [int] NOT NULL,
+	[QuestionId] [int] NOT NULL,
+	[FeedbackMarkId] [int] NOT NULL,
+ CONSTRAINT [PK_360Evaluation] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[360FeedbackGroup]    Script Date: 04.03.2019 21:53:04 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360FeedbackGroup](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Type] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_360FeedbackGroup] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[360FeedbackMark]    Script Date: 04.03.2019 21:53:04 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360FeedbackMark](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Mark] [int] NOT NULL,
+	[Title] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_360FeedbackMark] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[360Question]    Script Date: 04.03.2019 21:53:04 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360Question](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Text] [nvarchar](250) NOT NULL,
+	[360FeedbackGroupId] [int] NOT NULL,
+ CONSTRAINT [PK_360Question] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AppVersion]    Script Date: 04.03.2019 21:53:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,7 +97,7 @@ CREATE TABLE [dbo].[AppVersion](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EcfCompetence]    Script Date: 04.03.2019 21:53:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,7 +112,7 @@ CREATE TABLE [dbo].[EcfCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EcfCompetenceLevel]    Script Date: 04.03.2019 21:53:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -51,7 +128,7 @@ CREATE TABLE [dbo].[EcfCompetenceLevel](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EcfEvaluation]    Script Date: 04.03.2019 21:53:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -67,7 +144,7 @@ CREATE TABLE [dbo].[EcfEvaluation](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRole]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EcfRole]    Script Date: 04.03.2019 21:53:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -84,7 +161,7 @@ CREATE TABLE [dbo].[EcfRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EcfRoleCompetence]    Script Date: 04.03.2019 21:53:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -100,7 +177,7 @@ CREATE TABLE [dbo].[EcfRoleCompetence](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Employee]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[Employee]    Script Date: 04.03.2019 21:53:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -118,7 +195,7 @@ CREATE TABLE [dbo].[Employee](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EmployeeEvaluation]    Script Date: 04.03.2019 21:53:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -127,18 +204,19 @@ CREATE TABLE [dbo].[EmployeeEvaluation](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[EmployeeId] [int] NOT NULL,
 	[StartDate] [datetime] NOT NULL,
-	[StartedBy] [int] NOT NULL,
+	[StartedById] [int] NOT NULL,
 	[EndDate] [datetime] NULL,
-	[EndedBy] [int] NULL,
+	[EndedById] [int] NULL,
 	[OrganizationId] [int] NOT NULL,
 	[Archived] [bit] NOT NULL,
+	[TechnicalEvaluatorId] [int] NULL,
  CONSTRAINT [PK_EmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EmployeeRelations]    Script Date: 04.03.2019 21:53:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -157,7 +235,7 @@ CREATE TABLE [dbo].[EmployeeRelations](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EmployeeType]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[EmployeeType]    Script Date: 04.03.2019 21:53:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -171,7 +249,7 @@ CREATE TABLE [dbo].[EmployeeType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Organization]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[Organization]    Script Date: 04.03.2019 21:53:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -185,7 +263,7 @@ CREATE TABLE [dbo].[Organization](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Position]    Script Date: 02.03.2019 15:56:42 ******/
+/****** Object:  Table [dbo].[Position]    Script Date: 04.03.2019 21:53:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -205,7 +283,7 @@ CREATE TABLE [dbo].[Position](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PositionRole]    Script Date: 02.03.2019 15:56:43 ******/
+/****** Object:  Table [dbo].[PositionRole]    Script Date: 04.03.2019 21:53:07 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -221,7 +299,7 @@ CREATE TABLE [dbo].[PositionRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Project]    Script Date: 02.03.2019 15:56:43 ******/
+/****** Object:  Table [dbo].[Project]    Script Date: 04.03.2019 21:53:08 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -236,7 +314,7 @@ CREATE TABLE [dbo].[Project](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Team]    Script Date: 02.03.2019 15:56:43 ******/
+/****** Object:  Table [dbo].[Team]    Script Date: 04.03.2019 21:53:08 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -251,6 +329,32 @@ CREATE TABLE [dbo].[Team](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[360FeedbackGroup] ON 
+GO
+INSERT [dbo].[360FeedbackGroup] ([Id], [Type]) VALUES (1, N'Self')
+GO
+INSERT [dbo].[360FeedbackGroup] ([Id], [Type]) VALUES (2, N'Peer')
+GO
+INSERT [dbo].[360FeedbackGroup] ([Id], [Type]) VALUES (3, N'Customer')
+GO
+INSERT [dbo].[360FeedbackGroup] ([Id], [Type]) VALUES (4, N'Subordinate')
+GO
+SET IDENTITY_INSERT [dbo].[360FeedbackGroup] OFF
+GO
+SET IDENTITY_INSERT [dbo].[360FeedbackMark] ON 
+GO
+INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (1, 1, N'Far below expectations')
+GO
+INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (2, 2, N'Below expectations')
+GO
+INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (3, 3, N'Meets expectations')
+GO
+INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (4, 4, N'Above expectations')
+GO
+INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (5, 5, N'Far above expectations')
+GO
+SET IDENTITY_INSERT [dbo].[360FeedbackMark] OFF
 GO
 INSERT [dbo].[AppVersion] ([Name], [Version], [CreationDate]) VALUES (N'Evoflare.API', N'0.0.1.1', CAST(N'2019-02-27T10:17:01.4920533' AS DateTime2))
 GO
@@ -556,7 +660,7 @@ INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLev
 GO
 INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (2, 3, N'B2 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (3, 3, N'B3 ', NULL)
+INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (3, 3, N'B3 ', 4)
 GO
 INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (4, 3, N'B5 ', NULL)
 GO
@@ -968,7 +1072,9 @@ SET IDENTITY_INSERT [dbo].[Employee] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] ON 
 GO
-INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedBy], [EndDate], [EndedBy], [OrganizationId], [Archived]) VALUES (3, 21, CAST(N'2019-03-02T13:53:39.670' AS DateTime), 11, NULL, NULL, 1, 0)
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (3, 21, CAST(N'2019-03-02T13:53:39.670' AS DateTime), 11, NULL, NULL, 1, 0, 6)
+GO
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (4, 7, CAST(N'2019-03-03T11:29:11.267' AS DateTime), 11, NULL, NULL, 1, 0, 6)
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] OFF
 GO
@@ -1084,7 +1190,7 @@ INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (7, N'A
 GO
 SET IDENTITY_INSERT [dbo].[Team] OFF
 GO
-/****** Object:  Index [IX_Role]    Script Date: 02.03.2019 15:56:43 ******/
+/****** Object:  Index [IX_Role]    Script Date: 04.03.2019 21:53:09 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Role] ON [dbo].[EcfRole]
 (
 	[RoleId] ASC
@@ -1095,6 +1201,36 @@ GO
 ALTER TABLE [dbo].[Position] ADD  CONSTRAINT [DF_Position_IsDeleted]  DEFAULT ((0)) FOR [IsDeleted]
 GO
 ALTER TABLE [dbo].[PositionRole] ADD  CONSTRAINT [DF_PositionRole_DateTime]  DEFAULT (getutcdate()) FOR [DateTime]
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_Employee] FOREIGN KEY([Id])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_Employee]
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
+REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_EmployeeEvaluation]
+GO
+ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_360FeedbackMark] FOREIGN KEY([FeedbackMarkId])
+REFERENCES [dbo].[360FeedbackMark] ([Id])
+GO
+ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_360FeedbackMark]
+GO
+ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_360Question] FOREIGN KEY([QuestionId])
+REFERENCES [dbo].[360Question] ([Id])
+GO
+ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_360Question]
+GO
+ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
+REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+GO
+ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_EmployeeEvaluation]
+GO
+ALTER TABLE [dbo].[360Question]  WITH CHECK ADD  CONSTRAINT [FK_360Question_360FeedbackGroup] FOREIGN KEY([360FeedbackGroupId])
+REFERENCES [dbo].[360FeedbackGroup] ([Id])
+GO
+ALTER TABLE [dbo].[360Question] CHECK CONSTRAINT [FK_360Question_360FeedbackGroup]
 GO
 ALTER TABLE [dbo].[EcfCompetenceLevel]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceLevel_Competence] FOREIGN KEY([CompetenceId])
 REFERENCES [dbo].[EcfCompetence] ([Id])
@@ -1136,12 +1272,12 @@ REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_Employee]
 GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeEnded] FOREIGN KEY([EndedBy])
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeEnded] FOREIGN KEY([EndedById])
 REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeEnded]
 GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeStarted] FOREIGN KEY([StartedBy])
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeStarted] FOREIGN KEY([StartedById])
 REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeStarted]

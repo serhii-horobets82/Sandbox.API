@@ -25,6 +25,7 @@ namespace Evoflare.API.Models
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
+        public virtual _360employeeEvaluation _360employeeEvaluation { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEmployee { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEndedBy { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationStartedBy { get; set; }

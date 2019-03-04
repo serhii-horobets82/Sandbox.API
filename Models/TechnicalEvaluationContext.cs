@@ -30,6 +30,11 @@ namespace Evoflare.API.Models
         public virtual DbSet<PositionRole> PositionRole { get; set; }
         public virtual DbSet<Project> Project { get; set; }
         public virtual DbSet<Team> Team { get; set; }
+        public virtual DbSet<_360employeeEvaluation> _360employeeEvaluation { get; set; }
+        public virtual DbSet<_360evaluation> _360evaluation { get; set; }
+        public virtual DbSet<_360feedbackGroup> _360feedbackGroup { get; set; }
+        public virtual DbSet<_360feedbackMark> _360feedbackMark { get; set; }
+        public virtual DbSet<_360question> _360question { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -294,6 +299,87 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.ProjectId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Team_Project");
+            });
+
+            modelBuilder.Entity<_360employeeEvaluation>(entity =>
+            {
+                entity.ToTable("360EmployeeEvaluation");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Evaluation)
+                    .WithMany(p => p._360employeeEvaluation)
+                    .HasForeignKey(d => d.EvaluationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EmployeeEvaluation_EmployeeEvaluation");
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p._360employeeEvaluation)
+                    .HasForeignKey<_360employeeEvaluation>(d => d.Id)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EmployeeEvaluation_Employee");
+            });
+
+            modelBuilder.Entity<_360evaluation>(entity =>
+            {
+                entity.ToTable("360Evaluation");
+
+                entity.HasOne(d => d.Evaluation)
+                    .WithMany(p => p._360evaluation)
+                    .HasForeignKey(d => d.EvaluationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Evaluation_EmployeeEvaluation");
+
+                entity.HasOne(d => d.FeedbackMark)
+                    .WithMany(p => p._360evaluation)
+                    .HasForeignKey(d => d.FeedbackMarkId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Evaluation_360FeedbackMark");
+
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p._360evaluation)
+                    .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Evaluation_360Question");
+            });
+
+            modelBuilder.Entity<_360feedbackGroup>(entity =>
+            {
+                entity.ToTable("360FeedbackGroup");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<_360feedbackMark>(entity =>
+            {
+                entity.ToTable("360FeedbackMark");
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<_360question>(entity =>
+            {
+                entity.ToTable("360Question");
+
+                entity.Property(e => e.Text)
+                    .IsRequired()
+                    .HasMaxLength(250);
+
+                entity.Property(e => e._360feedbackGroupId).HasColumnName("360FeedbackGroupId");
+
+                entity.HasOne(d => d._360feedbackGroup)
+                    .WithMany(p => p._360question)
+                    .HasForeignKey(d => d._360feedbackGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Question_360FeedbackGroup");
             });
         }
     }

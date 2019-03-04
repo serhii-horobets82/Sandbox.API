@@ -8,6 +8,8 @@ namespace Evoflare.API.Models
         public EmployeeEvaluation()
         {
             EcfEvaluation = new HashSet<EcfEvaluation>();
+            _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
+            _360evaluation = new HashSet<_360evaluation>();
         }
 
         public int Id { get; set; }
@@ -25,5 +27,7 @@ namespace Evoflare.API.Models
         public virtual Organization Organization { get; set; }
         public virtual Employee StartedBy { get; set; }
         public virtual ICollection<EcfEvaluation> EcfEvaluation { get; set; }
+        public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
+        public virtual ICollection<_360evaluation> _360evaluation { get; set; }
     }
 }
