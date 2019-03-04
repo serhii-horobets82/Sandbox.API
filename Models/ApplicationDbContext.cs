@@ -15,6 +15,9 @@ namespace Evoflare.API.Models
             this.configuration = configuration;
         }
 
+        // user profile
+        public DbSet<UserProfile> Profile { get; set; }
+
         // user groups
         public DbSet<Group> Groups { get; set; }
 

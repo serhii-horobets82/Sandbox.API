@@ -1,3 +1,5 @@
+using Swashbuckle.AspNetCore.SwaggerUI;
+
 namespace Evoflare.API
 {
     using Boxed.AspNetCore;
@@ -80,6 +82,8 @@ namespace Evoflare.API
                 options.RoutePrefix = string.Empty;
                 // Show the request duration in Swagger UI.
                 options.DisplayRequestDuration();
+
+                options.DocExpansion(DocExpansion.None);
 
                 var provider = application.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
                 foreach (var apiVersionDescription in provider

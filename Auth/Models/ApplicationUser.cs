@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Evoflare.API.Constants;
 using Microsoft.AspNetCore.Identity;
 
 namespace Evoflare.API.Auth.Models
@@ -19,10 +19,10 @@ namespace Evoflare.API.Auth.Models
 
         public long? FacebookId { get; set; }
 
-        [Display(Name = "Profile picture url")]
-        public string PictureUrl { get; set; }
+        [Display(Name = "User age")]
+        public int Age { get; set; }
 
-        [NotMapped]
-        public string Token { get; set; }
+        [Display(Name = "User gender code")]
+        public Gender Gender { get; set; }
     }
 }

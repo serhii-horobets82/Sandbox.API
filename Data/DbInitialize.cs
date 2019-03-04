@@ -3,11 +3,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Constants;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +22,9 @@ namespace Evoflare.API.Data
         private const string DefaultPassword = "qwerty";
         private const string AdminRoleName = "Admin";
         private const string ManagerRoleName = "Manager";
+        private const string DefaultLocation = "Ukraine";
+        private const string DefaultLocale = "en";
+        private const string DefaultPictureUrl = "https://picsum.photos/300/300/?random";
 
 
         /// <summary>
@@ -51,10 +54,13 @@ namespace Evoflare.API.Data
         /// <param name="roleName">Role Name</param>
         /// <param name="firstName">First Name</param>
         /// <param name="lastName">Last Name</param>
+        /// <param name="gender"></param>
+        /// <param name="age"></param>
         private static void AddUserToRole(IServiceProvider serviceProvider, string userEmail, string userPwd,
-            string roleName, string firstName, string lastName)
+            string roleName, string firstName, string lastName, Gender gender, int age)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var appDbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             var checkAppUser = userManager.FindByEmailAsync(userEmail);
             checkAppUser.Wait();
@@ -73,19 +79,29 @@ namespace Evoflare.API.Data
                     LastName = lastName,
                     EmailConfirmed = true,
                     LockoutEnabled = false,
+                    Gender = gender,
+                    Age = age,
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                var taskCreateAppUser = userManager.CreateAsync(newAppUser, userPwd);
-                taskCreateAppUser.Wait();
+                var task = userManager.CreateAsync(newAppUser, userPwd);
+                task.Wait();
+                if (task.Result.Succeeded) appUser = newAppUser;
 
-                if (taskCreateAppUser.Result.Succeeded) appUser = newAppUser;
+                // Add random profile
+                appDbContext.Profile.Add(new UserProfile
+                    {
+                        IdentityId = newAppUser.Id,
+                        Location = DefaultLocation,
+                        Locale = DefaultLocale,
+                        PictureUrl = DefaultPictureUrl
+                    }
+                );
             }
 
             if (!string.IsNullOrEmpty(roleName))
             {
-                var newUserRole = userManager.AddToRoleAsync(appUser, roleName);
-                newUserRole.Wait();
+                userManager.AddToRoleAsync(appUser, roleName).Wait();
             }
         }
 
@@ -93,10 +109,7 @@ namespace Evoflare.API.Data
         {
             // drop database
             Log.Information("Deleting database - start");
-            if (context.Database.EnsureDeleted())
-            {
-                Log.Logger.Information("Deleting database - finish");
-            }
+            if (context.Database.EnsureDeleted()) Log.Logger.Information("Deleting database - finish");
             try
             {
                 // and create again
@@ -104,7 +117,7 @@ namespace Evoflare.API.Data
                 context.Database.EnsureCreated();
                 Log.Information("Creating database - finish");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error(ex, "Error creating database");
                 Log.Information($"Start sleep for {timeout} sec");
@@ -124,7 +137,7 @@ namespace Evoflare.API.Data
             var currentVersion = assemblyInfo.Version.ToString();
             // version in database table AppVersion
             var previousVersion = string.Empty;
-            
+
             // flag from config - recreate DB on application starts (if true) 
             var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
             var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
@@ -132,21 +145,19 @@ namespace Evoflare.API.Data
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            if(recreateDatabase)
+            if (recreateDatabase)
                 RecreateDatabase(applicationContext, retryTimeout);
             else
-            {
-                // check database for existence and initial creation
                 applicationContext.Database.EnsureCreated();
-            }
-            
+
             try
             {
                 // check core table AppVersion for records
                 if (applicationContext.AppVersion.Any())
-                {
                     previousVersion = applicationContext.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
-                }
+
+                // workaround to update db without migration 
+                applicationContext.Users.Where(e => e.Age > 0).ToList();
             }
             catch
             {
@@ -169,33 +180,29 @@ namespace Evoflare.API.Data
                 var userFirstName = "Super";
                 var userLastName = "Admin";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName);
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName, Gender.Male, 30);
 
                 userEmail = "manager@evoflare.com";
                 userFirstName = "Local";
                 userLastName = "Manager";
 
                 AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName,
-                    userLastName);
+                    userLastName, Gender.Female, 25);
 
                 userEmail = "user@evoflare.com";
                 userFirstName = "Typical";
                 userLastName = "User";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName);
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName, Gender.Male, 20);
             }
 
             // if version different - recreate business data with sql 
-            if (previousVersion != currentVersion)  
-            {
+            if (previousVersion != currentVersion)
                 using (var connection = applicationContext.Database.GetDbConnection())
                 {
                     if (connection.State != ConnectionState.Open)
                         connection.Open();
                     var command = connection.CreateCommand();
-
-                    //command.CommandText = "drop table if exists dbo";
-                    //command.ExecuteNonQuery();
 
                     var appAppVersion = new AppVersion
                     {
@@ -207,9 +214,7 @@ namespace Evoflare.API.Data
 
                     // initial insert
                     if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
-                    {
                         applicationContext.AppVersion.Add(appAppVersion);
-                    }
                     else
                         applicationContext.AppVersion.Update(appAppVersion);
 
@@ -226,7 +231,8 @@ namespace Evoflare.API.Data
                         sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
                         sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
                         sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
-                        sql = sql.Replace("[TechnicalEvaluation]", $"[{connection.Database}]"); // replace database name 
+                        sql = sql.Replace("[TechnicalEvaluation]",
+                            $"[{connection.Database}]"); // replace database name 
 
                         command.CommandText = sql;
                         try
@@ -235,7 +241,8 @@ namespace Evoflare.API.Data
                         }
                         catch (SqlException ex)
                         {
-                            if (ex.Number == 3726) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
+                            if (ex.Number == 3726
+                            ) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
                             {
                                 // TODO: temporary solution for deleting all table retry 3 times
                                 var retryExecution = 2;
@@ -252,113 +259,14 @@ namespace Evoflare.API.Data
                                 } while (retryExecution-- > 0);
                             }
                             else if (ex.Number != 2714) // "There is already an object named ..
+                            {
                                 throw;
+                            }
                         }
                     }
+
                     #endregion
                 }
-            }
-        }
-
-        public static bool Initialize(BaseAppContext context)
-        {
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
-            var currentVersion = assemblyInfo.Version.ToString();
-
-            // always try to create empty db 
-            context.Database.Migrate();
-
-            // recreate database - inline function
-            bool PurgeDb()
-            {
-                context.Database.EnsureDeleted();
-                try
-                {
-                    context.Database.EnsureCreated();
-                }
-                catch
-                {
-                    // Azure issue - need more time to restore :(
-                    Thread.Sleep(60000);
-                    context.Database.EnsureCreated();
-                }
-
-                //using (var connection = context.Database.GetDbConnection())
-                //{
-                //    if (connection.State != ConnectionState.Open)
-                //        connection.Open();
-                //    // initial insert
-                //    context.AppVersion.Add(new CoreAppVersion
-                //    {
-                //        Name = assemblyInfo.Name,
-                //        Version = currentVersion,
-                //        CreationDate = DateTime.Now,
-                //        Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
-                //    });
-                //    context.SaveChanges();
-                //}
-
-                return true;
-            }
-
-            // check table existence and compare ve
-            try
-            {
-                var databaseVersion = ""; //context.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
-                if (databaseVersion != currentVersion) return PurgeDb();
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 208 || ex.Number == 207
-                ) // "Invalid object name 'AppVersion'." or "Invalid column name 'Database'."
-                    return PurgeDb();
-            }
-
-            return false;
-        }
-
-        public static void Initialize(TechnicalEvaluationContext context)
-        {
-            var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
-            if (!Directory.Exists(baseDir)) return;
-
-            foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
-                using (var connection = context.Database.GetDbConnection())
-                {
-                    if (connection.State != ConnectionState.Open)
-                        connection.Open();
-
-                    var command = connection.CreateCommand();
-                    var sql = File.ReadAllText(file, Encoding.UTF8);
-                    sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
-                    sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
-                    sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
-                    sql = sql.Replace("[TechnicalEvaluation]", $"[{connection.Database}]"); // replace database name 
-
-                    command.CommandText = sql;
-                    try
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                    catch (SqlException ex)
-                    {
-                        var number = ex.Number;
-                        if (ex.Number != 2714) // "There is already an object named ..
-                            throw;
-                    }
-                }
-
-            //var sqlContentLines = File.ReadAllLines(file, Encoding.UTF8);
-            //context.Database.BeginTransaction();
-            ////sqlContent.Replace("[TechnicalEvaluation]", $"[{currentDB}]");
-
-            //var insertStatements  = sqlContentLines.Where(e => 
-            //    e.StartsWith("INSERT") ||
-            //    e.Contains("IDENTITY_INSERT"));
-
-            //insertStatements.ToList().ForEach(line => context.Database.ExecuteSqlCommand(line));
-
-            //context.Database.CommitTransaction();
         }
     }
 }

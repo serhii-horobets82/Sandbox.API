@@ -1,4 +1,7 @@
 using Evoflare.API.Auth;
+using Evoflare.API.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Evoflare.API
 {
@@ -58,6 +61,7 @@ namespace Evoflare.API
                 .AddSingleton<IJwtFactory, JwtFactory>()
                 // Add useful interface for accessing the ActionContext outside a controller.
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
+                .AddScoped<IActivityLogService, ActivityLogService>()
                 // Add useful interface for accessing the IUrlHelper outside a controller.
                 .AddScoped(x => x
                     .GetRequiredService<IUrlHelperFactory>()

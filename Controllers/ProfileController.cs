@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
@@ -18,10 +17,11 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]/[action]")]
     public class ProfileController : ControllerBase
     {
-        private readonly ClaimsPrincipal caller;
         private readonly ApplicationDbContext appDbContext;
+        private readonly ClaimsPrincipal caller;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext, IHttpContextAccessor httpContextAccessor)
+        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext,
+            IHttpContextAccessor httpContextAccessor)
         {
             caller = httpContextAccessor.HttpContext.User;
             this.appDbContext = appDbContext;
@@ -33,13 +33,23 @@ namespace Evoflare.API.Controllers
         {
             // retrieve the user info
             var userId = caller.Claims.Single(c => c.Type == "id");
-            var role = await appDbContext.UserRoles.SingleOrDefaultAsync(c => c.UserId == userId.Value);
+            var profile = await appDbContext.Profile
+                .Include(c => c.Identity)
+                .SingleAsync(c => c.Identity.Id == userId.Value);
 
             return new OkObjectResult(new
             {
-                userId,
-                caller.Identity.IsAuthenticated,
-                role
+                profile.Identity.Id,
+                profile.Identity.Email,
+                profile.Identity.EmailConfirmed,
+                profile.Identity.FirstName,
+                profile.Identity.LastName,
+                profile.Identity.FullName,
+                profile.Identity.Age,
+                profile.Identity.Gender,
+                profile.PictureUrl,
+                profile.Location,
+                profile.Locale
             });
         }
     }
