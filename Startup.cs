@@ -1,14 +1,11 @@
 using Evoflare.API.Auth;
 using Evoflare.API.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Evoflare.API
 {
-    using System;
-    using Evoflare.API.Constants;
     using Boxed.AspNetCore;
     using CorrelationId;
+    using Constants;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Diagnostics.HealthChecks;
     using Microsoft.AspNetCore.Hosting;
@@ -17,6 +14,7 @@ namespace Evoflare.API
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using System;
 
     /// <summary>
     /// The main start-up class for the application.
