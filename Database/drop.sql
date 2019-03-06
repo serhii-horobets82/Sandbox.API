@@ -27,3 +27,5 @@ GO
 DROP TABLE IF EXISTS [dbo].[Team];  
 GO
 DROP TABLE IF EXISTS [dbo].[Organization];  
+GO
+DROP TABLE IF EXISTS [dbo].[AppVersion];  
