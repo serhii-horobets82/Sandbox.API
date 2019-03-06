@@ -22,21 +22,40 @@ namespace Evoflare.API.Controllers
 
         // GET: api/EcfRoles
         [HttpGet]
-        public IEnumerable<EcfRole> GetRole()
+        public IEnumerable<EcfRole> GetRole([FromQuery] bool? withCompetences)
         {
+            if (withCompetences.HasValue && withCompetences.Value)
+            {
+                return _context.EcfRole
+                    .Include(r => r.EcfRoleCompetence)
+                        .ThenInclude(c => c.Competence)
+                            .ThenInclude(c => c.EcfCompetenceLevel);
+            }
             return _context.EcfRole;
         }
 
         // GET: api/EcfRoles/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetRole([FromRoute] int id)
+        public async Task<IActionResult> GetRole([FromRoute] int id, [FromQuery] bool? withCompetences)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var role = await _context.EcfRole.FindAsync(id);
+            EcfRole role = null;
+            if (withCompetences.HasValue && withCompetences.Value)
+            {
+                role = await _context.EcfRole
+                    .Include(r => r.EcfRoleCompetence)
+                        .ThenInclude(c => c.Competence)
+                            .ThenInclude(c => c.EcfCompetenceLevel)
+                    .FirstOrDefaultAsync(r => r.Id == id);
+            }
+            else
+            {
+                role = await _context.EcfRole.FindAsync(id);
+            }
 
             if (role == null)
             {
