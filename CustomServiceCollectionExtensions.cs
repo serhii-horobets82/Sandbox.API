@@ -279,9 +279,6 @@ namespace Evoflare.API
                     var assemblyVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
                     var assemblyDescription = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
 
-                    options.SwaggerDoc("v1.0",
-                        new Info {Title = $"Evoflare API v{assemblyVersion}", Version = assemblyVersion});
-
                     options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                     {
                         Description = "JWT Authorization header using the Bearer scheme",
@@ -294,6 +291,7 @@ namespace Evoflare.API
                     {
                         {"Bearer", Enumerable.Empty<string>()}
                     });
+
 
                     options.DescribeAllEnumsAsStrings();
                     options.DescribeAllParametersInCamelCase();
@@ -320,7 +318,12 @@ namespace Evoflare.API
                             Description = apiVersionDescription.IsDeprecated
                                 ? $"{assemblyDescription} This API version has been deprecated."
                                 : assemblyDescription,
-                            Version = apiVersionDescription.ApiVersion.ToString()
+                            Version = assemblyVersion,
+                            Contact = new Contact()
+                            {
+                                Name = "Evoflare team",
+                                Email = "mail.evoflare@gmail.com"
+                            }
                         };
                         options.SwaggerDoc(apiVersionDescription.GroupName, info);
                     }

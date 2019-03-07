@@ -1,9 +1,13 @@
 ﻿ 
 
-namespace AuthWebApi.ViewModels
+namespace Evoflare.API.ViewModels
 {
     public class FacebookAuthViewModel
     {
-        public string AccessToken { get; set; }
+        public string ClientId { get; set; }
+
+        public string Code { get; set; }
+
+        public string RedirectUri { get; set; }
     }
 }

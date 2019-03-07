@@ -13,11 +13,12 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
+        private readonly IActivityLogService activityLogService;
         private readonly ApplicationDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IActivityLogService activityLogService;
 
-        public AccountsController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext, IActivityLogService activityLogService)
+        public AccountsController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext,
+            IActivityLogService activityLogService)
         {
             this.userManager = userManager;
             this.appDbContext = appDbContext;
@@ -44,9 +45,10 @@ namespace Evoflare.API.Controllers
 
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-            await activityLogService.AddActivityAsync("", $"Register new user: username {model.Email}, id={userIdentity.Id} ", 0);
+            await activityLogService.AddActivityAsync("",
+                $"Register new user: username {model.Email}, id={userIdentity.Id} ", 0);
 
-            await appDbContext.Profile.AddAsync(new UserProfile{IdentityId = userIdentity.Id, Locale = model.Locale});
+            await appDbContext.Profile.AddAsync(new UserProfile {IdentityId = userIdentity.Id, Locale = model.Locale});
 
             //await userManager.AddClaimAsync(userIdentity, new Claim(ClaimTypes.Gender, model.Gender));
 

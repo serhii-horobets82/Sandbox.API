@@ -1,14 +1,14 @@
-﻿using Evoflare.API.Auth;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Helpers;
+using Evoflare.API.Services;
 using Evoflare.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Evoflare.API.Services;
 
 namespace Evoflare.API.Controllers
 {
@@ -16,12 +16,13 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IActivityLogService activityLogService;
         private readonly IJwtFactory jwtFactory;
         private readonly JwtIssuerOptions jwtOptions;
-        private readonly IActivityLogService activityLogService;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IActivityLogService activityLogService)
+        public AuthController(UserManager<ApplicationUser> userManager, IJwtFactory jwtFactory,
+            IOptions<JwtIssuerOptions> jwtOptions, IActivityLogService activityLogService)
         {
             this.userManager = userManager;
             this.jwtFactory = jwtFactory;
@@ -31,24 +32,22 @@ namespace Evoflare.API.Controllers
 
         // POST api/auth/login
         [HttpPost("login")]
-        public async Task<IActionResult> Post([FromBody]CredentialsViewModel credentials)
+        public async Task<IActionResult> Post([FromBody] CredentialsViewModel credentials)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            await activityLogService.AddActivityAsync(credentials.UserName, $"User request for auth token", 0);
+            await activityLogService.AddActivityAsync(credentials.UserName, "User request for auth token", 0);
 
             var identity = await GetClaimsIdentity(credentials.UserName, credentials.Password);
             if (identity == null)
-            {
-                return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.", ModelState));
-            }
+                return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.",
+                    ModelState));
 
-            var jwt = await Tokens.GenerateJwt(identity, jwtFactory, credentials.UserName, jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+            var jwt = await Tokens.GenerateJwt(identity, jwtFactory, credentials.UserName, jwtOptions,
+                new JsonSerializerSettings {Formatting = Formatting.Indented});
 
-            await activityLogService.AddActivityAsync(credentials.UserName, "User new authentication token has been provided", 0);
+            await activityLogService.AddActivityAsync(credentials.UserName,
+                "User new authentication token has been provided", 0);
 
             return new OkObjectResult(jwt);
         }
@@ -65,9 +64,7 @@ namespace Evoflare.API.Controllers
 
             // check the credentials
             if (await userManager.CheckPasswordAsync(userToVerify, password))
-            {
                 return await Task.FromResult(jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id));
-            }
 
             // Credentials are invalid, or account doesn't exist
             return await Task.FromResult<ClaimsIdentity>(null);

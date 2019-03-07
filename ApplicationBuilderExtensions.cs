@@ -69,10 +69,14 @@ namespace Evoflare.API
         }
 
 
-        public static IApplicationBuilder UseCustomSwaggerUI(this IApplicationBuilder application) =>
+        public static IApplicationBuilder UseCustomSwaggerUI(this IApplicationBuilder application, Assembly assembly) =>
         application.UseSwaggerUI(
             options =>
             {
+                options.InjectStylesheet("/swagger/custom.css");
+
+                options.IndexStream = () => assembly.GetManifestResourceStream("Evoflare.API.wwwroot.swagger.index.html");
+
                 // Set the Swagger UI browser document title.
                 options.DocumentTitle = typeof(Startup)
                 .Assembly
