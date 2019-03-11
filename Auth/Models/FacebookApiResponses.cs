@@ -53,7 +53,7 @@ namespace Evoflare.API.Auth.Models
         public FacebookUserAccessTokenData Data { get; set; }
     }
 
-    internal class FacebookAppAccessToken
+    internal class OAuthAccessToken
     {
         [JsonProperty("token_type")] public string TokenType { get; set; }
 

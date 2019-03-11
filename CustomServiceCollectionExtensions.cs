@@ -71,6 +71,8 @@ namespace Evoflare.API
 
             // Register the ConfigurationBuilder instance of FacebookAuthSettings
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
+            services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
+
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>

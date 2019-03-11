@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
@@ -20,15 +21,21 @@ namespace Evoflare.API.Controllers
         private static readonly HttpClient Client = new HttpClient();
         private readonly ApplicationDbContext appDbContext;
         private readonly FacebookAuthSettings fbAuthSettings;
+        private readonly GithubAuthSettings githubAuthSettings;
         private readonly IJwtFactory jwtFactory;
         private readonly JwtIssuerOptions jwtOptions;
         public readonly UserManager<ApplicationUser> UserManager;
 
-        public ExternalAuthController(IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
-            UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext, IJwtFactory jwtFactory,
+        public ExternalAuthController(
+            IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
+            IOptions<GithubAuthSettings> githubAuthSettingsAccessor,
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext appDbContext,
+            IJwtFactory jwtFactory,
             IOptions<JwtIssuerOptions> jwtOptions)
         {
             fbAuthSettings = fbAuthSettingsAccessor.Value;
+            githubAuthSettings = githubAuthSettingsAccessor.Value;
             UserManager = userManager;
             this.appDbContext = appDbContext;
             this.jwtFactory = jwtFactory;
@@ -37,11 +44,11 @@ namespace Evoflare.API.Controllers
 
         // POST api/externalauth/facebook
         [HttpPost]
-        public async Task<IActionResult> Facebook([FromBody] FacebookAuthViewModel model)
+        public async Task<IActionResult> Facebook([FromBody] OAuthViewModel model)
         {
             var appAccessTokenResponse = await Client.GetStringAsync(
                 $"https://graph.facebook.com/v2.4/oauth/access_token?client_id={fbAuthSettings.AppId}&client_secret={fbAuthSettings.AppSecret}&code={model.Code}&redirect_uri={model.RedirectUri}");
-            var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessToken>(appAccessTokenResponse);
+            var appAccessToken = JsonConvert.DeserializeObject<OAuthAccessToken>(appAccessTokenResponse);
 
             var userInfoResponse = await Client.GetStringAsync(
                 $"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={appAccessToken.AccessToken}");
@@ -68,7 +75,9 @@ namespace Evoflare.API.Controllers
 
                 await appDbContext.Profile.AddAsync(new UserProfile
                 {
-                    IdentityId = appUser.Id, PictureUrl = userInfo.Picture.Data.Url, Location = "",
+                    IdentityId = appUser.Id,
+                    PictureUrl = userInfo.Picture.Data.Url,
+                    Location = "",
                     Locale = userInfo.Locale
                 });
                 await appDbContext.SaveChangesAsync();
@@ -82,9 +91,36 @@ namespace Evoflare.API.Controllers
 
             var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
                 jwtFactory, localUser.UserName, jwtOptions,
-                new JsonSerializerSettings {Formatting = Formatting.Indented});
+                new JsonSerializerSettings { Formatting = Formatting.Indented });
 
             return new OkObjectResult(jwt);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Github([FromBody] OAuthViewModel model)
+        {
+            Client.DefaultRequestHeaders.Add("Accept", "application/json");
+            var appAccessTokenResponse = await Client.GetStringAsync(
+                $"https://github.com/login/oauth/access_token?client_id={githubAuthSettings.AppId}&client_secret={githubAuthSettings.AppSecret}&code={model.Code}&redirect_uri={model.RedirectUri}");
+            var appAccessToken = JsonConvert.DeserializeObject<OAuthAccessToken>(appAccessTokenResponse);
+
+            try
+            {
+                Client.DefaultRequestHeaders.Add("User-Agent", "github");
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", appAccessToken.AccessToken);
+
+                var userInfoResponse = await Client.GetStringAsync($"https://api.github.com/user?access_token={appAccessToken.AccessToken}");
+                var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+
+
+            return new OkObjectResult("");
         }
     }
 }

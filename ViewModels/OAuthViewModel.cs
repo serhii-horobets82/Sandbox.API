@@ -2,7 +2,7 @@
 
 namespace Evoflare.API.ViewModels
 {
-    public class FacebookAuthViewModel
+    public class OAuthViewModel
     {
         public string ClientId { get; set; }
 
