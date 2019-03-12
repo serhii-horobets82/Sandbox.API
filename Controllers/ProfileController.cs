@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
@@ -19,10 +20,12 @@ namespace Evoflare.API.Controllers
     {
         private readonly ApplicationDbContext appDbContext;
         private readonly ClaimsPrincipal caller;
+        private readonly UserManager<ApplicationUser> userManager;
 
         public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext,
             IHttpContextAccessor httpContextAccessor)
         {
+            this.userManager = userManager;
             caller = httpContextAccessor.HttpContext.User;
             this.appDbContext = appDbContext;
         }
@@ -31,11 +34,16 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Me()
         {
+            ApplicationUser user = await userManager.GetUserAsync(User);
+
             // retrieve the user info
-            var userId = caller.Claims.Single(c => c.Type == "id");
+            var userId = User.Claims.Single(c => c.Type == "id");
+
             var profile = await appDbContext.Profile
                 .Include(c => c.Identity)
                 .SingleAsync(c => c.Identity.Id == userId.Value);
+
+            IEnumerable<string> roles = await userManager.GetRolesAsync(profile.Identity);
 
             return new OkObjectResult(new
             {
@@ -49,7 +57,8 @@ namespace Evoflare.API.Controllers
                 profile.Identity.Gender,
                 profile.PictureUrl,
                 profile.Location,
-                profile.Locale
+                profile.Locale,
+                roles
             });
         }
     }

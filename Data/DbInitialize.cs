@@ -20,8 +20,6 @@ namespace Evoflare.API.Data
     public static class DbInitializer
     {
         private const string DefaultPassword = "qwerty";
-        private const string AdminRoleName = "Admin";
-        private const string ManagerRoleName = "Manager";
         private const string DefaultLocation = "Ukraine";
         private const string DefaultLocale = "en";
         private const string DefaultPictureUrl = "https://picsum.photos/300/300/?random";
@@ -169,8 +167,8 @@ namespace Evoflare.API.Data
             // check for roles
             if (!applicationContext.Roles.Any())
             {
-                CreateRole(serviceProvider, AdminRoleName);
-                CreateRole(serviceProvider, ManagerRoleName);
+                CreateRole(serviceProvider, Constants.Roles.Admin);
+                CreateRole(serviceProvider, Constants.Roles.Manager);
             }
 
             // check for users
@@ -180,13 +178,13 @@ namespace Evoflare.API.Data
                 var userFirstName = "Super";
                 var userLastName = "Admin";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, AdminRoleName, userFirstName, userLastName, Gender.Male, 30);
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.Admin, userFirstName, userLastName, Gender.Male, 30);
 
                 userEmail = "manager@evoflare.com";
                 userFirstName = "Local";
                 userLastName = "Manager";
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, ManagerRoleName, userFirstName,
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.Manager, userFirstName,
                     userLastName, Gender.Female, 25);
 
                 userEmail = "user@evoflare.com";

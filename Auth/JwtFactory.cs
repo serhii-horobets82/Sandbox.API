@@ -45,17 +45,24 @@ namespace Evoflare.API.Auth
 
         public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
         {
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+            return new ClaimsIdentity(new[]
             {
+                new Claim(ClaimTypes.Name, userName),
                 new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
+                new Claim(ClaimTypes.NameIdentifier, id),
             });
+
+            //return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+            //{
+            //    new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
+            //    new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
+            //});
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
         private static long ToUnixEpochDate(DateTime date)
         {
-            return (long) Math.Round((date.ToUniversalTime() -
+            return (long)Math.Round((date.ToUniversalTime() -
                                       new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
                 .TotalSeconds);
         }

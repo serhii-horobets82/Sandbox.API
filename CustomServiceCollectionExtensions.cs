@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
@@ -128,6 +129,8 @@ namespace Evoflare.API
                     options.Password.RequiredLength = 6;
 
                     options.SignIn.RequireConfirmedEmail = true;
+
+                    //options.ClaimsIdentity.UserIdClaimType = "Token";
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
