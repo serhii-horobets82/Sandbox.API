@@ -110,17 +110,50 @@ namespace Evoflare.API.Controllers
                 Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", appAccessToken.AccessToken);
 
                 var userInfoResponse = await Client.GetStringAsync($"https://api.github.com/user?access_token={appAccessToken.AccessToken}");
-                var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
+                var userInfo = JsonConvert.DeserializeObject<GithubUserData>(userInfoResponse);
+                var user = await UserManager.FindByEmailAsync(userInfo.Email);
+
+                if (user == null)
+                {
+                    var appUser = new ApplicationUser
+                    {
+                        LastName = userInfo.Name,
+                        Email = userInfo.Email,
+                        UserName = userInfo.Email
+                    };
+
+                    var result = await UserManager.CreateAsync(appUser,
+                        Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+
+                    if (!result.Succeeded)
+                        return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+
+                    await appDbContext.Profile.AddAsync(new UserProfile
+                    {
+                        IdentityId = appUser.Id,
+                        PictureUrl = userInfo.AvatarUrl,
+                        Location = userInfo.Location,
+                    });
+                    await appDbContext.SaveChangesAsync();
+                }
+
+                var localUser = await UserManager.FindByNameAsync(userInfo.Email);
+
+                if (localUser == null)
+                    return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.",
+                        ModelState));
+
+                var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
+                    jwtFactory, localUser.UserName, jwtOptions,
+                    new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                return new OkObjectResult(jwt);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-
-
-
-            return new OkObjectResult("");
         }
     }
 }

@@ -2,17 +2,27 @@
 
 namespace Evoflare.API.Auth.Models
 {
-    internal class FacebookUserData
+    internal class UserData
     {
         public long Id { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+    }
 
-        [JsonProperty("first_name")]
-        public string FirstName { get; set; }
+    internal class GithubUserData : UserData
+    {
+        [JsonProperty("avatar_url")]
+        public string AvatarUrl { get; set; }
+        public string Company { get; set; }
+        public string Location { get; set; }
+        
+    }
 
-        [JsonProperty("last_name")]
-        public string LastName { get; set; }
+    internal class FacebookUserData : UserData
+    {
+        [JsonProperty("first_name")] public string FirstName { get; set; }
+
+        [JsonProperty("last_name")] public string LastName { get; set; }
 
         public string Gender { get; set; }
         public string Locale { get; set; }
@@ -46,11 +56,6 @@ namespace Evoflare.API.Auth.Models
         [JsonProperty("is_valid")] public bool IsValid { get; set; }
 
         [JsonProperty("user_id")] public long UserId { get; set; }
-    }
-
-    internal class FacebookUserAccessTokenValidation
-    {
-        public FacebookUserAccessTokenData Data { get; set; }
     }
 
     internal class OAuthAccessToken
