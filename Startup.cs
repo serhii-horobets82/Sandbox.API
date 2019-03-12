@@ -1,3 +1,4 @@
+using System.Reflection;
 using Evoflare.API.Auth;
 using Evoflare.API.Services;
 
@@ -108,7 +109,7 @@ namespace Evoflare.API
                 .UseAuthentication()
                 .UseMvc()
                 .UseSwagger()
-                .UseCustomSwaggerUI()
+                .UseCustomSwaggerUI(GetType().GetTypeInfo().Assembly)
                 .UseDbSeed(this.configuration);
     }
 }

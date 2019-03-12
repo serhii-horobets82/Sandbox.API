@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using AuthWebApi.ViewModels;
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
-using Evoflare.API.Constants;
 using Evoflare.API.Helpers;
 using Evoflare.API.Models;
+using Evoflare.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -18,44 +18,43 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]/[action]")]
     public class ExternalAuthController : Controller
     {
-        private readonly ApplicationDbContext _appDbContext;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly FacebookAuthSettings _fbAuthSettings;
-        private readonly IJwtFactory _jwtFactory;
-        private readonly JwtIssuerOptions _jwtOptions;
         private static readonly HttpClient Client = new HttpClient();
+        private readonly ApplicationDbContext appDbContext;
+        private readonly FacebookAuthSettings fbAuthSettings;
+        private readonly GithubAuthSettings githubAuthSettings;
+        private readonly IJwtFactory jwtFactory;
+        private readonly JwtIssuerOptions jwtOptions;
+        public readonly UserManager<ApplicationUser> UserManager;
 
-        public ExternalAuthController(IOptions<FacebookAuthSettings> fbAuthSettingsAccessor, UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public ExternalAuthController(
+            IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
+            IOptions<GithubAuthSettings> githubAuthSettingsAccessor,
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext appDbContext,
+            IJwtFactory jwtFactory,
+            IOptions<JwtIssuerOptions> jwtOptions)
         {
-            _fbAuthSettings = fbAuthSettingsAccessor.Value;
-            _userManager = userManager;
-            _appDbContext = appDbContext;
-            _jwtFactory = jwtFactory;
-            _jwtOptions = jwtOptions.Value;
+            fbAuthSettings = fbAuthSettingsAccessor.Value;
+            githubAuthSettings = githubAuthSettingsAccessor.Value;
+            UserManager = userManager;
+            this.appDbContext = appDbContext;
+            this.jwtFactory = jwtFactory;
+            this.jwtOptions = jwtOptions.Value;
         }
 
         // POST api/externalauth/facebook
         [HttpPost]
-        public async Task<IActionResult> Facebook([FromBody]FacebookAuthViewModel model)
+        public async Task<IActionResult> Facebook([FromBody] OAuthViewModel model)
         {
-            // 1.generate an app access token
-            var appAccessTokenResponse = await Client.GetStringAsync($"https://graph.facebook.com/oauth/access_token?client_id={_fbAuthSettings.AppId}&client_secret={_fbAuthSettings.AppSecret}&grant_type=client_credentials");
-            var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessToken>(appAccessTokenResponse);
-            // 2. validate the user access token
-            var userAccessTokenValidationResponse = await Client.GetStringAsync($"https://graph.facebook.com/debug_token?input_token={model.AccessToken}&access_token={appAccessToken.AccessToken}");
-            var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidation>(userAccessTokenValidationResponse);
+            var appAccessTokenResponse = await Client.GetStringAsync(
+                $"https://graph.facebook.com/v2.4/oauth/access_token?client_id={fbAuthSettings.AppId}&client_secret={fbAuthSettings.AppSecret}&code={model.Code}&redirect_uri={model.RedirectUri}");
+            var appAccessToken = JsonConvert.DeserializeObject<OAuthAccessToken>(appAccessTokenResponse);
 
-            if (!userAccessTokenValidation.Data.IsValid)
-            {
-                return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid facebook token.", ModelState));
-            }
-
-            // 3. we've got a valid token so we can request user data from fb
-            var userInfoResponse = await Client.GetStringAsync($"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={model.AccessToken}");
+            var userInfoResponse = await Client.GetStringAsync(
+                $"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={appAccessToken.AccessToken}");
             var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
 
-            // 4. ready to create the local user account (if necessary) and jwt
-            var user = await _userManager.FindByEmailAsync(userInfo.Email);
+            var user = await UserManager.FindByEmailAsync(userInfo.Email);
 
             if (user == null)
             {
@@ -68,26 +67,93 @@ namespace Evoflare.API.Controllers
                     UserName = userInfo.Email
                 };
 
-                var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+                var result = await UserManager.CreateAsync(appUser,
+                    Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
 
-                if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+                if (!result.Succeeded)
+                    return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-                await _appDbContext.Profile.AddAsync(new UserProfile { IdentityId = appUser.Id, PictureUrl = userInfo.Picture.Data.Url, Location = "", Locale = userInfo.Locale });
-                await _appDbContext.SaveChangesAsync();
+                await appDbContext.Profile.AddAsync(new UserProfile
+                {
+                    IdentityId = appUser.Id,
+                    PictureUrl = userInfo.Picture.Data.Url,
+                    Location = "",
+                    Locale = userInfo.Locale
+                });
+                await appDbContext.SaveChangesAsync();
             }
 
-            // generate the jwt for the local user...
-            var localUser = await _userManager.FindByNameAsync(userInfo.Email);
+            var localUser = await UserManager.FindByNameAsync(userInfo.Email);
 
             if (localUser == null)
-            {
-                return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.", ModelState));
-            }
+                return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.",
+                    ModelState));
 
-            var jwt = await Tokens.GenerateJwt(_jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
-              _jwtFactory, localUser.UserName, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+            var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
+                jwtFactory, localUser.UserName, jwtOptions,
+                new JsonSerializerSettings { Formatting = Formatting.Indented });
 
             return new OkObjectResult(jwt);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Github([FromBody] OAuthViewModel model)
+        {
+            Client.DefaultRequestHeaders.Add("Accept", "application/json");
+            var appAccessTokenResponse = await Client.GetStringAsync(
+                $"https://github.com/login/oauth/access_token?client_id={githubAuthSettings.AppId}&client_secret={githubAuthSettings.AppSecret}&code={model.Code}&redirect_uri={model.RedirectUri}");
+            var appAccessToken = JsonConvert.DeserializeObject<OAuthAccessToken>(appAccessTokenResponse);
+
+            try
+            {
+                Client.DefaultRequestHeaders.Add("User-Agent", "github");
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", appAccessToken.AccessToken);
+
+                var userInfoResponse = await Client.GetStringAsync($"https://api.github.com/user?access_token={appAccessToken.AccessToken}");
+                var userInfo = JsonConvert.DeserializeObject<GithubUserData>(userInfoResponse);
+                var user = await UserManager.FindByEmailAsync(userInfo.Email);
+
+                if (user == null)
+                {
+                    var appUser = new ApplicationUser
+                    {
+                        LastName = userInfo.Name,
+                        Email = userInfo.Email,
+                        UserName = userInfo.Email
+                    };
+
+                    var result = await UserManager.CreateAsync(appUser,
+                        Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+
+                    if (!result.Succeeded)
+                        return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+
+                    await appDbContext.Profile.AddAsync(new UserProfile
+                    {
+                        IdentityId = appUser.Id,
+                        PictureUrl = userInfo.AvatarUrl,
+                        Location = userInfo.Location,
+                    });
+                    await appDbContext.SaveChangesAsync();
+                }
+
+                var localUser = await UserManager.FindByNameAsync(userInfo.Email);
+
+                if (localUser == null)
+                    return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.",
+                        ModelState));
+
+                var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
+                    jwtFactory, localUser.UserName, jwtOptions,
+                    new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                return new OkObjectResult(jwt);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
