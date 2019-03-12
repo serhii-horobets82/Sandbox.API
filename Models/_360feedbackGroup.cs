@@ -7,12 +7,14 @@ namespace Evoflare.API.Models
     {
         public _360feedbackGroup()
         {
-            _360question = new HashSet<_360question>();
+            _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
+            _360questionarie = new HashSet<_360questionarie>();
         }
 
         public int Id { get; set; }
         public string Type { get; set; }
 
-        public virtual ICollection<_360question> _360question { get; set; }
+        public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
+        public virtual ICollection<_360questionarie> _360questionarie { get; set; }
     }
 }

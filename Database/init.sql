@@ -15,6 +15,8 @@ CREATE TABLE [dbo].[360EmployeeEvaluation](
 	[EvaluationId] [int] NOT NULL,
 	[StartDate] [datetime] NOT NULL,
 	[EndDate] [datetime] NULL,
+	[OrganizationId] [int] NOT NULL,
+	[360FeedbackGroupId] [int] NOT NULL,
  CONSTRAINT [PK_360EmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -30,6 +32,7 @@ CREATE TABLE [dbo].[360Evaluation](
 	[EvaluationId] [int] NOT NULL,
 	[QuestionId] [int] NOT NULL,
 	[FeedbackMarkId] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_360Evaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -67,11 +70,59 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+CREATE TABLE [dbo].[360PendingEvaluator](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[360EmployeeEvaluationId] [int] NOT NULL,
+	[EvaluatorId] [int] NOT NULL,
+	[Action] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_360PendingEvaluator] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE TABLE [dbo].[360Question](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[QuestionToMarkId] [int] NOT NULL,
+	[Question] [nvarchar](250) NOT NULL,
+	[Order] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_360Question_1] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360Questionarie](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Text] [nvarchar](250) NOT NULL,
 	[360FeedbackGroupId] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_360Question] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360QuestionToMark](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[QuestionId] [int] NOT NULL,
+	[MarkId] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_360QuestionToMark] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -90,6 +141,23 @@ CREATE TABLE [dbo].[AppVersion](
 	[Name] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CustomerContact](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](250) NOT NULL,
+	[Email] [varchar](250) NOT NULL,
+	[Phone] [varchar](20) NULL,
+	[ProjectId] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_CustomerContact] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
 GO
 SET ANSI_NULLS ON
 GO
@@ -212,7 +280,7 @@ CREATE TABLE [dbo].[EmployeeEvaluation](
 	[EndedById] [int] NULL,
 	[OrganizationId] [int] NOT NULL,
 	[Archived] [bit] NOT NULL,
-	[TechnicalEvaluatorId] [int] NULL,
+	[TechnicalEvaluatorId] [int] NOT NULL,
  CONSTRAINT [PK_EmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -245,6 +313,22 @@ CREATE TABLE [dbo].[EmployeeType](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Type] [nvarchar](50) NOT NULL,
  CONSTRAINT [PK_EmployeeType] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EvaluationSchedule](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EmployeeId] [int] NOT NULL,
+	[EvaluationDate] [datetime] NOT NULL,
+	[Archived] [bit] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_EvaluationSchedule] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -351,6 +435,56 @@ GO
 INSERT [dbo].[360FeedbackMark] ([Id], [Mark], [Title]) VALUES (5, 5, N'Far above expectations')
 GO
 SET IDENTITY_INSERT [dbo].[360FeedbackMark] OFF
+GO
+SET IDENTITY_INSERT [dbo].[360Question] ON 
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (5, 4, N'wawaw `
+awaww 2', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (6, 5, N'tatat 1
+tatatata 2', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (7, 6, N'tgggggggggggg
+gadss
+dfgjfdh', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (8, 7, N'234234
+flskdfj', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (9, 8, N'auauauau
+sfjd999 999', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (10, 9, N'0a0a0a0a', 0, 1)
+GO
+SET IDENTITY_INSERT [dbo].[360Question] OFF
+GO
+SET IDENTITY_INSERT [dbo].[360Questionarie] ON 
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (1, N'Q1. Something edit', 1, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (2, N'Q1. Awawawa a dasd as question', 2, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (4, N'Some other question', 1, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (5, N'Good question', 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[360Questionarie] OFF
+GO
+SET IDENTITY_INSERT [dbo].[360QuestionToMark] ON 
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (4, 4, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (5, 4, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (6, 4, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (7, 5, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (8, 5, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (9, 5, 5, 1)
+GO
+SET IDENTITY_INSERT [dbo].[360QuestionToMark] OFF
 GO
 INSERT [dbo].[AppVersion] ([Name], [Version], [CreationDate]) VALUES (N'Evoflare.API', N'0.0.1.1', CAST(N'2019-02-27T10:17:01.4920533' AS DateTime2))
 GO
@@ -1228,6 +1362,11 @@ ALTER TABLE [dbo].[Position] ADD  CONSTRAINT [DF_Position_IsDeleted]  DEFAULT ((
 GO
 ALTER TABLE [dbo].[PositionRole] ADD  CONSTRAINT [DF_PositionRole_DateTime]  DEFAULT (getutcdate()) FOR [DateTime]
 GO
+ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_360FeedbackGroup] FOREIGN KEY([360FeedbackGroupId])
+REFERENCES [dbo].[360FeedbackGroup] ([Id])
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_360FeedbackGroup]
+GO
 ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_Employee] FOREIGN KEY([Id])
 REFERENCES [dbo].[Employee] ([Id])
 GO
@@ -1238,25 +1377,85 @@ REFERENCES [dbo].[EmployeeEvaluation] ([Id])
 GO
 ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_EmployeeEvaluation]
 GO
+ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_Organization]
+GO
 ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_360FeedbackMark] FOREIGN KEY([FeedbackMarkId])
 REFERENCES [dbo].[360FeedbackMark] ([Id])
 GO
 ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_360FeedbackMark]
 GO
 ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_360Question] FOREIGN KEY([QuestionId])
-REFERENCES [dbo].[360Question] ([Id])
+REFERENCES [dbo].[360Questionarie] ([Id])
 GO
 ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_360Question]
 GO
 ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
-REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+REFERENCES [dbo].[360EmployeeEvaluation] ([Id])
 GO
 ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_EmployeeEvaluation]
 GO
-ALTER TABLE [dbo].[360Question]  WITH CHECK ADD  CONSTRAINT [FK_360Question_360FeedbackGroup] FOREIGN KEY([360FeedbackGroupId])
+ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_Organization]
+GO
+ALTER TABLE [dbo].[360PendingEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_360PendingEvaluator_360PendingEvaluator] FOREIGN KEY([360EmployeeEvaluationId])
+REFERENCES [dbo].[360EmployeeEvaluation] ([Id])
+GO
+ALTER TABLE [dbo].[360PendingEvaluator] CHECK CONSTRAINT [FK_360PendingEvaluator_360PendingEvaluator]
+GO
+ALTER TABLE [dbo].[360PendingEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_360PendingEvaluator_Employee] FOREIGN KEY([EvaluatorId])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[360PendingEvaluator] CHECK CONSTRAINT [FK_360PendingEvaluator_Employee]
+GO
+ALTER TABLE [dbo].[360PendingEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_360PendingEvaluator_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360PendingEvaluator] CHECK CONSTRAINT [FK_360PendingEvaluator_Organization]
+GO
+ALTER TABLE [dbo].[360Question]  WITH CHECK ADD  CONSTRAINT [FK_360Question_360QuestionToMark] FOREIGN KEY([QuestionToMarkId])
+REFERENCES [dbo].[360QuestionToMark] ([Id])
+GO
+ALTER TABLE [dbo].[360Question] CHECK CONSTRAINT [FK_360Question_360QuestionToMark]
+GO
+ALTER TABLE [dbo].[360Question]  WITH CHECK ADD  CONSTRAINT [FK_360Question_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360Question] CHECK CONSTRAINT [FK_360Question_Organization]
+GO
+ALTER TABLE [dbo].[360Questionarie]  WITH CHECK ADD  CONSTRAINT [FK_360Question_360FeedbackGroup] FOREIGN KEY([360FeedbackGroupId])
 REFERENCES [dbo].[360FeedbackGroup] ([Id])
 GO
-ALTER TABLE [dbo].[360Question] CHECK CONSTRAINT [FK_360Question_360FeedbackGroup]
+ALTER TABLE [dbo].[360Questionarie] CHECK CONSTRAINT [FK_360Question_360FeedbackGroup]
+GO
+ALTER TABLE [dbo].[360Questionarie]  WITH CHECK ADD  CONSTRAINT [FK_360Questionarie_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360Questionarie] CHECK CONSTRAINT [FK_360Questionarie_Organization]
+GO
+ALTER TABLE [dbo].[360QuestionToMark]  WITH CHECK ADD  CONSTRAINT [FK_360QuestionToMark_360Questionarie] FOREIGN KEY([QuestionId])
+REFERENCES [dbo].[360Questionarie] ([Id])
+GO
+ALTER TABLE [dbo].[360QuestionToMark] CHECK CONSTRAINT [FK_360QuestionToMark_360Questionarie]
+GO
+ALTER TABLE [dbo].[360QuestionToMark]  WITH CHECK ADD  CONSTRAINT [FK_360QuestionToMark_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360QuestionToMark] CHECK CONSTRAINT [FK_360QuestionToMark_Organization]
+GO
+ALTER TABLE [dbo].[CustomerContact]  WITH CHECK ADD  CONSTRAINT [FK_CustomerContact_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[CustomerContact] CHECK CONSTRAINT [FK_CustomerContact_Organization]
+GO
+ALTER TABLE [dbo].[CustomerContact]  WITH CHECK ADD  CONSTRAINT [FK_CustomerContact_Project] FOREIGN KEY([ProjectId])
+REFERENCES [dbo].[Project] ([Id])
+GO
+ALTER TABLE [dbo].[CustomerContact] CHECK CONSTRAINT [FK_CustomerContact_Project]
 GO
 ALTER TABLE [dbo].[EcfCompetenceLevel]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceLevel_Competence] FOREIGN KEY([CompetenceId])
 REFERENCES [dbo].[EcfCompetence] ([Id])
@@ -1353,6 +1552,16 @@ REFERENCES [dbo].[Team] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeRelations] CHECK CONSTRAINT [FK_EmployeeRelations_Team]
 GO
+ALTER TABLE [dbo].[EvaluationSchedule]  WITH CHECK ADD  CONSTRAINT [FK_EvaluationSchedule_Employee] FOREIGN KEY([EmployeeId])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EvaluationSchedule] CHECK CONSTRAINT [FK_EvaluationSchedule_Employee]
+GO
+ALTER TABLE [dbo].[EvaluationSchedule]  WITH CHECK ADD  CONSTRAINT [FK_EvaluationSchedule_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[EvaluationSchedule] CHECK CONSTRAINT [FK_EvaluationSchedule_Organization]
+GO
 ALTER TABLE [dbo].[Position]  WITH CHECK ADD  CONSTRAINT [FK_Position_EmployeeCreatedBy] FOREIGN KEY([CreatedBy])
 REFERENCES [dbo].[Employee] ([Id])
 GO
@@ -1383,7 +1592,8 @@ REFERENCES [dbo].[Project] ([Id])
 GO
 ALTER TABLE [dbo].[Team] CHECK CONSTRAINT [FK_Team_Project]
 GO
-
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'BE enum: Add=1, Remove=2' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'360PendingEvaluator', @level2type=N'COLUMN',@level2name=N'Action'
+GO
 USE [master]
 GO
 ALTER DATABASE [TechnicalEvaluation] SET  READ_WRITE 

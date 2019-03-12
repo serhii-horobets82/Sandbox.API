@@ -7,13 +7,16 @@ namespace Evoflare.API.Models
     {
         public Employee()
         {
+            EcfEmployeeEvaluator = new HashSet<EcfEmployeeEvaluator>();
             EmployeeEvaluationEmployee = new HashSet<EmployeeEvaluation>();
             EmployeeEvaluationEndedBy = new HashSet<EmployeeEvaluation>();
             EmployeeEvaluationStartedBy = new HashSet<EmployeeEvaluation>();
             EmployeeRelationsEmployee = new HashSet<EmployeeRelations>();
             EmployeeRelationsManager = new HashSet<EmployeeRelations>();
+            EvaluationSchedule = new HashSet<EvaluationSchedule>();
             PositionCreatedByNavigation = new HashSet<Position>();
             PositionUpdatedByNavigation = new HashSet<Position>();
+            _360pendingEvaluator = new HashSet<_360pendingEvaluator>();
         }
 
         public int Id { get; set; }
@@ -26,12 +29,15 @@ namespace Evoflare.API.Models
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
         public virtual _360employeeEvaluation _360employeeEvaluation { get; set; }
+        public virtual ICollection<EcfEmployeeEvaluator> EcfEmployeeEvaluator { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEmployee { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEndedBy { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationStartedBy { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelationsEmployee { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelationsManager { get; set; }
+        public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual ICollection<Position> PositionCreatedByNavigation { get; set; }
         public virtual ICollection<Position> PositionUpdatedByNavigation { get; set; }
+        public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
     }
 }
