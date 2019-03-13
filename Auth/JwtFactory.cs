@@ -25,8 +25,8 @@ namespace Evoflare.API.Auth
                 new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(jwtOptions.IssuedAt).ToString(),
                     ClaimValueTypes.Integer64),
-                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Rol),
-                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
+                identity.FindFirst(Constants.JwtClaimIdentifiers.Rol),
+                identity.FindFirst(Constants.JwtClaimIdentifiers.Id)
             };
 
             // Create the JWT security token and encode it.
@@ -45,18 +45,11 @@ namespace Evoflare.API.Auth
 
         public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
         {
-            return new ClaimsIdentity(new[]
+            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
             {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(ClaimTypes.NameIdentifier, id),
+                new Claim(Constants.JwtClaimIdentifiers.Id, id),
+                new Claim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess),
             });
-
-            //return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
-            //{
-            //    new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-            //    new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
-            //});
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

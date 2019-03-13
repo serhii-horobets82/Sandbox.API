@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,14 +16,11 @@ namespace Evoflare.API.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly ApplicationDbContext appDbContext;
-        private readonly ClaimsPrincipal caller;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext,
-            IHttpContextAccessor httpContextAccessor)
+        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext)
         {
             this.userManager = userManager;
-            caller = httpContextAccessor.HttpContext.User;
             this.appDbContext = appDbContext;
         }
 
@@ -34,14 +28,10 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Me()
         {
-            ApplicationUser user = await userManager.GetUserAsync(User);
-
-            // retrieve the user info
-            var userId = User.Claims.Single(c => c.Type == "id");
-
+            var user = await userManager.GetUserAsync(User);
             var profile = await appDbContext.Profile
                 .Include(c => c.Identity)
-                .SingleAsync(c => c.Identity.Id == userId.Value);
+                .SingleAsync(c => c.Identity.Id == user.Id);
 
             IEnumerable<string> roles = await userManager.GetRolesAsync(profile.Identity);
 

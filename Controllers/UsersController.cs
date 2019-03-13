@@ -9,12 +9,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace Evoflare.API.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -32,17 +33,17 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ApplicationUser>> GetAsync()
+        public async Task<IEnumerable<JObject>> GetAsync()
         {
             var hasPermission = await UserHasRole(Constants.Roles.Admin);
             if (!hasPermission) return null;
 
-            return await context.ApplicationUsers.Select(c => new ApplicationUser
+            return await context.ApplicationUsers.Select(c => new JObject
             {
-                Id = c.Id,
-                Email = c.Email,
-                FirstName = c.FirstName,
-                LastName = c.LastName
+                { "id",  c.Id },
+                { "email",  c.Email },
+                { "firstName",  c.FirstName },
+                { "lastName",  c.LastName }
             }).ToListAsync();
         }
 
