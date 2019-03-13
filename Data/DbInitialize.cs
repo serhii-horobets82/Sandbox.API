@@ -207,7 +207,7 @@ namespace Evoflare.API.Data
                         Name = assemblyInfo.Name,
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
-                        //Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
+                        Database = $"{connection.DataSource}, v.{connection.ServerVersion}"
                     };
 
                     // initial insert
@@ -228,6 +228,7 @@ namespace Evoflare.API.Data
                         var sql = File.ReadAllText(file, Encoding.UTF8);
                         sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
                         sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
+                        sql = sql.Replace("\r\nGO", "\r\n"); // remove last lines with GO commands 
                         sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
                         sql = sql.Replace("[TechnicalEvaluation]",
                             $"[{connection.Database}]"); // replace database name 
