@@ -207,7 +207,7 @@ namespace Evoflare.API.Data
                         Name = assemblyInfo.Name,
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
-                        Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
+                        //Database = $"Source: {connection.DataSource}, v.{connection.ServerVersion}"
                     };
 
                     // initial insert

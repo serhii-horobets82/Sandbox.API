@@ -16,8 +16,10 @@ namespace Evoflare.API.Models
         }
 
         public virtual DbSet<AppVersion> AppVersion { get; set; }
+        public virtual DbSet<CustomerContact> CustomerContact { get; set; }
         public virtual DbSet<EcfCompetence> EcfCompetence { get; set; }
         public virtual DbSet<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
+        public virtual DbSet<EcfEmployeeEvaluator> EcfEmployeeEvaluator { get; set; }
         public virtual DbSet<EcfEvaluation> EcfEvaluation { get; set; }
         public virtual DbSet<EcfRole> EcfRole { get; set; }
         public virtual DbSet<EcfRoleCompetence> EcfRoleCompetence { get; set; }
@@ -25,6 +27,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
+        public virtual DbSet<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
         public virtual DbSet<Position> Position { get; set; }
         public virtual DbSet<PositionRole> PositionRole { get; set; }
@@ -34,7 +37,10 @@ namespace Evoflare.API.Models
         public virtual DbSet<_360evaluation> _360evaluation { get; set; }
         public virtual DbSet<_360feedbackGroup> _360feedbackGroup { get; set; }
         public virtual DbSet<_360feedbackMark> _360feedbackMark { get; set; }
+        public virtual DbSet<_360pendingEvaluator> _360pendingEvaluator { get; set; }
         public virtual DbSet<_360question> _360question { get; set; }
+        public virtual DbSet<_360questionToMark> _360questionToMark { get; set; }
+        public virtual DbSet<_360questionarie> _360questionarie { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -53,6 +59,34 @@ namespace Evoflare.API.Models
                 entity.HasKey(e => e.Name);
 
                 entity.Property(e => e.Name).ValueGeneratedNever();
+            });
+
+            modelBuilder.Entity<CustomerContact>(entity =>
+            {
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.CustomerContact)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CustomerContact_Organization");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.CustomerContact)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CustomerContact_Project");
             });
 
             modelBuilder.Entity<EcfCompetence>(entity =>
@@ -79,6 +113,25 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.CompetenceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_CompetenceLevel_Competence");
+            });
+
+            modelBuilder.Entity<EcfEmployeeEvaluator>(entity =>
+            {
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Evaluation)
+                    .WithMany(p => p.EcfEmployeeEvaluator)
+                    .HasForeignKey(d => d.EvaluationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfEmployeeEvaluator_EmployeeEvaluation");
+
+                entity.HasOne(d => d.Evaluator)
+                    .WithMany(p => p.EcfEmployeeEvaluator)
+                    .HasForeignKey(d => d.EvaluatorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfEmployeeEvaluator_Employee");
             });
 
             modelBuilder.Entity<EcfEvaluation>(entity =>
@@ -225,6 +278,23 @@ namespace Evoflare.API.Models
                     .HasMaxLength(50);
             });
 
+            modelBuilder.Entity<EvaluationSchedule>(entity =>
+            {
+                entity.Property(e => e.EvaluationDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.EvaluationSchedule)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EvaluationSchedule_Employee");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.EvaluationSchedule)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EvaluationSchedule_Organization");
+            });
+
             modelBuilder.Entity<Organization>(entity =>
             {
                 entity.Property(e => e.Name)
@@ -311,6 +381,8 @@ namespace Evoflare.API.Models
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
 
+                entity.Property(e => e._360feedbackGroupId).HasColumnName("360FeedbackGroupId");
+
                 entity.HasOne(d => d.Evaluation)
                     .WithMany(p => p._360employeeEvaluation)
                     .HasForeignKey(d => d.EvaluationId)
@@ -322,6 +394,18 @@ namespace Evoflare.API.Models
                     .HasForeignKey<_360employeeEvaluation>(d => d.Id)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360EmployeeEvaluation_Employee");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360employeeEvaluation)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EmployeeEvaluation_Organization");
+
+                entity.HasOne(d => d._360feedbackGroup)
+                    .WithMany(p => p._360employeeEvaluation)
+                    .HasForeignKey(d => d._360feedbackGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EmployeeEvaluation_360FeedbackGroup");
             });
 
             modelBuilder.Entity<_360evaluation>(entity =>
@@ -339,6 +423,12 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.FeedbackMarkId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Evaluation_360FeedbackMark");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360evaluation)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Evaluation_Organization");
 
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p._360evaluation)
@@ -365,9 +455,72 @@ namespace Evoflare.API.Models
                     .HasMaxLength(50);
             });
 
+            modelBuilder.Entity<_360pendingEvaluator>(entity =>
+            {
+                entity.ToTable("360PendingEvaluator");
+
+                entity.Property(e => e._360employeeEvaluationId).HasColumnName("360EmployeeEvaluationId");
+
+                entity.HasOne(d => d.Evaluator)
+                    .WithMany(p => p._360pendingEvaluator)
+                    .HasForeignKey(d => d.EvaluatorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360PendingEvaluator_Employee");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360pendingEvaluator)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360PendingEvaluator_Organization");
+
+                entity.HasOne(d => d._360employeeEvaluation)
+                    .WithMany(p => p._360pendingEvaluator)
+                    .HasForeignKey(d => d._360employeeEvaluationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360PendingEvaluator_360PendingEvaluator");
+            });
+
             modelBuilder.Entity<_360question>(entity =>
             {
                 entity.ToTable("360Question");
+
+                entity.Property(e => e.Question)
+                    .IsRequired()
+                    .HasMaxLength(250);
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360question)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Question_Organization");
+
+                entity.HasOne(d => d.QuestionToMark)
+                    .WithMany(p => p._360question)
+                    .HasForeignKey(d => d.QuestionToMarkId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Question_360QuestionToMark");
+            });
+
+            modelBuilder.Entity<_360questionToMark>(entity =>
+            {
+                entity.ToTable("360QuestionToMark");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360questionToMark)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360QuestionToMark_Organization");
+
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p._360questionToMark)
+                    .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360QuestionToMark_360Questionarie");
+            });
+
+            modelBuilder.Entity<_360questionarie>(entity =>
+            {
+                entity.ToTable("360Questionarie");
 
                 entity.Property(e => e.Text)
                     .IsRequired()
@@ -375,8 +528,14 @@ namespace Evoflare.API.Models
 
                 entity.Property(e => e._360feedbackGroupId).HasColumnName("360FeedbackGroupId");
 
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360questionarie)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360Questionarie_Organization");
+
                 entity.HasOne(d => d._360feedbackGroup)
-                    .WithMany(p => p._360question)
+                    .WithMany(p => p._360questionarie)
                     .HasForeignKey(d => d._360feedbackGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Question_360FeedbackGroup");

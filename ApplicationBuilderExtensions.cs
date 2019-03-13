@@ -63,7 +63,7 @@ namespace Evoflare.API
         /// <returns></returns>
         public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application, IConfiguration configuration)
         {
-            DbInitializer.Initialize(application.ApplicationServices, configuration);
+            //DbInitializer.Initialize(application.ApplicationServices, configuration);
 
             return application;
         }

@@ -45,7 +45,49 @@ namespace Evoflare.API.Controllers
                 .Include(e => e.Employee)
                 .ToListAsync();
         }
-        
+
+        // GET: api/EmployeeEvaluations/5/evaluators
+        [HttpGet("{employeeId}/evaluators")]
+        public async Task<IActionResult> Get360Evaluators(int employeeId)
+        {
+            // TODO: only works for employee. Add implementation for Manager
+            var employeeEvaluation = _context.EmployeeEvaluation
+                .Where(e => e.TechnicalEvaluatorId == employeeId);
+
+            var a = await _context.EmployeeRelations
+                .Where(r => r.EmployeeId == employeeId)
+                .ToListAsync();
+            var teams = a.Select(r => r.TeamId).Distinct().ToHashSet();
+            var directManagerIds = a.Select(r => r.ManagerId).Where(m => m != null).Distinct().ToList();
+
+            var directManagers = await _context.Employee
+                .Where(e => directManagerIds.Contains(e.Id))
+                .ToListAsync();
+
+            var peersAndManagers = await _context.EmployeeRelations
+                .Where(r => teams.Contains(r.TeamId))
+                .Include(r => r.Employee)
+                .Include(r => r.Manager)
+                .ToListAsync();
+
+            var customers = await _context.Team
+                .Where(t => teams.Contains(t.Id))
+                .SelectMany(t => t.Project.CustomerContact)
+                .ToListAsync();
+
+            var result = new
+            {
+                Customers = customers,
+                Peers = peersAndManagers.Select(r => r.Manager).Where(m => m != null)
+                    .Concat(
+                        peersAndManagers.Select(r => r.Employee).Where(e => e != null)
+                    )
+                    .Where(e => e.Id != employeeId)
+                    .Distinct().ToList()
+            };
+            return Ok(result);
+        }
+
         // GET: api/EmployeeEvaluations/5
         [HttpGet("{employeeId}")]
         public async Task<ActionResult<IEnumerable<EmployeeEvaluation>>> GetEvaluations(int employeeId)
