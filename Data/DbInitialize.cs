@@ -169,6 +169,7 @@ namespace Evoflare.API.Data
             {
                 CreateRole(serviceProvider, Constants.Roles.Admin);
                 CreateRole(serviceProvider, Constants.Roles.Manager);
+                CreateRole(serviceProvider, Constants.Roles.HR);
             }
 
             // check for users
@@ -186,6 +187,13 @@ namespace Evoflare.API.Data
 
                 AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.Manager, userFirstName,
                     userLastName, Gender.Female, 25);
+
+                userEmail = "hr@evoflare.com";
+                userFirstName = "Human";
+                userLastName = "Resources";
+
+                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.HR, userFirstName,
+                    userLastName, Gender.Female, 30);
 
                 userEmail = "user@evoflare.com";
                 userFirstName = "Typical";
