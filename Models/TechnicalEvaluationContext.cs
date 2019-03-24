@@ -19,8 +19,8 @@ namespace Evoflare.API.Models
         public virtual DbSet<CustomerContact> CustomerContact { get; set; }
         public virtual DbSet<EcfCompetence> EcfCompetence { get; set; }
         public virtual DbSet<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
-        public virtual DbSet<EcfEmployeeEvaluator> EcfEmployeeEvaluator { get; set; }
-        public virtual DbSet<EcfEvaluation> EcfEvaluation { get; set; }
+        public virtual DbSet<EcfEmployeeEvaluation> EcfEmployeeEvaluation { get; set; }
+        public virtual DbSet<EcfEvaluationResult> EcfEvaluationResult { get; set; }
         public virtual DbSet<EcfRole> EcfRole { get; set; }
         public virtual DbSet<EcfRoleCompetence> EcfRoleCompetence { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
@@ -115,26 +115,43 @@ namespace Evoflare.API.Models
                     .HasConstraintName("FK_CompetenceLevel_Competence");
             });
 
-            modelBuilder.Entity<EcfEmployeeEvaluator>(entity =>
+            modelBuilder.Entity<EcfEmployeeEvaluation>(entity =>
             {
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.EndBy)
+                    .WithMany(p => p.EcfEmployeeEvaluationEndBy)
+                    .HasForeignKey(d => d.EndById)
+                    .HasConstraintName("FK_EcfEmployeeEvaluation_EndByEmployee");
+
                 entity.HasOne(d => d.Evaluation)
-                    .WithMany(p => p.EcfEmployeeEvaluator)
+                    .WithMany(p => p.EcfEmployeeEvaluation)
                     .HasForeignKey(d => d.EvaluationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EcfEmployeeEvaluator_EmployeeEvaluation");
+                    .HasConstraintName("FK_EcfEmployeeEvaluation_EmployeeEvaluation");
 
                 entity.HasOne(d => d.Evaluator)
-                    .WithMany(p => p.EcfEmployeeEvaluator)
+                    .WithMany(p => p.EcfEmployeeEvaluationEvaluator)
                     .HasForeignKey(d => d.EvaluatorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EcfEmployeeEvaluator_Employee");
+                    .HasConstraintName("FK_EcfEmployeeEvaluation_Evaluator");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.EcfEmployeeEvaluation)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfEmployeeEvaluation_Organization");
+
+                entity.HasOne(d => d.StartBy)
+                    .WithMany(p => p.EcfEmployeeEvaluationStartBy)
+                    .HasForeignKey(d => d.StartById)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EcfEmployeeEvaluation_StartByEmployee");
             });
 
-            modelBuilder.Entity<EcfEvaluation>(entity =>
+            modelBuilder.Entity<EcfEvaluationResult>(entity =>
             {
                 entity.Property(e => e.Competence)
                     .IsRequired()
@@ -142,16 +159,16 @@ namespace Evoflare.API.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.CompetenceNavigation)
-                    .WithMany(p => p.EcfEvaluation)
+                    .WithMany(p => p.EcfEvaluationResult)
                     .HasForeignKey(d => d.Competence)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EcfEvaluation_EcfCompetence");
 
                 entity.HasOne(d => d.Evaluation)
-                    .WithMany(p => p.EcfEvaluation)
+                    .WithMany(p => p.EcfEvaluationResult)
                     .HasForeignKey(d => d.EvaluationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EcfEvaluation_EmployeeEvaluation");
+                    .HasConstraintName("FK_EcfEvaluationResults_EcfEmployeeEvaluation");
             });
 
             modelBuilder.Entity<EcfRole>(entity =>
@@ -222,7 +239,7 @@ namespace Evoflare.API.Models
                 entity.HasOne(d => d.EndedBy)
                     .WithMany(p => p.EmployeeEvaluationEndedBy)
                     .HasForeignKey(d => d.EndedById)
-                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeEnded");
+                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeEndedBy");
 
                 entity.HasOne(d => d.Organization)
                     .WithMany(p => p.EmployeeEvaluation)
@@ -234,7 +251,7 @@ namespace Evoflare.API.Models
                     .WithMany(p => p.EmployeeEvaluationStartedBy)
                     .HasForeignKey(d => d.StartedById)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeStarted");
+                    .HasConstraintName("FK_EmployeeEvaluation_EmployeeStartedBy");
             });
 
             modelBuilder.Entity<EmployeeRelations>(entity =>

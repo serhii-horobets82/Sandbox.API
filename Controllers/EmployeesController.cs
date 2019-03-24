@@ -145,6 +145,107 @@ namespace Evoflare.API.Controllers
             return Ok(employee);
         }
 
+        // GET: api/Employees/profile/5
+        // TODO: remove this from url, it should go from user 
+        [HttpGet("profile/{id}")]
+        public async Task<IActionResult> GetEmployeeProfile([FromRoute] int id)
+        {
+            var employee = await _context.Employee
+                .Include(e => e.EmployeeType)
+                .Include(e => e.EmployeeRelationsEmployee)
+                    .ThenInclude(e => e.Team.Project)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(employee);
+        }
+
+        public class ProfileEcfCompetence
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public int CompetenceLevel { get; set; }
+            public int RoleLevel { get; set; }
+            public List<int> Levels { get; set; }
+        }
+
+        // GET: api/Employees/profile/5/ecf-evaluation
+        // TODO: remove this from url, it should go from user 
+        [HttpGet("profile/{id}/ecf-evaluation")]
+        public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf([FromRoute] int id)
+        {
+            var competences = await _context.EcfCompetence
+                .Include(c => c.EcfCompetenceLevel)
+                .ToListAsync();
+            var competencesById = competences.ToDictionary(c => c.Id);
+
+            var competencesFromRoles = await _context.EmployeeRelations
+                .Where(p => p.EmployeeId == id)
+                .Select(p => p.Position)
+                .SelectMany(p => p.PositionRole.Select(r => r.Role))
+                .SelectMany(r => r.EcfRoleCompetence.Select(c => c.CompetenceId))
+                .ToListAsync();
+
+            var lastEvaluation = await _context.EmployeeEvaluation
+                .Include(e => e.EcfEmployeeEvaluation)
+                    .ThenInclude(e => e.EcfEvaluationResult)
+                .FirstOrDefaultAsync(e => e.EmployeeId == id && !e.Archived);
+
+            var pastEvaluationsByCompetence = new Dictionary<string, EcfEvaluationResult>();
+            if (lastEvaluation != null)
+            {
+                if (lastEvaluation.EcfEmployeeEvaluation != null && lastEvaluation.EcfEmployeeEvaluation.Any())
+                {
+                    pastEvaluationsByCompetence = lastEvaluation
+                        .EcfEmployeeEvaluation.First()
+                        .EcfEvaluationResult
+                        .ToDictionary(e => e.Competence, e => new EcfEvaluationResult
+                        {
+                            Competence = e.Competence,
+                            CompetenceLevel = e.CompetenceLevel
+                        });
+                }
+            }
+
+            foreach (var item in competencesFromRoles)
+            {
+                if (!pastEvaluationsByCompetence.ContainsKey(item))
+                {
+                    pastEvaluationsByCompetence.Add(item, new EcfEvaluationResult
+                    {
+                        Competence = item
+                    });
+                }
+            }
+
+            var profileCompetences = new List<ProfileEcfCompetence>();
+            foreach(var competenceId in pastEvaluationsByCompetence.Keys)
+            {
+                var competence = competencesById[competenceId];
+                var c = pastEvaluationsByCompetence[competenceId];
+                var d = new ProfileEcfCompetence
+                {
+                    Id = c.Competence,
+                    Name = competence.Name,
+                    RoleLevel = 0,
+                    CompetenceLevel = c.CompetenceLevel ?? 0,
+                    Levels = Enumerable.Range(1, 5).Select(i => 0).ToList()                    
+                };
+                foreach(var l in competence.EcfCompetenceLevel)
+                {
+                    d.Levels[l.Level] = 1;
+                }
+                profileCompetences.Add(d);
+            }
+
+            return profileCompetences;
+        }
+
+
         private bool EmployeeExists(int id)
         {
             return _context.Employee.Any(e => e.Id == id);

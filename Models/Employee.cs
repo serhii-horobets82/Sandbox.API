@@ -7,7 +7,9 @@ namespace Evoflare.API.Models
     {
         public Employee()
         {
-            EcfEmployeeEvaluator = new HashSet<EcfEmployeeEvaluator>();
+            EcfEmployeeEvaluationEndBy = new HashSet<EcfEmployeeEvaluation>();
+            EcfEmployeeEvaluationEvaluator = new HashSet<EcfEmployeeEvaluation>();
+            EcfEmployeeEvaluationStartBy = new HashSet<EcfEmployeeEvaluation>();
             EmployeeEvaluationEmployee = new HashSet<EmployeeEvaluation>();
             EmployeeEvaluationEndedBy = new HashSet<EmployeeEvaluation>();
             EmployeeEvaluationStartedBy = new HashSet<EmployeeEvaluation>();
@@ -29,7 +31,9 @@ namespace Evoflare.API.Models
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
-        public virtual ICollection<EcfEmployeeEvaluator> EcfEmployeeEvaluator { get; set; }
+        public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationEndBy { get; set; }
+        public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationEvaluator { get; set; }
+        public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationStartBy { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEmployee { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEndedBy { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationStartedBy { get; set; }

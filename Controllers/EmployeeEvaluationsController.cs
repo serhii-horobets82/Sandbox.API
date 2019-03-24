@@ -34,7 +34,7 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<IEnumerable<EmployeeEvaluation>>> GetWhomEvaluate(int employeeId, [FromQuery] bool? history)
         {
             var employeeEvaluation = _context.EmployeeEvaluation
-                .Where(e => e.TechnicalEvaluatorId == employeeId);
+                .Where(e => e.EcfEmployeeEvaluation.Any(t => t.OrganizationId == employeeId));
 
             if (!history.HasValue || (history.HasValue && !history.Value))
             {
@@ -43,6 +43,7 @@ namespace Evoflare.API.Controllers
 
             return await employeeEvaluation
                 .Include(e => e.Employee)
+                .Include(e => e.EcfEmployeeEvaluation)
                 .ToListAsync();
         }
 
@@ -52,7 +53,7 @@ namespace Evoflare.API.Controllers
         {
             // TODO: only works for employee. Add implementation for Manager
             var employeeEvaluation = _context.EmployeeEvaluation
-                .Where(e => e.TechnicalEvaluatorId == employeeId);
+                .Where(e => e.EcfEmployeeEvaluation.Any(ee => ee.EvaluatorId == employeeId));
 
             var a = await _context.EmployeeRelations
                 .Where(r => r.EmployeeId == employeeId)
@@ -105,9 +106,10 @@ namespace Evoflare.API.Controllers
         {
             var employeeEvaluation = await _context.EmployeeEvaluation
                 .Include(e => e.Employee)
-                .Include(e => e.EcfEvaluation)
-                    .ThenInclude(e => e.CompetenceNavigation)
-                        .ThenInclude(c => c.EcfCompetenceLevel)
+                .Include(e => e.EcfEmployeeEvaluation)
+                    .ThenInclude(e => e.EcfEvaluationResult)
+                        .ThenInclude(e => e.CompetenceNavigation)
+                            .ThenInclude(c => c.EcfCompetenceLevel)
                 .FirstOrDefaultAsync(e => e.Id == evaluationId);
 
             return employeeEvaluation;
@@ -161,23 +163,29 @@ namespace Evoflare.API.Controllers
             employeeEvaluation.OrganizationId = 1;
             employeeEvaluation.StartDate = DateTime.UtcNow;
             employeeEvaluation.StartedById = 11;
-            
+
             var lastEvaluation = await _context.EmployeeEvaluation
-                .Include(e => e.EcfEvaluation)
+                .Include(e => e.EcfEmployeeEvaluation)
+                    .ThenInclude(e => e.EcfEvaluationResult)
                 .FirstOrDefaultAsync(e => e.EmployeeId == employeeEvaluation.EmployeeId && !e.Archived);
 
-            var pastEvaluationsByCompetence = new Dictionary<string, EcfEvaluation>();
+            var pastEvaluationsByCompetence = new Dictionary<string, EcfEvaluationResult>();
             if (lastEvaluation != null)
             {
                 lastEvaluation.Archived = true;
                 _context.Entry(lastEvaluation).State = EntityState.Modified;
-
-                lastEvaluation.EcfEvaluation.ToDictionary(e => e.Competence, e => new EcfEvaluation
+                if (lastEvaluation.EcfEmployeeEvaluation != null && lastEvaluation.EcfEmployeeEvaluation.Any())
                 {
-                    EvaluationId = employeeEvaluation.Id,
-                    Competence = e.Competence,
-                    CompetenceLevel = e.CompetenceLevel
-                });
+                    pastEvaluationsByCompetence = lastEvaluation
+                        .EcfEmployeeEvaluation.First()
+                        .EcfEvaluationResult
+                        .ToDictionary(e => e.Competence, e => new EcfEvaluationResult
+                        {
+                            EvaluationId = employeeEvaluation.Id,
+                            Competence = e.Competence,
+                            CompetenceLevel = e.CompetenceLevel
+                        });
+                }
             }
 
             var competencesFromRoles = await _context.EmployeeRelations
@@ -186,19 +194,26 @@ namespace Evoflare.API.Controllers
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
                 .SelectMany(r => r.EcfRoleCompetence.Select(c => c.CompetenceId))
                 .ToListAsync();
-            
+
             foreach (var item in competencesFromRoles)
             {
                 if (!pastEvaluationsByCompetence.ContainsKey(item))
                 {
-                    pastEvaluationsByCompetence.Add(item, new EcfEvaluation
+                    pastEvaluationsByCompetence.Add(item, new EcfEvaluationResult
                     {
                         Competence = item,
                         EvaluationId = employeeEvaluation.Id
                     });
                 }
             }
-            employeeEvaluation.EcfEvaluation = pastEvaluationsByCompetence.Values;
+            employeeEvaluation.EcfEmployeeEvaluation = new List<EcfEmployeeEvaluation>
+            {
+                new EcfEmployeeEvaluation
+                {
+                    EcfEvaluationResult = pastEvaluationsByCompetence.Values.ToList(),
+                    OrganizationId = 1
+                }
+            };
 
             foreach (var item in employeeEvaluation._360employeeEvaluation)
             {

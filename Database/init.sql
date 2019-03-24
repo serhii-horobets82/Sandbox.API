@@ -132,20 +132,6 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[AppVersion](
-	[Name] [nvarchar](450) NOT NULL,
-	[Version] [nvarchar](max) NULL,
-	[CreationDate] [datetime2](7) NOT NULL,
- CONSTRAINT [PK_AppVersion] PRIMARY KEY CLUSTERED 
-(
-	[Name] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[CustomerContact](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](250) NOT NULL,
@@ -192,13 +178,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[EcfEmployeeEvaluator](
+CREATE TABLE [dbo].[EcfEmployeeEvaluation](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EvaluationId] [int] NOT NULL,
 	[EvaluatorId] [int] NOT NULL,
 	[StartDate] [datetime] NOT NULL,
+	[StartById] [int] NOT NULL,
 	[EndDate] [datetime] NULL,
-	[EvaluationId] [int] NOT NULL,
- CONSTRAINT [PK_EcfEmployeeEvaluator] PRIMARY KEY CLUSTERED 
+	[EndById] [int] NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_EcfEmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -208,7 +197,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[EcfEvaluation](
+CREATE TABLE [dbo].[EcfEvaluationResult](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[EvaluationId] [int] NOT NULL,
 	[Competence] [char](3) NOT NULL,
@@ -410,6 +399,20 @@ CREATE TABLE [dbo].[Team](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] ON 
+GO
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (10, 10, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+GO
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (11, 2, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+GO
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (12, 16, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+GO
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (13, 21, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+GO
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (14, 12, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+GO
+SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] OFF
+GO
 SET IDENTITY_INSERT [dbo].[360FeedbackGroup] ON 
 GO
 INSERT [dbo].[360FeedbackGroup] ([Id], [Type]) VALUES (1, N'Self')
@@ -456,17 +459,95 @@ sfjd999 999', 0, 1)
 GO
 INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (10, 9, N'0a0a0a0a', 0, 1)
 GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (14, 4, N'wawaw `
+awaww 2', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (15, 5, N'tatat 1
+tatatata 2
+sfdd', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (16, 6, N'tgggggggggggg
+gadss
+dfgjfdh', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (17, 15, N'adsdDAa', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (18, 16, N'asdad3', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (19, 17, N'adasd3', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (20, 12, N'sfsdfsdf
+asdfasedf
+45rawf4w', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (21, 13, N'waf4wa
+4warfr
+', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (22, 14, N'a3wdawf
+awf3faw4
+f4awf', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (23, 18, N'safdf
+a
+f', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (24, 19, N'2f3
+f4was
+fsd
+', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (25, 20, N'fa3w
+fw3
+', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (26, 21, N'asdfds', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (27, 22, N'afsdfafsdf', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (28, 23, N'asdfsd', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (29, 24, N'as df aw
+4f awf', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (30, 25, N'waffwa 
+aw fds
+f as
+dfs ', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (31, 26, N'asfdwf3', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (32, 27, N'fsaw3f
+wafwe 
+', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (33, 28, N'ffw4fe
+awfw
+afsf', 0, 1)
+GO
+INSERT [dbo].[360Question] ([Id], [QuestionToMarkId], [Question], [Order], [OrganizationId]) VALUES (34, 29, N'agw
+ar23f
+wgsdfgs dasf', 0, 1)
+GO
 SET IDENTITY_INSERT [dbo].[360Question] OFF
 GO
 SET IDENTITY_INSERT [dbo].[360Questionarie] ON 
 GO
-INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (1, N'Q1. Something edit', 1, 1)
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (1, N'Question 1', 1, 1)
 GO
-INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (2, N'Q1. Awawawa a dasd as question', 2, 1)
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (2, N'Question 1', 2, 1)
 GO
-INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (4, N'Some other question', 1, 1)
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (4, N'Question 2', 1, 1)
 GO
-INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (5, N'Good question', 1, 1)
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (5, N'Question 3', 1, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (8, N'Question 4', 1, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (9, N'Question 2', 2, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (10, N'Question 3', 2, 1)
+GO
+INSERT [dbo].[360Questionarie] ([Id], [Text], [360FeedbackGroupId], [OrganizationId]) VALUES (11, N'Question 4', 2, 1)
 GO
 SET IDENTITY_INSERT [dbo].[360Questionarie] OFF
 GO
@@ -484,9 +565,49 @@ INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]
 GO
 INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (9, 5, 5, 1)
 GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (12, 8, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (13, 8, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (14, 8, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (15, 1, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (16, 1, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (17, 1, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (18, 2, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (19, 2, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (20, 2, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (21, 9, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (22, 9, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (23, 9, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (24, 10, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (25, 10, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (26, 10, 5, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (27, 11, 1, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (28, 11, 3, 1)
+GO
+INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (29, 11, 5, 1)
+GO
 SET IDENTITY_INSERT [dbo].[360QuestionToMark] OFF
 GO
-INSERT [dbo].[AppVersion] ([Name], [Version], [CreationDate]) VALUES (N'Evoflare.API', N'0.0.1.1', CAST(N'2019-02-27T10:17:01.4920533' AS DateTime2))
+SET IDENTITY_INSERT [dbo].[CustomerContact] ON 
+GO
+INSERT [dbo].[CustomerContact] ([Id], [Name], [Email], [Phone], [ProjectId], [OrganizationId]) VALUES (2, N'Name namin', N'mail@mail.com', N'+242342343', 3, 1)
+GO
+SET IDENTITY_INSERT [dbo].[CustomerContact] OFF
 GO
 INSERT [dbo].[EcfCompetence] ([Id], [Name], [Summary]) VALUES (N'A1 ', N'IS and Business Strategy Alignment', N'Anticipates long term business requirements, influences improvement of organisational process efficiency and effectivenes. Determines the IS model and the enterprise architecture in line with the organisation’s policy and ensures a secure environment. Makes strategic IS policy decisions for the enterprise, including sourcing strategies.  ')
 GO
@@ -784,57 +905,85 @@ INSERT [dbo].[EcfCompetenceLevel] ([Id], [CompetenceId], [Level], [Description])
 GO
 SET IDENTITY_INSERT [dbo].[EcfCompetenceLevel] OFF
 GO
-SET IDENTITY_INSERT [dbo].[EcfEvaluation] ON 
+SET IDENTITY_INSERT [dbo].[EcfEmployeeEvaluation] ON 
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (1, 3, N'B1 ', 2)
+INSERT [dbo].[EcfEmployeeEvaluation] ([Id], [EvaluationId], [EvaluatorId], [StartDate], [StartById], [EndDate], [EndById], [OrganizationId]) VALUES (1, 3, 6, CAST(N'2019-03-02T13:53:39.670' AS DateTime), 11, NULL, NULL, 1)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (2, 3, N'B2 ', NULL)
+INSERT [dbo].[EcfEmployeeEvaluation] ([Id], [EvaluationId], [EvaluatorId], [StartDate], [StartById], [EndDate], [EndById], [OrganizationId]) VALUES (2, 4, 6, CAST(N'2019-03-03T11:29:11.267' AS DateTime), 11, NULL, NULL, 1)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (3, 3, N'B3 ', 4)
+INSERT [dbo].[EcfEmployeeEvaluation] ([Id], [EvaluationId], [EvaluatorId], [StartDate], [StartById], [EndDate], [EndById], [OrganizationId]) VALUES (3, 5, 7, CAST(N'2019-03-05T17:32:01.637' AS DateTime), 11, NULL, NULL, 1)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (4, 3, N'B5 ', NULL)
+INSERT [dbo].[EcfEmployeeEvaluation] ([Id], [EvaluationId], [EvaluatorId], [StartDate], [StartById], [EndDate], [EndById], [OrganizationId]) VALUES (4, 9, 6, CAST(N'2019-03-12T20:56:01.140' AS DateTime), 11, NULL, NULL, 1)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (5, 3, N'C4 ', NULL)
+SET IDENTITY_INSERT [dbo].[EcfEmployeeEvaluation] OFF
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (6, 3, N'A6 ', NULL)
+SET IDENTITY_INSERT [dbo].[EcfEvaluationResult] ON 
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (7, 3, N'B4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (1, 1, N'B1 ', 2)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (8, 3, N'E8 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (2, 1, N'B2 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (9, 3, N'C1 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (3, 1, N'B3 ', 4)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (10, 3, N'C2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (4, 1, N'B5 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (11, 3, N'C3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (5, 1, N'C4 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (12, 3, N'E3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (6, 1, N'A6 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (13, 3, N'E6 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (7, 1, N'B4 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (14, 5, N'A6 ', 2)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (8, 1, N'E8 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (15, 5, N'B2 ', 4)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (9, 1, N'C1 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (16, 5, N'B4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (10, 1, N'C2 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (17, 5, N'C4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (11, 1, N'C3 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (18, 5, N'E8 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (12, 1, N'E3 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (19, 5, N'C2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (13, 1, N'E6 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (20, 5, N'C3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (14, 3, N'A6 ', 2)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (21, 5, N'E3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (15, 3, N'B2 ', 4)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (22, 5, N'E6 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (16, 3, N'B4 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (23, 5, N'B3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (17, 3, N'C4 ', NULL)
 GO
-INSERT [dbo].[EcfEvaluation] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (24, 5, N'B5 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (18, 3, N'E8 ', NULL)
 GO
-SET IDENTITY_INSERT [dbo].[EcfEvaluation] OFF
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (19, 3, N'C2 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (20, 3, N'C3 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (21, 3, N'E3 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (22, 3, N'E6 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (23, 3, N'B3 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (24, 3, N'B5 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (49, 4, N'B1 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (50, 4, N'B2 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (51, 4, N'B3 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (52, 4, N'B5 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (53, 4, N'C4 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (54, 4, N'C1 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (55, 4, N'C2 ', NULL)
+GO
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (56, 4, N'C3 ', NULL)
+GO
+SET IDENTITY_INSERT [dbo].[EcfEvaluationResult] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EcfRole] ON 
 GO
@@ -1230,6 +1379,8 @@ INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById
 GO
 INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (5, 17, CAST(N'2019-03-05T17:32:01.637' AS DateTime), 11, NULL, NULL, 1, 0, 7)
 GO
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (9, 18, CAST(N'2019-03-12T20:56:01.140' AS DateTime), 11, NULL, NULL, 1, 0, 6)
+GO
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeRelations] ON 
@@ -1334,6 +1485,8 @@ INSERT [dbo].[Project] ([Id], [Name], [OrganizationId]) VALUES (1, N'Smart produ
 GO
 INSERT [dbo].[Project] ([Id], [Name], [OrganizationId]) VALUES (2, N'Usual product 1', 1)
 GO
+INSERT [dbo].[Project] ([Id], [Name], [OrganizationId]) VALUES (3, N'Karandash', 1)
+GO
 SET IDENTITY_INSERT [dbo].[Project] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Team] ON 
@@ -1367,7 +1520,7 @@ REFERENCES [dbo].[360FeedbackGroup] ([Id])
 GO
 ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_360FeedbackGroup]
 GO
-ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_Employee] FOREIGN KEY([Id])
+ALTER TABLE [dbo].[360EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_360EmployeeEvaluation_Employee] FOREIGN KEY([EvaluatorEmployeeId])
 REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[360EmployeeEvaluation] CHECK CONSTRAINT [FK_360EmployeeEvaluation_Employee]
@@ -1462,25 +1615,35 @@ REFERENCES [dbo].[EcfCompetence] ([Id])
 GO
 ALTER TABLE [dbo].[EcfCompetenceLevel] CHECK CONSTRAINT [FK_CompetenceLevel_Competence]
 GO
-ALTER TABLE [dbo].[EcfEmployeeEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluator_Employee] FOREIGN KEY([EvaluatorId])
+ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
+REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+GO
+ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_EmployeeEvaluation]
+GO
+ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_EndByEmployee] FOREIGN KEY([EndById])
 REFERENCES [dbo].[Employee] ([Id])
 GO
-ALTER TABLE [dbo].[EcfEmployeeEvaluator] CHECK CONSTRAINT [FK_EcfEmployeeEvaluator_Employee]
+ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_EndByEmployee]
 GO
-ALTER TABLE [dbo].[EcfEmployeeEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluator_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
-REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
 GO
-ALTER TABLE [dbo].[EcfEmployeeEvaluator] CHECK CONSTRAINT [FK_EcfEmployeeEvaluator_EmployeeEvaluation]
+ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_Organization]
 GO
-ALTER TABLE [dbo].[EcfEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEvaluation_EcfCompetence] FOREIGN KEY([Competence])
+ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_StartByEmployee] FOREIGN KEY([StartById])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_StartByEmployee]
+GO
+ALTER TABLE [dbo].[EcfEvaluationResult]  WITH CHECK ADD  CONSTRAINT [FK_EcfEvaluation_EcfCompetence] FOREIGN KEY([Competence])
 REFERENCES [dbo].[EcfCompetence] ([Id])
 GO
-ALTER TABLE [dbo].[EcfEvaluation] CHECK CONSTRAINT [FK_EcfEvaluation_EcfCompetence]
+ALTER TABLE [dbo].[EcfEvaluationResult] CHECK CONSTRAINT [FK_EcfEvaluation_EcfCompetence]
 GO
-ALTER TABLE [dbo].[EcfEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEvaluation_EmployeeEvaluation] FOREIGN KEY([EvaluationId])
-REFERENCES [dbo].[EmployeeEvaluation] ([Id])
+ALTER TABLE [dbo].[EcfEvaluationResult]  WITH CHECK ADD  CONSTRAINT [FK_EcfEvaluationResults_EcfEmployeeEvaluation] FOREIGN KEY([EvaluationId])
+REFERENCES [dbo].[EcfEmployeeEvaluation] ([Id])
 GO
-ALTER TABLE [dbo].[EcfEvaluation] CHECK CONSTRAINT [FK_EcfEvaluation_EmployeeEvaluation]
+ALTER TABLE [dbo].[EcfEvaluationResult] CHECK CONSTRAINT [FK_EcfEvaluationResults_EcfEmployeeEvaluation]
 GO
 ALTER TABLE [dbo].[EcfRoleCompetence]  WITH CHECK ADD  CONSTRAINT [FK_EcfRoleCompetence_EcfCompetence] FOREIGN KEY([CompetenceId])
 REFERENCES [dbo].[EcfCompetence] ([Id])
@@ -1501,26 +1664,6 @@ ALTER TABLE [dbo].[Employee]  WITH CHECK ADD  CONSTRAINT [FK_Employee_Organizati
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[Employee] CHECK CONSTRAINT [FK_Employee_Organization]
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_Employee] FOREIGN KEY([EmployeeId])
-REFERENCES [dbo].[Employee] ([Id])
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_Employee]
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeEnded] FOREIGN KEY([EndedById])
-REFERENCES [dbo].[Employee] ([Id])
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeEnded]
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeStarted] FOREIGN KEY([StartedById])
-REFERENCES [dbo].[Employee] ([Id])
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeStarted]
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_Organization] FOREIGN KEY([OrganizationId])
-REFERENCES [dbo].[Organization] ([Id])
-GO
-ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_Organization]
 GO
 ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRelations_Employee] FOREIGN KEY([EmployeeId])
 REFERENCES [dbo].[Employee] ([Id])

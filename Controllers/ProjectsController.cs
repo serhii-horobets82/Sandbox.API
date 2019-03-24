@@ -50,8 +50,10 @@ namespace Evoflare.API.Controllers
                             relation.Employee.EmployeeRelationsManager = null;
                             relation.Employee.PositionCreatedByNavigation = null;
                             relation.Employee._360pendingEvaluator = null;
-                            relation.Employee.EcfEmployeeEvaluator = null;
+                            relation.Employee.EcfEmployeeEvaluationEndBy = null;
+                            relation.Employee.EcfEmployeeEvaluationStartBy = null;
                             relation.Employee.EmployeeEvaluationStartedBy = null;
+                            relation.Employee.EmployeeEvaluationEndedBy = null;
                         }
                         if (relation.Manager != null)
                         {
@@ -59,8 +61,10 @@ namespace Evoflare.API.Controllers
                             relation.Manager.EmployeeRelationsManager = null;
                             relation.Manager.PositionCreatedByNavigation = null;
                             relation.Manager._360pendingEvaluator = null;
-                            relation.Manager.EcfEmployeeEvaluator = null;
+                            relation.Manager.EcfEmployeeEvaluationEndBy = null;
+                            relation.Manager.EcfEmployeeEvaluationStartBy = null;
                             relation.Manager.EmployeeEvaluationStartedBy = null;
+                            relation.Manager.EmployeeEvaluationEndedBy = null;
                         }
                         if (relation.Position != null)
                         {
