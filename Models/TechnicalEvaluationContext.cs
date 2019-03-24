@@ -375,8 +375,6 @@ namespace Evoflare.API.Models
             {
                 entity.ToTable("360EmployeeEvaluation");
 
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
@@ -389,9 +387,9 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360EmployeeEvaluation_EmployeeEvaluation");
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p._360employeeEvaluation)
-                    .HasForeignKey<_360employeeEvaluation>(d => d.Id)
+                entity.HasOne(d => d.EvaluatorEmployee)
+                    .WithMany(p => p._360employeeEvaluation)
+                    .HasForeignKey(d => d.EvaluatorEmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360EmployeeEvaluation_Employee");
 

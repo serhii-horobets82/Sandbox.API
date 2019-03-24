@@ -16,6 +16,7 @@ namespace Evoflare.API.Models
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
             PositionCreatedByNavigation = new HashSet<Position>();
             PositionUpdatedByNavigation = new HashSet<Position>();
+            _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
             _360pendingEvaluator = new HashSet<_360pendingEvaluator>();
         }
 
@@ -28,7 +29,6 @@ namespace Evoflare.API.Models
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
-        public virtual _360employeeEvaluation _360employeeEvaluation { get; set; }
         public virtual ICollection<EcfEmployeeEvaluator> EcfEmployeeEvaluator { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEmployee { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEndedBy { get; set; }
@@ -38,6 +38,7 @@ namespace Evoflare.API.Models
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual ICollection<Position> PositionCreatedByNavigation { get; set; }
         public virtual ICollection<Position> PositionUpdatedByNavigation { get; set; }
+        public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
     }
 }

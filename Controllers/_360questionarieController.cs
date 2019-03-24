@@ -52,6 +52,7 @@ namespace Evoflare.API.Controllers
         {
             foreach (var item in questions)
             {
+                item.OrganizationId = 1;
                 if (item.Id == 0)
                 {
                     _context._360question.Add(item);
@@ -132,11 +133,12 @@ namespace Evoflare.API.Controllers
             //    new _360questionToMark {MarkId = 3, _360question = new List<_360question> { new _360question { }} },
             //    new _360questionToMark {MarkId = 5, _360question = new List<_360question> { new _360question { }} }
             //};
+            _360questionarie.OrganizationId = 1;
             _360questionarie._360questionToMark = new List<_360questionToMark>
             {
-                new _360questionToMark {MarkId = 1},
-                new _360questionToMark {MarkId = 3},
-                new _360questionToMark {MarkId = 5}
+                new _360questionToMark {MarkId = 1,OrganizationId = 1},
+                new _360questionToMark {MarkId = 3,OrganizationId = 1},
+                new _360questionToMark {MarkId = 5,OrganizationId = 1}
             };
             _context._360questionarie.Add(_360questionarie);
             await _context.SaveChangesAsync();

@@ -200,6 +200,12 @@ namespace Evoflare.API.Controllers
             }
             employeeEvaluation.EcfEvaluation = pastEvaluationsByCompetence.Values;
 
+            foreach (var item in employeeEvaluation._360employeeEvaluation)
+            {
+                item.OrganizationId = 1;
+                item.StartDate = DateTime.UtcNow;
+            }
+
             _context.EmployeeEvaluation.Add(employeeEvaluation);
             await _context.SaveChangesAsync();
 
@@ -220,6 +226,20 @@ namespace Evoflare.API.Controllers
             await _context.SaveChangesAsync();
 
             return employeeEvaluation;
+        }
+
+        // GET: api/EmployeeEvaluations/i-evaluate-360/1
+        [HttpGet("i-evaluate-360/{id}")]
+        public async Task<ActionResult<List<_360employeeEvaluation>>> GetIEvaluate360(int id)
+        {
+            // TODO: remove the id input, use EmployeeId from current user principal
+            
+            var employeesToEvaluate = await _context._360employeeEvaluation
+                .Where(e => e.EvaluatorEmployeeId == id && e.EndDate == null && e.Evaluation.EndDate == null)
+                .Include(e => e.Evaluation.Employee)
+                .ToListAsync();
+
+            return employeesToEvaluate;
         }
 
         private bool EmployeeEvaluationExists(int id)

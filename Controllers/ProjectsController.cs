@@ -22,10 +22,56 @@ namespace Evoflare.API.Controllers
 
         // GET: api/Projects
         [HttpGet]
-        public IEnumerable<Project> GetProject()
+        public async Task<IEnumerable<Project>> GetProjects()
         {
-            return _context.Project
-                .Include(_ => _.Team);
+            var projects = await _context.Project
+                //.Where(p => p.OrganizationId == 1)
+                .Include(_ => _.Team)
+                    .ThenInclude(t => t.EmployeeRelations)
+                        .ThenInclude(r => r.Position)
+                .Include(p => p.CustomerContact)
+                .ToListAsync();
+
+            var employees = await _context.Employee.Include(e => e.EmployeeType).ToListAsync();
+            foreach (var proj in projects)
+            {
+                proj.EmployeeRelations = null;
+                foreach (var team in proj.Team)
+                {
+                    team.Project = null;
+                    foreach (var relation in team.EmployeeRelations)
+                    {
+                        relation.Project = null;
+                        relation.Team = null;
+                       
+                        if (relation.Employee != null)
+                        {
+                            relation.Employee.EmployeeRelationsEmployee = null;
+                            relation.Employee.EmployeeRelationsManager = null;
+                            relation.Employee.PositionCreatedByNavigation = null;
+                            relation.Employee._360pendingEvaluator = null;
+                            relation.Employee.EcfEmployeeEvaluator = null;
+                            relation.Employee.EmployeeEvaluationStartedBy = null;
+                        }
+                        if (relation.Manager != null)
+                        {
+                            relation.Manager.EmployeeRelationsEmployee = null;
+                            relation.Manager.EmployeeRelationsManager = null;
+                            relation.Manager.PositionCreatedByNavigation = null;
+                            relation.Manager._360pendingEvaluator = null;
+                            relation.Manager.EcfEmployeeEvaluator = null;
+                            relation.Manager.EmployeeEvaluationStartedBy = null;
+                        }
+                        if (relation.Position != null)
+                        {
+                            relation.Position.EmployeeRelations = null;
+                            relation.Position.CreatedByNavigation = null;
+                            relation.Position.UpdatedByNavigation = null;
+                        }
+                    }
+                }
+            }
+            return projects;
         }
 
         // GET: api/Projects/5
@@ -62,6 +108,21 @@ namespace Evoflare.API.Controllers
             }
 
             _context.Entry(project).State = EntityState.Modified;
+            foreach (var item in project.CustomerContact)
+            {
+                item.OrganizationId = 1;
+                item.ProjectId = project.Id;
+
+                if (item.Id == 0)
+                {
+                    _context.CustomerContact.Add(item);
+                }
+                else
+                {
+                    // TODO: this may lead to incorrect history of updates
+                    _context.Entry(item).State = EntityState.Modified;
+                }
+            }
 
             try
             {

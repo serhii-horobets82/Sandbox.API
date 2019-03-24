@@ -48,8 +48,15 @@ namespace Evoflare.API.Controllers
                                 {
                                     Id = c.Competence.Id,
                                     Name = c.Competence.Name,
-                                    Summary = c.Competence.Summary
-                                }
+                                    Summary = c.Competence.Summary,
+                                    EcfCompetenceLevel = c.Competence.EcfCompetenceLevel
+                                        .Select(l => new EcfCompetenceLevel
+                                        {
+                                            Id = l.Id,
+                                            Level = l.Level
+                                        })
+                                        .ToList()
+                                },
                             }).ToList()
                         }
                     }).ToList()

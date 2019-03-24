@@ -20,7 +20,7 @@ namespace Evoflare.API.Models
         public int _360feedbackGroupId { get; set; }
 
         public virtual EmployeeEvaluation Evaluation { get; set; }
-        public virtual Employee IdNavigation { get; set; }
+        public virtual Employee EvaluatorEmployee { get; set; }
         public virtual Organization Organization { get; set; }
         public virtual _360feedbackGroup _360feedbackGroup { get; set; }
         public virtual ICollection<_360evaluation> _360evaluation { get; set; }
