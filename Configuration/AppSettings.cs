@@ -9,6 +9,7 @@ namespace Evoflare.API.Configuration
     {
         public string Secret { get; set; }
         public bool RecreateDbOnStart { get; set; }
+        public bool SeedDatabase { get; set; }
         public string DbCoreSchema { get; set; }
         public int RetryTimeout { get; set; }
     }

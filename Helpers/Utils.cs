@@ -33,7 +33,7 @@ namespace Evoflare.API.Helpers
         {
             var response = new Token()
             {
-                Id = identity.Claims.Single(c => c.Type == "id").Value,
+                Id = identity.Claims.Single(c => c.Type == Constants.JwtClaimIdentifiers.Id).Value,
                 AuthToken = await jwtFactory.GenerateEncodedToken(userName, identity),
                 ExpiresIn = (int)jwtOptions.ValidFor.TotalSeconds
             };

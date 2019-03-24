@@ -225,7 +225,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[EcfRole](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[RoleId] [int] NOT NULL,
+	[RoleId] [int] NOT NULL UNIQUE,
 	[Name] [nvarchar](50) NOT NULL,
 	[Summary] [nvarchar](max) NULL,
 	[Description] [nvarchar](max) NULL,

@@ -1,3 +1,4 @@
+using Evoflare.API.Configuration;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace Evoflare.API
@@ -63,7 +64,11 @@ namespace Evoflare.API
         /// <returns></returns>
         public static IApplicationBuilder UseDbSeed(this IApplicationBuilder application, IConfiguration configuration)
         {
-            //DbInitializer.Initialize(application.ApplicationServices, configuration);
+            var appSettings = configuration.GetSection<AppSettings>();
+            if (appSettings.SeedDatabase)
+            {
+                DbInitializer.Initialize(application.ApplicationServices, configuration);
+            }
 
             return application;
         }

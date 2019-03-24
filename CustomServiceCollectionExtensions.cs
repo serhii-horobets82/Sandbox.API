@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
@@ -113,8 +114,7 @@ namespace Evoflare.API
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ApiUser",
-                    policy => policy.RequireClaim(Auth.Constants.Strings.JwtClaimIdentifiers.Rol,
-                        Auth.Constants.Strings.JwtClaims.ApiAccess));
+                    policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol,Constants.JwtClaims.ApiAccess));
             });
 
             // add identity
@@ -128,7 +128,10 @@ namespace Evoflare.API
                     options.Password.RequiredLength = 6;
 
                     options.SignIn.RequireConfirmedEmail = true;
+                    // Set for correct userManager.GetUserAsync execution
+                    options.ClaimsIdentity.UserIdClaimType = Constants.JwtClaimIdentifiers.Id;
                 })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 

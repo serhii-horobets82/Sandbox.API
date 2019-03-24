@@ -25,8 +25,8 @@ namespace Evoflare.API.Auth
                 new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(jwtOptions.IssuedAt).ToString(),
                     ClaimValueTypes.Integer64),
-                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Rol),
-                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
+                identity.FindFirst(Constants.JwtClaimIdentifiers.Rol),
+                identity.FindFirst(Constants.JwtClaimIdentifiers.Id)
             };
 
             // Create the JWT security token and encode it.
@@ -47,15 +47,15 @@ namespace Evoflare.API.Auth
         {
             return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
             {
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
+                new Claim(Constants.JwtClaimIdentifiers.Id, id),
+                new Claim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess),
             });
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
         private static long ToUnixEpochDate(DateTime date)
         {
-            return (long) Math.Round((date.ToUniversalTime() -
+            return (long)Math.Round((date.ToUniversalTime() -
                                       new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
                 .TotalSeconds);
         }
