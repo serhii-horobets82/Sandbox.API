@@ -337,6 +337,11 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Position_EmployeeCreatedBy");
 
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.Position)
+                    .HasForeignKey(d => d.ProjectId)
+                    .HasConstraintName("FK_Position_Project");
+
                 entity.HasOne(d => d.UpdatedByNavigation)
                     .WithMany(p => p.PositionUpdatedByNavigation)
                     .HasForeignKey(d => d.UpdatedBy)

@@ -9,6 +9,7 @@ namespace Evoflare.API.Models
         {
             CustomerContact = new HashSet<CustomerContact>();
             EmployeeRelations = new HashSet<EmployeeRelations>();
+            Position = new HashSet<Position>();
             Team = new HashSet<Team>();
         }
 
@@ -18,6 +19,7 @@ namespace Evoflare.API.Models
 
         public virtual ICollection<CustomerContact> CustomerContact { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
+        public virtual ICollection<Position> Position { get; set; }
         public virtual ICollection<Team> Team { get; set; }
     }
 }

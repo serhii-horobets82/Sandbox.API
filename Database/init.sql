@@ -214,7 +214,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[EcfRole](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[RoleId] [int] NOT NULL UNIQUE,
+	[RoleId] [int] NOT NULL,
 	[Name] [nvarchar](50) NOT NULL,
 	[Summary] [nvarchar](max) NULL,
 	[Description] [nvarchar](max) NULL,
@@ -269,7 +269,6 @@ CREATE TABLE [dbo].[EmployeeEvaluation](
 	[EndedById] [int] NULL,
 	[OrganizationId] [int] NOT NULL,
 	[Archived] [bit] NOT NULL,
-	[TechnicalEvaluatorId] [int] NOT NULL,
  CONSTRAINT [PK_EmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -288,6 +287,7 @@ CREATE TABLE [dbo].[EmployeeRelations](
 	[ProjectId] [int] NULL,
 	[PositionId] [int] NULL,
 	[OrganizationId] [int] NOT NULL,
+	[Archived] [bit] NOT NULL,
  CONSTRAINT [PK_EmployeeRelations] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -343,12 +343,13 @@ GO
 CREATE TABLE [dbo].[Position](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](100) NOT NULL,
-	[OrganizationId] [int] NOT NULL,
+	[ProjectId] [int] NULL,
 	[CreatedDate] [datetime] NOT NULL,
 	[CreatedBy] [int] NOT NULL,
 	[UpdatedDate] [datetime] NULL,
 	[UpdatedBy] [int] NULL,
 	[IsDeleted] [bit] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_Position] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -1373,59 +1374,59 @@ SET IDENTITY_INSERT [dbo].[Employee] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] ON 
 GO
-INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (3, 21, CAST(N'2019-03-02T13:53:39.670' AS DateTime), 11, NULL, NULL, 1, 0, 6)
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived]) VALUES (3, 21, CAST(N'2019-03-02T13:53:39.670' AS DateTime), 11, NULL, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (4, 7, CAST(N'2019-03-03T11:29:11.267' AS DateTime), 11, NULL, NULL, 1, 0, 6)
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived]) VALUES (4, 7, CAST(N'2019-03-03T11:29:11.267' AS DateTime), 11, NULL, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (5, 17, CAST(N'2019-03-05T17:32:01.637' AS DateTime), 11, NULL, NULL, 1, 0, 7)
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived]) VALUES (5, 17, CAST(N'2019-03-05T17:32:01.637' AS DateTime), 11, NULL, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived], [TechnicalEvaluatorId]) VALUES (9, 18, CAST(N'2019-03-12T20:56:01.140' AS DateTime), 11, NULL, NULL, 1, 0, 6)
+INSERT [dbo].[EmployeeEvaluation] ([Id], [EmployeeId], [StartDate], [StartedById], [EndDate], [EndedById], [OrganizationId], [Archived]) VALUES (9, 18, CAST(N'2019-03-12T20:56:01.140' AS DateTime), 11, NULL, NULL, 1, 0)
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeRelations] ON 
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (1, NULL, 1, 1, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (1, NULL, 1, 1, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (2, 6, NULL, 1, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (2, 6, NULL, 1, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (3, 21, NULL, 4, 1, 2, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (3, 21, NULL, 4, 1, 2, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (4, 12, NULL, 4, 1, 1, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (4, 12, NULL, 4, 1, 1, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (5, NULL, 10, 5, 2, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (5, NULL, 10, 5, 2, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (6, 18, NULL, 5, 2, 2, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (6, 18, NULL, 5, 2, 2, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (7, NULL, 2, 6, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (7, NULL, 2, 6, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (8, 16, NULL, 6, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (8, 16, NULL, 6, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (9, 21, NULL, 6, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (9, 21, NULL, 6, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (10, 18, NULL, 6, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (10, 18, NULL, 6, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (11, 12, NULL, 6, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (11, 12, NULL, 6, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (12, NULL, 2, 7, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (12, NULL, 2, 7, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (13, 12, NULL, 7, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (13, 12, NULL, 7, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (14, 16, NULL, 7, 1, 3, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (14, 16, NULL, 7, 1, 3, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (15, 18, NULL, 7, 1, 2, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (15, 18, NULL, 7, 1, 2, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (16, 21, NULL, 7, 1, 3, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (16, 21, NULL, 7, 1, 3, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (17, NULL, 2, 8, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (17, NULL, 2, 8, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (18, 7, NULL, 8, 1, 2, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (18, 7, NULL, 8, 1, 2, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (19, 13, NULL, 8, 1, NULL, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (19, 13, NULL, 8, 1, NULL, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (20, 17, NULL, 8, 1, 3, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (20, 17, NULL, 8, 1, 3, 1, 0)
 GO
-INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId]) VALUES (21, 21, NULL, 8, 1, 2, 1)
+INSERT [dbo].[EmployeeRelations] ([Id], [EmployeeId], [ManagerId], [TeamId], [ProjectId], [PositionId], [OrganizationId], [Archived]) VALUES (21, 21, NULL, 8, 1, 2, 1, 0)
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeRelations] OFF
 GO
@@ -1453,11 +1454,15 @@ SET IDENTITY_INSERT [dbo].[Organization] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Position] ON 
 GO
-INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (1, N'First position', 0, CAST(N'2019-02-26T18:14:57.683' AS DateTime), 1, NULL, NULL, 0)
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (1, N'First position', NULL, CAST(N'2019-02-26T18:14:57.683' AS DateTime), 1, NULL, NULL, 0, 0)
 GO
-INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (2, N'Developer 1', 0, CAST(N'2019-02-26T19:18:03.260' AS DateTime), 1, NULL, NULL, 0)
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (2, N'Developer 1', NULL, CAST(N'2019-02-26T19:18:03.260' AS DateTime), 1, NULL, NULL, 0, 0)
 GO
-INSERT [dbo].[Position] ([Id], [Name], [OrganizationId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted]) VALUES (3, N'Developer 2', 0, CAST(N'2019-02-26T19:19:59.907' AS DateTime), 1, NULL, NULL, 0)
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (3, N'Developer 2', NULL, CAST(N'2019-02-26T19:19:59.907' AS DateTime), 1, NULL, NULL, 0, 0)
+GO
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (4, N'Middle Developer', NULL, CAST(N'2019-03-26T17:26:59.023' AS DateTime), 1, NULL, NULL, 0, 0)
+GO
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (5, N'Senior Developer', NULL, CAST(N'2019-03-26T17:27:36.577' AS DateTime), 1, NULL, NULL, 0, 0)
 GO
 SET IDENTITY_INSERT [dbo].[Position] OFF
 GO
@@ -1476,6 +1481,18 @@ GO
 INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (6, 3, 27, CAST(N'2019-02-26T19:19:59.960' AS DateTime))
 GO
 INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (7, 3, 22, CAST(N'2019-02-26T19:19:59.967' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (8, 4, 1, CAST(N'2019-03-26T17:26:59.063' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (9, 4, 4, CAST(N'2019-03-26T17:26:59.073' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (10, 5, 1, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (11, 5, 2, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (12, 5, 3, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (13, 5, 4, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
 GO
 SET IDENTITY_INSERT [dbo].[PositionRole] OFF
 GO
@@ -1508,6 +1525,8 @@ GO
 INSERT [dbo].[Team] ([Id], [Name], [ProjectId], [OrganizationId]) VALUES (8, N'Mainenance team', 1, 1)
 GO
 SET IDENTITY_INSERT [dbo].[Team] OFF
+GO
+ALTER TABLE [dbo].[EmployeeRelations] ADD  CONSTRAINT [DF_EmployeeRelations_Archived]  DEFAULT ((0)) FOR [Archived]
 GO
 ALTER TABLE [dbo].[Position] ADD  CONSTRAINT [DF_Position_CreatedDate]  DEFAULT (getutcdate()) FOR [CreatedDate]
 GO
@@ -1625,6 +1644,11 @@ REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_EndByEmployee]
 GO
+ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_Evaluator] FOREIGN KEY([EvaluatorId])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EcfEmployeeEvaluation] CHECK CONSTRAINT [FK_EcfEmployeeEvaluation_Evaluator]
+GO
 ALTER TABLE [dbo].[EcfEmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EcfEmployeeEvaluation_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
 GO
@@ -1664,6 +1688,26 @@ ALTER TABLE [dbo].[Employee]  WITH CHECK ADD  CONSTRAINT [FK_Employee_Organizati
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[Employee] CHECK CONSTRAINT [FK_Employee_Organization]
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_Employee] FOREIGN KEY([EmployeeId])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_Employee]
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeEndedBy] FOREIGN KEY([EndedById])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeEndedBy]
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_EmployeeStartedBy] FOREIGN KEY([StartedById])
+REFERENCES [dbo].[Employee] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_EmployeeStartedBy]
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeEvaluation_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeEvaluation] CHECK CONSTRAINT [FK_EmployeeEvaluation_Organization]
 GO
 ALTER TABLE [dbo].[EmployeeRelations]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeRelations_Employee] FOREIGN KEY([EmployeeId])
 REFERENCES [dbo].[Employee] ([Id])
@@ -1714,6 +1758,11 @@ ALTER TABLE [dbo].[Position]  WITH CHECK ADD  CONSTRAINT [FK_Position_EmployeeUp
 REFERENCES [dbo].[Employee] ([Id])
 GO
 ALTER TABLE [dbo].[Position] CHECK CONSTRAINT [FK_Position_EmployeeUpdatedBy]
+GO
+ALTER TABLE [dbo].[Position]  WITH CHECK ADD  CONSTRAINT [FK_Position_Project] FOREIGN KEY([ProjectId])
+REFERENCES [dbo].[Project] ([Id])
+GO
+ALTER TABLE [dbo].[Position] CHECK CONSTRAINT [FK_Position_Project]
 GO
 ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_EcfRole] FOREIGN KEY([RoleId])
 REFERENCES [dbo].[EcfRole] ([Id])
