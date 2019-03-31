@@ -145,10 +145,10 @@ namespace Evoflare.API.Controllers
             return Ok(employee);
         }
 
-        // GET: api/Employees/profile/5
-        // TODO: remove this from url, it should go from user 
-        [HttpGet("profile/{id}")]
-        public async Task<IActionResult> GetEmployeeProfile([FromRoute] int id)
+        // GET: api/Employees/profile
+        // TODO: remove this from header, it should go from user 
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetEmployeeProfile([FromHeader(Name = "_EmployeeId")] int id)
         {
             var employee = await _context.Employee
                 .Include(e => e.EmployeeType)
@@ -173,10 +173,10 @@ namespace Evoflare.API.Controllers
             public List<int> Levels { get; set; }
         }
 
-        // GET: api/Employees/profile/5/ecf-evaluation
-        // TODO: remove this from url, it should go from user 
-        [HttpGet("profile/{id}/ecf-evaluation")]
-        public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf([FromRoute] int id)
+        // GET: api/Employees/profile/ecf-evaluation
+        // TODO: remove from header, should come from user
+        [HttpGet("profile/ecf-evaluation")]
+        public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf([FromHeader(Name = "_EmployeeId")] int id)
         {
             var competences = await _context.EcfCompetence
                 .Include(c => c.EcfCompetenceLevel)

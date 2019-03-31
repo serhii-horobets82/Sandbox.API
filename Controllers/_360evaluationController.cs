@@ -41,13 +41,16 @@ namespace Evoflare.API.Controllers
             return _360evaluation;
         }
 
-        // GET: api/_360evaluation/employee/5/evaluator/2
-        [HttpGet("employee/{id}/evaluator/{testEvaluatorId}")]
-        public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id, int testEvaluatorId)
+        // GET: api/_360evaluation/employee/5/evaluator
+        // TODO: remove from header, should come from user
+        /// <summary>
+        /// Gets a questionary for a specific employee. Used when 360 in progress, evaluator needs to give feedback.
+        /// </summary>
+        [HttpGet("employee/{id}/evaluator")]
+        public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id, [FromHeader(Name = "_EmployeeId")] int employeeId)
         {
-            // TODO: remove testEvaluatorId from api
             var questionarie = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == testEvaluatorId && e.Evaluation.EmployeeId == id)
+                .Where(e => e.EvaluatorEmployeeId == employeeId && e.Evaluation.EmployeeId == id)
                 .Include(e => e._360feedbackGroup)
                     .ThenInclude(f => f._360questionarie)
                         .ThenInclude(q => q._360questionToMark)
@@ -59,6 +62,9 @@ namespace Evoflare.API.Controllers
                 .ToList();
         }
 
+        /// <summary>
+        /// Save a full feedback for all the questions in the questionarie.
+        /// </summary>
         [HttpPost("feedback/{id}")]
         public async Task<IActionResult> Save360Feedback(int id, List<_360evaluation> feedbacks)
         {
