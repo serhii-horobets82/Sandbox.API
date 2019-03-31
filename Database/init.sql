@@ -1,6 +1,5 @@
 USE [master]
 GO
-
 CREATE DATABASE [TechnicalEvaluation]
 GO
 USE [TechnicalEvaluation]
@@ -17,11 +16,14 @@ CREATE TABLE [dbo].[360EmployeeEvaluation](
 	[EndDate] [datetime] NULL,
 	[OrganizationId] [int] NOT NULL,
 	[360FeedbackGroupId] [int] NOT NULL,
+	[StartDoing] [nvarchar](max) NULL,
+	[StopDoing] [nvarchar](max) NULL,
+	[OtherComments] [nvarchar](max) NULL,
  CONSTRAINT [PK_360EmployeeEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 SET ANSI_NULLS ON
 GO
@@ -38,6 +40,23 @@ CREATE TABLE [dbo].[360Evaluation](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[360EvaluationComment](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EvaluationId] [int] NOT NULL,
+	[StartDoing] [nvarchar](max) NULL,
+	[StopDoing] [nvarchar](max) NULL,
+	[OtherComments] [nvarchar](max) NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_360EvaluationComment] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 SET ANSI_NULLS ON
 GO
@@ -402,15 +421,15 @@ CREATE TABLE [dbo].[Team](
 GO
 SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] ON 
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (10, 10, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (10, 10, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (11, 2, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (11, 2, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (12, 16, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (12, 16, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (13, 21, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (13, 21, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId]) VALUES (14, 12, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (14, 12, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
 SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] OFF
 GO
@@ -1464,6 +1483,8 @@ INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], 
 GO
 INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (5, N'Senior Developer', NULL, CAST(N'2019-03-26T17:27:36.577' AS DateTime), 1, NULL, NULL, 0, 0)
 GO
+INSERT [dbo].[Position] ([Id], [Name], [ProjectId], [CreatedDate], [CreatedBy], [UpdatedDate], [UpdatedBy], [IsDeleted], [OrganizationId]) VALUES (6, N'Junior project position (Smart product 1)', 1, CAST(N'2019-03-31T12:58:27.070' AS DateTime), 1, NULL, NULL, 0, 0)
+GO
 SET IDENTITY_INSERT [dbo].[Position] OFF
 GO
 SET IDENTITY_INSERT [dbo].[PositionRole] ON 
@@ -1493,6 +1514,8 @@ GO
 INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (12, 5, 3, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
 GO
 INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (13, 5, 4, CAST(N'2019-03-26T17:27:36.600' AS DateTime))
+GO
+INSERT [dbo].[PositionRole] ([Id], [PositionId], [RoleId], [DateTime]) VALUES (14, 6, 1, CAST(N'2019-03-31T12:58:27.087' AS DateTime))
 GO
 SET IDENTITY_INSERT [dbo].[PositionRole] OFF
 GO
@@ -1573,6 +1596,16 @@ ALTER TABLE [dbo].[360Evaluation]  WITH CHECK ADD  CONSTRAINT [FK_360Evaluation_
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[360Evaluation] CHECK CONSTRAINT [FK_360Evaluation_Organization]
+GO
+ALTER TABLE [dbo].[360EvaluationComment]  WITH CHECK ADD  CONSTRAINT [FK_360EvaluationComment_360EmployeeEvaluation] FOREIGN KEY([EvaluationId])
+REFERENCES [dbo].[360EmployeeEvaluation] ([Id])
+GO
+ALTER TABLE [dbo].[360EvaluationComment] CHECK CONSTRAINT [FK_360EvaluationComment_360EmployeeEvaluation]
+GO
+ALTER TABLE [dbo].[360EvaluationComment]  WITH CHECK ADD  CONSTRAINT [FK_360EvaluationComment_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[360EvaluationComment] CHECK CONSTRAINT [FK_360EvaluationComment_Organization]
 GO
 ALTER TABLE [dbo].[360PendingEvaluator]  WITH CHECK ADD  CONSTRAINT [FK_360PendingEvaluator_360PendingEvaluator] FOREIGN KEY([360EmployeeEvaluationId])
 REFERENCES [dbo].[360EmployeeEvaluation] ([Id])
