@@ -62,18 +62,29 @@ namespace Evoflare.API.Controllers
                 .ToList();
         }
 
+        public class _360FeedbackSubmit
+        {
+            public string StartDoing { get; set; }
+            public string StopDoing { get; set; }
+            public string OtherComments { get; set; }
+            public List<_360evaluation> Feedbacks { get; set; }
+        }
+
         /// <summary>
         /// Save a full feedback for all the questions in the questionarie.
         /// </summary>
         [HttpPost("feedback/{id}")]
-        public async Task<IActionResult> Save360Feedback(int id, List<_360evaluation> feedbacks)
+        public async Task<IActionResult> Save360Feedback(int id, _360FeedbackSubmit feedback)
         {
-            feedbacks.ForEach(f => f.OrganizationId = 1);
-            _context._360evaluation.AddRange(feedbacks);
+            feedback.Feedbacks.ForEach(f => f.OrganizationId = 1);
+            _context._360evaluation.AddRange(feedback.Feedbacks);
 
             var evaluation = await _context._360employeeEvaluation.FirstOrDefaultAsync(e => e.EvaluationId == id);
             evaluation.EndDate = DateTime.UtcNow;
-            _context.Entry(evaluation).Property(nameof(_360employeeEvaluation.EndDate)).IsModified = true;
+            evaluation.StartDoing = feedback.StartDoing;
+            evaluation.StopDoing = feedback.StopDoing;
+            evaluation.OtherComments = feedback.OtherComments;
+            _context.Entry(evaluation).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
 

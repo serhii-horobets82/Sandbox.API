@@ -35,6 +35,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         public virtual DbSet<_360evaluation> _360evaluation { get; set; }
+        public virtual DbSet<_360evaluationComment> _360evaluationComment { get; set; }
         public virtual DbSet<_360feedbackGroup> _360feedbackGroup { get; set; }
         public virtual DbSet<_360feedbackMark> _360feedbackMark { get; set; }
         public virtual DbSet<_360pendingEvaluator> _360pendingEvaluator { get; set; }
@@ -455,6 +456,23 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Evaluation_360Question");
+            });
+
+            modelBuilder.Entity<_360evaluationComment>(entity =>
+            {
+                entity.ToTable("360EvaluationComment");
+
+                entity.HasOne(d => d.Evaluation)
+                    .WithMany(p => p._360evaluationComment)
+                    .HasForeignKey(d => d.EvaluationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EvaluationComment_360EmployeeEvaluation");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p._360evaluationComment)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_360EvaluationComment_Organization");
             });
 
             modelBuilder.Entity<_360feedbackGroup>(entity =>

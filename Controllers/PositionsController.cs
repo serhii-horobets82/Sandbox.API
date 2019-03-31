@@ -21,70 +21,69 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/Positions
+        /// <summary>
+        /// Get list of all available positions across the Organization
+        /// </summary>
         [HttpGet]
         public async Task<IEnumerable<Position>> GetPosition()
         {
-            var positions = await _context.Position
-                .Select(p => new Position
+            return await LoadPositions();
+        }
+
+        // GET: api/Positions/project/1
+        /// <summary>
+        /// Get list of positions by project
+        /// </summary>
+        [HttpGet("project/{id}")]
+        public async Task<IEnumerable<Position>> GetPositionByProject(int id)
+        {
+            return await LoadPositions(id);
+        }
+
+        private async Task<IEnumerable<Position>> LoadPositions(int? projectId = null)
+        {
+            var positions = _context.Position.AsQueryable();
+            if (projectId.HasValue)
+            {
+                positions = positions.Where(p => p.ProjectId == projectId.Value);
+            }
+            return await positions.Select(p => new Position
+            {
+                Id = p.Id,
+                Name = p.Name,
+                PositionRole = p.PositionRole.Select(pr => new PositionRole
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    PositionRole = p.PositionRole.Select(pr => new PositionRole
+                    Id = pr.Id,
+                    RoleId = pr.RoleId,
+                    Role = new EcfRole
                     {
-                        Id = pr.Id,
-                        RoleId = pr.RoleId,
-                        Role = new EcfRole
+                        Id = pr.Role.Id,
+                        Name = pr.Role.Name,
+                        Summary = pr.Role.Summary,
+                        Description = pr.Role.Description,
+                        EcfRoleCompetence = pr.Role.EcfRoleCompetence.Select(c => new EcfRoleCompetence
                         {
-                            Id = pr.Role.Id,
-                            Name = pr.Role.Name,
-                            Summary = pr.Role.Summary,
-                            Description = pr.Role.Description,
-                            EcfRoleCompetence = pr.Role.EcfRoleCompetence.Select(c => new EcfRoleCompetence
+                            Id = c.Id,
+                            CompetenceId = c.CompetenceId,
+                            CompetenceLevel = c.CompetenceLevel,
+                            Competence = new EcfCompetence
                             {
-                                Id = c.Id,
-                                CompetenceId = c.CompetenceId,
-                                CompetenceLevel = c.CompetenceLevel,
-                                Competence = new EcfCompetence
-                                {
-                                    Id = c.Competence.Id,
-                                    Name = c.Competence.Name,
-                                    Summary = c.Competence.Summary,
-                                    EcfCompetenceLevel = c.Competence.EcfCompetenceLevel
-                                        .Select(l => new EcfCompetenceLevel
-                                        {
-                                            Id = l.Id,
-                                            Level = l.Level
-                                        })
-                                        .ToList()
-                                },
-                            }).ToList()
-                        }
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            //var positions = await _context.Position
-            //    .Include(position => position.PositionRole)
-            //        .ThenInclude(positionRole => positionRole.Role)
-            //    .ToListAsync();
-
-            //var roleCompetence = await _context.EcfRoleCompetence
-            //    .Include(role => role.Competence)
-            //    .ToListAsync();
-            //positions.ForEach(position =>
-            //{
-            //    foreach (var role in position.PositionRole)
-            //    {
-            //        role.
-            //    }
-            //});
-            
-            return positions;
-            //return _context.Position
-            //    .Include(position => position.PositionRole)
-            //        .ThenInclude(positionRole => positionRole.Role)
-            //        .ThenInclude(role => role.EcfRoleCompetence)
-            //        .ThenInclude(roleCompetence => roleCompetence.Competence);
+                                Id = c.Competence.Id,
+                                Name = c.Competence.Name,
+                                Summary = c.Competence.Summary,
+                                EcfCompetenceLevel = c.Competence.EcfCompetenceLevel
+                                    .Select(l => new EcfCompetenceLevel
+                                    {
+                                        Id = l.Id,
+                                        Level = l.Level
+                                    })
+                                    .ToList()
+                            },
+                        }).ToList()
+                    }
+                }).ToList()
+            })
+            .ToListAsync();
         }
 
         [HttpGet("/simple")]
@@ -106,7 +105,9 @@ namespace Evoflare.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var position = await _context.Position.FindAsync(id);
+            var position = await _context.Position
+                .Include(c => c.PositionRole)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (position == null)
             {

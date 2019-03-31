@@ -16,6 +16,7 @@ namespace Evoflare.API.Models
             Team = new HashSet<Team>();
             _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
             _360evaluation = new HashSet<_360evaluation>();
+            _360evaluationComment = new HashSet<_360evaluationComment>();
             _360pendingEvaluator = new HashSet<_360pendingEvaluator>();
             _360question = new HashSet<_360question>();
             _360questionToMark = new HashSet<_360questionToMark>();
@@ -34,6 +35,7 @@ namespace Evoflare.API.Models
         public virtual ICollection<Team> Team { get; set; }
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         public virtual ICollection<_360evaluation> _360evaluation { get; set; }
+        public virtual ICollection<_360evaluationComment> _360evaluationComment { get; set; }
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
         public virtual ICollection<_360question> _360question { get; set; }
         public virtual ICollection<_360questionToMark> _360questionToMark { get; set; }

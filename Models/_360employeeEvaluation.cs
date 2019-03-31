@@ -8,6 +8,7 @@ namespace Evoflare.API.Models
         public _360employeeEvaluation()
         {
             _360evaluation = new HashSet<_360evaluation>();
+            _360evaluationComment = new HashSet<_360evaluationComment>();
             _360pendingEvaluator = new HashSet<_360pendingEvaluator>();
         }
 
@@ -18,12 +19,16 @@ namespace Evoflare.API.Models
         public DateTime? EndDate { get; set; }
         public int OrganizationId { get; set; }
         public int _360feedbackGroupId { get; set; }
+        public string StartDoing { get; set; }
+        public string StopDoing { get; set; }
+        public string OtherComments { get; set; }
 
         public virtual EmployeeEvaluation Evaluation { get; set; }
         public virtual Employee EvaluatorEmployee { get; set; }
         public virtual Organization Organization { get; set; }
         public virtual _360feedbackGroup _360feedbackGroup { get; set; }
         public virtual ICollection<_360evaluation> _360evaluation { get; set; }
+        public virtual ICollection<_360evaluationComment> _360evaluationComment { get; set; }
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
     }
 }
