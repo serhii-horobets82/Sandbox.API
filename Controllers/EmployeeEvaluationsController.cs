@@ -249,7 +249,7 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<List<_360employeeEvaluation>>> GetIEvaluate360([FromHeader(Name = "_EmployeeId")] int id)
         {
             var employeesToEvaluate = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == id && e.EndDate == null && e.Evaluation.EndDate == null)
+                .Where(e => e.EvaluatorEmployeeId == id /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
                 .Include(e => e.Evaluation.Employee)
                 .ToListAsync();
 

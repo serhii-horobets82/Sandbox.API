@@ -164,6 +164,21 @@ namespace Evoflare.API.Controllers
             return Ok(employee);
         }
 
+        // GET: api/Employees/suggestions-to-improve
+        // TODO: remove this from header, it should go from user 
+        [HttpGet("suggestions-to-improve")]
+        public async Task<List<_360employeeEvaluation>> GetSuggestionsToImprove([FromHeader(Name = "_EmployeeId")] int id)
+        {
+            var evaluation = await _context.EmployeeEvaluation.FirstOrDefaultAsync(e => e.EmployeeId == id && !e.Archived);
+            if (evaluation != null)
+            {
+                var _360Feedbacks = await _context._360employeeEvaluation.Where(e => e.EvaluationId == evaluation.Id).ToListAsync();
+                return _360Feedbacks;
+            }
+
+            return new List<_360employeeEvaluation>();
+        }
+
         public class ProfileEcfCompetence
         {
             public string Id { get; set; }

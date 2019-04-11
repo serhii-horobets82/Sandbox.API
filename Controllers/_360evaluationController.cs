@@ -79,7 +79,7 @@ namespace Evoflare.API.Controllers
             feedback.Feedbacks.ForEach(f => f.OrganizationId = 1);
             _context._360evaluation.AddRange(feedback.Feedbacks);
 
-            var evaluation = await _context._360employeeEvaluation.FirstOrDefaultAsync(e => e.EvaluationId == id);
+            var evaluation = await _context._360employeeEvaluation.FirstOrDefaultAsync(e => e.Id == id);
             evaluation.EndDate = DateTime.UtcNow;
             evaluation.StartDoing = feedback.StartDoing;
             evaluation.StopDoing = feedback.StopDoing;
