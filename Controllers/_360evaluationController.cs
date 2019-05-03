@@ -147,6 +147,39 @@ namespace Evoflare.API.Controllers
             return _360evaluation;
         }
 
+        // GET: api/_360evaluation/by-project/5
+        [HttpGet("by-project/{id}")]
+        public async Task<ActionResult<List<EmployeeRelations>>> Get_360evaluationByProject(int id)
+        {
+            var employees = await _context.EmployeeRelations
+                .Where(r => r.ProjectId == id)
+                .Include(r => r.Team)
+                .Include(r => r.Employee)
+                .Include(r => r.Employee)
+                    .ThenInclude(e => e.EmployeeEvaluationEmployee)
+                        .ThenInclude(e => e._360employeeEvaluation)
+                .Include(r => r.Manager)
+                .Include(r => r.Manager)
+                    .ThenInclude(e => e.EmployeeEvaluationEmployee)
+                        .ThenInclude(e => e._360employeeEvaluation)
+                .ToListAsync();
+            foreach (var item in employees)
+            {
+                item.Team.EmployeeRelations = null;
+                //if (item.Employee != null)
+                //{
+                //item.Employee.EcfEmployeeEvaluationEndBy = null;
+                //    item.Employee.EcfEmployeeEvaluationStartBy = null;
+                //    item.Employee.EcfEmployeeEvaluationEvaluator = null;
+                //    item.Employee.EmployeeEvaluationEndedBy = null;
+                //    item.Employee.EmployeeEvaluationStartedBy = null;
+                //    item.Employee.EmployeeRelationsEmployee = null;
+                //    item.Employee.EmployeeRelationsManager = null;
+                //}
+            }
+            return employees;
+        }
+
         private bool _360evaluationExists(int id)
         {
             return _context._360evaluation.Any(e => e.Id == id);

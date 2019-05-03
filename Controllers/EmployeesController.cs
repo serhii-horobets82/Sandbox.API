@@ -193,16 +193,18 @@ namespace Evoflare.API.Controllers
         [HttpGet("profile/ecf-evaluation")]
         public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf([FromHeader(Name = "_EmployeeId")] int id)
         {
+            // getting all the competences from DB
             var competences = await _context.EcfCompetence
                 .Include(c => c.EcfCompetenceLevel)
                 .ToListAsync();
             var competencesById = competences.ToDictionary(c => c.Id);
 
+            // getting only Competences from roles
             var competencesFromRoles = await _context.EmployeeRelations
                 .Where(p => p.EmployeeId == id)
                 .Select(p => p.Position)
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
-                .SelectMany(r => r.EcfRoleCompetence.Select(c => c.CompetenceId))
+                .SelectMany(r => r.EcfRoleCompetence.Select(c => new { RoleCompetenceLevel = c.CompetenceLevel, c.CompetenceId }))
                 .ToListAsync();
 
             var lastEvaluation = await _context.EmployeeEvaluation
@@ -210,7 +212,8 @@ namespace Evoflare.API.Controllers
                     .ThenInclude(e => e.EcfEvaluationResult)
                 .FirstOrDefaultAsync(e => e.EmployeeId == id && !e.Archived);
 
-            var pastEvaluationsByCompetence = new Dictionary<string, EcfEvaluationResult>();
+            var pastEvaluationsByCompetence = 
+                new Dictionary<string, (string competenceId, int competenceLevel, int roleCompetenceLevel)>();
             if (lastEvaluation != null)
             {
                 if (lastEvaluation.EcfEmployeeEvaluation != null && lastEvaluation.EcfEmployeeEvaluation.Any())
@@ -218,22 +221,20 @@ namespace Evoflare.API.Controllers
                     pastEvaluationsByCompetence = lastEvaluation
                         .EcfEmployeeEvaluation.First()
                         .EcfEvaluationResult
-                        .ToDictionary(e => e.Competence, e => new EcfEvaluationResult
-                        {
-                            Competence = e.Competence,
-                            CompetenceLevel = e.CompetenceLevel
-                        });
+                        .ToDictionary(e => e.Competence, e => (e.Competence, e.CompetenceLevel ?? 0, 0));
                 }
             }
 
             foreach (var item in competencesFromRoles)
             {
-                if (!pastEvaluationsByCompetence.ContainsKey(item))
+                if (!pastEvaluationsByCompetence.ContainsKey(item.CompetenceId))
                 {
-                    pastEvaluationsByCompetence.Add(item, new EcfEvaluationResult
-                    {
-                        Competence = item
-                    });
+                    pastEvaluationsByCompetence.Add(item.CompetenceId, (item.CompetenceId, 0, item.RoleCompetenceLevel));
+                }
+                else
+                {
+                    var c = pastEvaluationsByCompetence[item.CompetenceId];
+                    pastEvaluationsByCompetence[item.CompetenceId] = (c.competenceId, c.competenceLevel, item.RoleCompetenceLevel);
                 }
             }
 
@@ -244,10 +245,10 @@ namespace Evoflare.API.Controllers
                 var c = pastEvaluationsByCompetence[competenceId];
                 var d = new ProfileEcfCompetence
                 {
-                    Id = c.Competence,
+                    Id = c.competenceId,
                     Name = competence.Name,
-                    RoleLevel = 0,
-                    CompetenceLevel = c.CompetenceLevel ?? 0,
+                    RoleLevel = c.roleCompetenceLevel,
+                    CompetenceLevel = c.competenceLevel,
                     Levels = Enumerable.Range(1, 5).Select(i => 0).ToList()                    
                 };
                 foreach(var l in competence.EcfCompetenceLevel)

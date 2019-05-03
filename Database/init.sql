@@ -221,6 +221,7 @@ CREATE TABLE [dbo].[EcfEvaluationResult](
 	[EvaluationId] [int] NOT NULL,
 	[Competence] [char](3) NOT NULL,
 	[CompetenceLevel] [int] NULL,
+	[Date] [datetime] NULL,
  CONSTRAINT [PK_EcfEvaluation] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -423,7 +424,7 @@ SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] ON
 GO
 INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (10, 10, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
-INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (11, 2, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
+INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (11, 2, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), CAST(N'2019-04-11T06:12:17.823' AS DateTime), 1, 2, N'Start doing things', N'Stop doing smth', N'Some comment')
 GO
 INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (12, 16, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
@@ -432,6 +433,18 @@ GO
 INSERT [dbo].[360EmployeeEvaluation] ([Id], [EvaluatorEmployeeId], [EvaluationId], [StartDate], [EndDate], [OrganizationId], [360FeedbackGroupId], [StartDoing], [StopDoing], [OtherComments]) VALUES (14, 12, 9, CAST(N'2019-03-12T20:56:06.957' AS DateTime), NULL, 1, 2, NULL, NULL, NULL)
 GO
 SET IDENTITY_INSERT [dbo].[360EmployeeEvaluation] OFF
+GO
+SET IDENTITY_INSERT [dbo].[360Evaluation] ON 
+GO
+INSERT [dbo].[360Evaluation] ([Id], [EvaluationId], [QuestionId], [FeedbackMarkId], [OrganizationId]) VALUES (2, 11, 2, 5, 1)
+GO
+INSERT [dbo].[360Evaluation] ([Id], [EvaluationId], [QuestionId], [FeedbackMarkId], [OrganizationId]) VALUES (3, 11, 9, 4, 1)
+GO
+INSERT [dbo].[360Evaluation] ([Id], [EvaluationId], [QuestionId], [FeedbackMarkId], [OrganizationId]) VALUES (4, 11, 10, 4, 1)
+GO
+INSERT [dbo].[360Evaluation] ([Id], [EvaluationId], [QuestionId], [FeedbackMarkId], [OrganizationId]) VALUES (5, 11, 11, 5, 1)
+GO
+SET IDENTITY_INSERT [dbo].[360Evaluation] OFF
 GO
 SET IDENTITY_INSERT [dbo].[360FeedbackGroup] ON 
 GO
@@ -939,69 +952,69 @@ SET IDENTITY_INSERT [dbo].[EcfEmployeeEvaluation] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EcfEvaluationResult] ON 
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (1, 1, N'B1 ', 2)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (1, 1, N'B1 ', 2, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (2, 1, N'B2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (2, 1, N'B2 ', 3, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (3, 1, N'B3 ', 4)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (3, 1, N'B3 ', 4, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (4, 1, N'B5 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (4, 1, N'B5 ', 1, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (5, 1, N'C4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (5, 1, N'C4 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (6, 1, N'A6 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (6, 1, N'A6 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (7, 1, N'B4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (7, 1, N'B4 ', 2, CAST(N'2019-04-26T09:35:05.603' AS DateTime))
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (8, 1, N'E8 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (8, 1, N'E8 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (9, 1, N'C1 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (9, 1, N'C1 ', 3, CAST(N'2019-04-26T15:21:04.423' AS DateTime))
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (10, 1, N'C2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (10, 1, N'C2 ', 2, CAST(N'2019-04-26T15:21:05.663' AS DateTime))
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (11, 1, N'C3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (11, 1, N'C3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (12, 1, N'E3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (12, 1, N'E3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (13, 1, N'E6 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (13, 1, N'E6 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (14, 3, N'A6 ', 2)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (14, 3, N'A6 ', 2, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (15, 3, N'B2 ', 4)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (15, 3, N'B2 ', 4, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (16, 3, N'B4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (16, 3, N'B4 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (17, 3, N'C4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (17, 3, N'C4 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (18, 3, N'E8 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (18, 3, N'E8 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (19, 3, N'C2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (19, 3, N'C2 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (20, 3, N'C3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (20, 3, N'C3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (21, 3, N'E3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (21, 3, N'E3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (22, 3, N'E6 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (22, 3, N'E6 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (23, 3, N'B3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (23, 3, N'B3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (24, 3, N'B5 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (24, 3, N'B5 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (49, 4, N'B1 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (49, 4, N'B1 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (50, 4, N'B2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (50, 4, N'B2 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (51, 4, N'B3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (51, 4, N'B3 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (52, 4, N'B5 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (52, 4, N'B5 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (53, 4, N'C4 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (53, 4, N'C4 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (54, 4, N'C1 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (54, 4, N'C1 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (55, 4, N'C2 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (55, 4, N'C2 ', NULL, NULL)
 GO
-INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel]) VALUES (56, 4, N'C3 ', NULL)
+INSERT [dbo].[EcfEvaluationResult] ([Id], [EvaluationId], [Competence], [CompetenceLevel], [Date]) VALUES (56, 4, N'C3 ', NULL, NULL)
 GO
 SET IDENTITY_INSERT [dbo].[EcfEvaluationResult] OFF
 GO

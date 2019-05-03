@@ -77,6 +77,10 @@ namespace Evoflare.API
                     .AddCustomJsonOptions(this.hostingEnvironment)
                     .AddCustomCors()
                     .AddCustomMvcOptions(this.hostingEnvironment)
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    })
                 .Services
                 .AddProjectCommands()
                 .AddProjectMappers()

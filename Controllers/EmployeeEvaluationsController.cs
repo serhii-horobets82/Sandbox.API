@@ -115,10 +115,12 @@ namespace Evoflare.API.Controllers
             return employeeEvaluation;
         }
 
-        // POST: api/EmployeeEvaluations/5
+        // POST: api/EmployeeEvaluations/ecf-evaluation/{evaluationId}
+        // evaluationId is actual Evaluation id, NOT the EcfEvaluation id
         [HttpPost("ecf-evaluation/{evaluationId}")]
-        public async Task<ActionResult<EcfEvaluation>> DeleteEmployeeEvaluation(int evaluationId, EcfEvaluation ecfEvaluation)
+        public async Task<ActionResult<EcfEvaluationResult>> PostEcfEvaluationMark(int evaluationId, EcfEvaluationResult ecfEvaluation)
         {
+            ecfEvaluation.Date = DateTime.UtcNow;
             _context.Entry(ecfEvaluation).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

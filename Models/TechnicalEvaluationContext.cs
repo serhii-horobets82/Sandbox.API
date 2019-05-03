@@ -159,6 +159,8 @@ namespace Evoflare.API.Models
                     .HasMaxLength(3)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
                 entity.HasOne(d => d.CompetenceNavigation)
                     .WithMany(p => p.EcfEvaluationResult)
                     .HasForeignKey(d => d.Competence)
