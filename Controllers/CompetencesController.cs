@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,18 +13,18 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class CompetencesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext db;
+        private readonly TechnicalEvaluationContext _context;
 
-        public CompetencesController(TechnicalEvaluationContext db)
+        public CompetencesController(TechnicalEvaluationContext context)
         {
-            this.db = db;
+            this._context = context;
         }
 
         [HttpGet("", Name = "GetCompetences")]
         [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<EcfCompetence>))]
         public async Task<List<EcfCompetence>> Get()
         {
-            return await db.EcfCompetence
+            return await _context.EcfCompetence
                 .Include(level => level.EcfCompetenceLevel)
                 .ToListAsync();
         }
@@ -34,9 +35,40 @@ namespace Evoflare.API.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "A Competence with the specified unique identifier could not be found.")]
         public async Task<EcfCompetence> Get(string id)
         {
-            return await db.EcfCompetence
+            return await _context.EcfCompetence
                 .Include(level => level.EcfCompetenceLevel)
                 .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public class EcfCompetenceRow
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public int? CompetenceLevel { get; set; }
+            public int? RoleLevel { get; set; }
+            public List<bool> Levels { get; set; }
+            //public class RowLevel
+            //{
+            //    public int Level { get; set; }
+            //}
+        }
+
+        [HttpGet("rows")]
+        public async Task<List<EcfCompetenceRow>> GetCompetences([FromHeader(Name = "_EmployeeId")] int id)
+        {
+            // getting all the competences from DB
+            var competences = await _context.EcfCompetence
+                .Include(c => c.EcfCompetenceLevel)
+                .ToListAsync();
+            return competences.Select(c => new EcfCompetenceRow
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Levels = Enumerable.Range(1, 5)
+                    .Select(i => c.EcfCompetenceLevel.Any(l => l.Level == i))
+                    //.Select(i => new EcfCompetenceRow.RowLevel { Level = i ? 1 : 0 })
+                    .ToList()
+            }).ToList();
         }
     }
 }
