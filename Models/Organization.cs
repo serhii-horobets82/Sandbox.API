@@ -12,7 +12,9 @@ namespace Evoflare.API.Models
             Employee = new HashSet<Employee>();
             EmployeeEvaluation = new HashSet<EmployeeEvaluation>();
             EmployeeRelations = new HashSet<EmployeeRelations>();
+            EmployeeType = new HashSet<EmployeeType>();
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
+            RoleGrade = new HashSet<RoleGrade>();
             Team = new HashSet<Team>();
             _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
             _360evaluation = new HashSet<_360evaluation>();
@@ -31,7 +33,9 @@ namespace Evoflare.API.Models
         public virtual ICollection<Employee> Employee { get; set; }
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
+        public virtual ICollection<EmployeeType> EmployeeType { get; set; }
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
+        public virtual ICollection<RoleGrade> RoleGrade { get; set; }
         public virtual ICollection<Team> Team { get; set; }
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         public virtual ICollection<_360evaluation> _360evaluation { get; set; }

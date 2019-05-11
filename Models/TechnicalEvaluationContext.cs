@@ -15,7 +15,6 @@ namespace Evoflare.API.Models
         {
         }
 
-        public virtual DbSet<AppVersion> AppVersion { get; set; }
         public virtual DbSet<CustomerContact> CustomerContact { get; set; }
         public virtual DbSet<EcfCompetence> EcfCompetence { get; set; }
         public virtual DbSet<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
@@ -32,6 +31,8 @@ namespace Evoflare.API.Models
         public virtual DbSet<Position> Position { get; set; }
         public virtual DbSet<PositionRole> PositionRole { get; set; }
         public virtual DbSet<Project> Project { get; set; }
+        public virtual DbSet<RoleGrade> RoleGrade { get; set; }
+        public virtual DbSet<RoleGradeCompetence> RoleGradeCompetence { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         public virtual DbSet<_360evaluation> _360evaluation { get; set; }
@@ -54,13 +55,6 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
-
-            modelBuilder.Entity<AppVersion>(entity =>
-            {
-                entity.HasKey(e => e.Name);
-
-                entity.Property(e => e.Name).ValueGeneratedNever();
-            });
 
             modelBuilder.Entity<CustomerContact>(entity =>
             {
@@ -296,6 +290,12 @@ namespace Evoflare.API.Models
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.EmployeeType)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeeType_Organization");
             });
 
             modelBuilder.Entity<EvaluationSchedule>(entity =>
@@ -375,6 +375,49 @@ namespace Evoflare.API.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<RoleGrade>(entity =>
+            {
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.EmployeeType)
+                    .WithMany(p => p.RoleGrade)
+                    .HasForeignKey(d => d.EmployeeTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CareerPath_EmployeeType");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.RoleGrade)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CareerPath_Organization");
+            });
+
+            modelBuilder.Entity<RoleGradeCompetence>(entity =>
+            {
+                entity.Property(e => e.CompetenceId)
+                    .IsRequired()
+                    .HasMaxLength(3)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.RoleGradeCompetence)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CareerPathSkills_EcfCompetence");
+
+                entity.HasOne(d => d.CompetenceLevel)
+                    .WithMany(p => p.RoleGradeCompetence)
+                    .HasForeignKey(d => d.CompetenceLevelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CareerPathSkills_EcfCompetenceLevel");
+
+                entity.HasOne(d => d.RoleGrade)
+                    .WithMany(p => p.RoleGradeCompetence)
+                    .HasForeignKey(d => d.RoleGradeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CareerPathSkills_CareerPath");
             });
 
             modelBuilder.Entity<Team>(entity =>

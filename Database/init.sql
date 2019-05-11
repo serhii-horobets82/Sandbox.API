@@ -321,6 +321,7 @@ GO
 CREATE TABLE [dbo].[EmployeeType](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Type] [nvarchar](50) NOT NULL,
+	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_EmployeeType] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -400,6 +401,37 @@ CREATE TABLE [dbo].[Project](
 	[Name] [nvarchar](100) NOT NULL,
 	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_Project] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoleGrade](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[EmployeeTypeId] [int] NOT NULL,
+	[Name] [nvarchar](max) NOT NULL,
+	[Order] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_CareerPath] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoleGradeCompetence](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[CompetenceId] [char](3) NOT NULL,
+	[CompetenceLevelId] [int] NOT NULL,
+	[RoleGradeId] [int] NOT NULL,
+ CONSTRAINT [PK_CareerPathSkills] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1464,17 +1496,21 @@ SET IDENTITY_INSERT [dbo].[EmployeeRelations] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeType] ON 
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (1, N'MANAGER')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (1, N'MANAGER', 1)
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (2, N'DEV')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (2, N'DEV', 1)
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (3, N'QA')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (3, N'QA', 1)
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (4, N'AUTOMATION')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (4, N'AUTOMATION', 1)
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (5, N'DEVOPS')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (5, N'DEVOPS', 1)
 GO
-INSERT [dbo].[EmployeeType] ([Id], [Type]) VALUES (6, N'OPERATIONS')
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (6, N'OPERATIONS', 1)
+GO
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (8, N'Performance Engineer', 1)
+GO
+INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (9, N'Another role', 1)
 GO
 SET IDENTITY_INSERT [dbo].[EmployeeType] OFF
 GO
@@ -1541,6 +1577,54 @@ GO
 INSERT [dbo].[Project] ([Id], [Name], [OrganizationId]) VALUES (3, N'Karandash', 1)
 GO
 SET IDENTITY_INSERT [dbo].[Project] OFF
+GO
+SET IDENTITY_INSERT [dbo].[RoleGrade] ON 
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (1, 2, N'Intern Developer', 1, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (2, 2, N'Junior Developer', 2, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (3, 2, N'Middle Developer', 3, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (4, 2, N'Senior Developer', 4, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (5, 2, N'Tech/Team Lead', 5, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (6, 2, N'Architect', 6, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (8, 3, N'Intern QA', 1, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (9, 3, N'Junior QA', 2, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (10, 3, N'Middle QA', 3, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (11, 3, N'Serior QA', 4, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (12, 8, N'Junior Performance Engineer', 1, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (13, 8, N'Middle Performance Engineer', 2, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (14, 9, N'Some grade', 1, 1)
+GO
+INSERT [dbo].[RoleGrade] ([Id], [EmployeeTypeId], [Name], [Order], [OrganizationId]) VALUES (15, 9, N'Some other grade', 2, 1)
+GO
+SET IDENTITY_INSERT [dbo].[RoleGrade] OFF
+GO
+SET IDENTITY_INSERT [dbo].[RoleGradeCompetence] ON 
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (10, N'A2 ', 3, 14)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (11, N'A4 ', 8, 14)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (12, N'A6 ', 14, 14)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (13, N'A2 ', 3, 15)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (14, N'A4 ', 9, 15)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (15, N'A6 ', 15, 15)
+GO
+SET IDENTITY_INSERT [dbo].[RoleGradeCompetence] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Team] ON 
 GO
@@ -1785,6 +1869,11 @@ REFERENCES [dbo].[Team] ([Id])
 GO
 ALTER TABLE [dbo].[EmployeeRelations] CHECK CONSTRAINT [FK_EmployeeRelations_Team]
 GO
+ALTER TABLE [dbo].[EmployeeType]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeType_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[EmployeeType] CHECK CONSTRAINT [FK_EmployeeType_Organization]
+GO
 ALTER TABLE [dbo].[EvaluationSchedule]  WITH CHECK ADD  CONSTRAINT [FK_EvaluationSchedule_Employee] FOREIGN KEY([EmployeeId])
 REFERENCES [dbo].[Employee] ([Id])
 GO
@@ -1819,6 +1908,31 @@ ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_Po
 REFERENCES [dbo].[Position] ([Id])
 GO
 ALTER TABLE [dbo].[PositionRole] CHECK CONSTRAINT [FK_PositionRole_Position]
+GO
+ALTER TABLE [dbo].[RoleGrade]  WITH CHECK ADD  CONSTRAINT [FK_CareerPath_EmployeeType] FOREIGN KEY([EmployeeTypeId])
+REFERENCES [dbo].[EmployeeType] ([Id])
+GO
+ALTER TABLE [dbo].[RoleGrade] CHECK CONSTRAINT [FK_CareerPath_EmployeeType]
+GO
+ALTER TABLE [dbo].[RoleGrade]  WITH CHECK ADD  CONSTRAINT [FK_CareerPath_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[RoleGrade] CHECK CONSTRAINT [FK_CareerPath_Organization]
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence]  WITH CHECK ADD  CONSTRAINT [FK_CareerPathSkills_CareerPath] FOREIGN KEY([RoleGradeId])
+REFERENCES [dbo].[RoleGrade] ([Id])
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence] CHECK CONSTRAINT [FK_CareerPathSkills_CareerPath]
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence]  WITH CHECK ADD  CONSTRAINT [FK_CareerPathSkills_EcfCompetence] FOREIGN KEY([CompetenceId])
+REFERENCES [dbo].[EcfCompetence] ([Id])
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence] CHECK CONSTRAINT [FK_CareerPathSkills_EcfCompetence]
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence]  WITH CHECK ADD  CONSTRAINT [FK_CareerPathSkills_EcfCompetenceLevel] FOREIGN KEY([CompetenceLevelId])
+REFERENCES [dbo].[EcfCompetenceLevel] ([Id])
+GO
+ALTER TABLE [dbo].[RoleGradeCompetence] CHECK CONSTRAINT [FK_CareerPathSkills_EcfCompetenceLevel]
 GO
 ALTER TABLE [dbo].[Team]  WITH CHECK ADD  CONSTRAINT [FK_Team_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
