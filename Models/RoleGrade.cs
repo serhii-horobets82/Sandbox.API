@@ -7,6 +7,8 @@ namespace Evoflare.API.Models
     {
         public RoleGrade()
         {
+            ProjectPosition = new HashSet<ProjectPosition>();
+            ProjectPositionCompetence = new HashSet<ProjectPositionCompetence>();
             RoleGradeCompetence = new HashSet<RoleGradeCompetence>();
         }
 
@@ -18,6 +20,8 @@ namespace Evoflare.API.Models
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
+        public virtual ICollection<ProjectPosition> ProjectPosition { get; set; }
+        public virtual ICollection<ProjectPositionCompetence> ProjectPositionCompetence { get; set; }
         public virtual ICollection<RoleGradeCompetence> RoleGradeCompetence { get; set; }
     }
 }

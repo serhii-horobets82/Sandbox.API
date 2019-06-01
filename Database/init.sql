@@ -151,6 +151,54 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+CREATE TABLE [dbo].[Certificate](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](200) NOT NULL,
+	[Company] [nvarchar](200) NULL,
+	[Technology] [nvarchar](200) NULL,
+	[Stack] [nvarchar](200) NULL,
+	[CertificationLevel] [nvarchar](200) NULL,
+ CONSTRAINT [PK_Certificate] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CertificationExam](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Code] [nvarchar](50) NOT NULL,
+	[Name] [nvarchar](200) NOT NULL,
+	[Price] [int] NOT NULL,
+ CONSTRAINT [PK_CertificationExam] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CompetenceCertificate](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[CompetenceId] [char](3) NOT NULL,
+	[CompetenceLevelId] [int] NOT NULL,
+	[CertificateId] [int] NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_CompetenceCertificate] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE TABLE [dbo].[CustomerContact](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](250) NOT NULL,
@@ -361,6 +409,25 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+CREATE TABLE [dbo].[Pdp](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](200) NOT NULL,
+	[StudyStartDate] [datetime] NULL,
+	[ClassroomStartDate] [datetime] NULL,
+	[AssessmentStartDate] [datetime] NULL,
+	[ExamDate] [datetime] NOT NULL,
+	[CertificateId] [int] NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_Pdp] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE TABLE [dbo].[Position](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](100) NOT NULL,
@@ -401,6 +468,37 @@ CREATE TABLE [dbo].[Project](
 	[Name] [nvarchar](100) NOT NULL,
 	[OrganizationId] [int] NOT NULL,
  CONSTRAINT [PK_Project] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ProjectPosition](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[RoleGradeId] [int] NOT NULL,
+	[PositionName] [nvarchar](120) NOT NULL,
+	[OrganizationId] [int] NOT NULL,
+ CONSTRAINT [PK_ProjectPosition] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ProjectPositionCompetence](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[RoleGradeId] [int] NOT NULL,
+	[ProjectPositionId] [int] NOT NULL,
+	[CompetenceId] [char](3) NOT NULL,
+	[CompetenceLevelId] [int] NOT NULL,
+ CONSTRAINT [PK_ProjectPositionCompetence] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -667,6 +765,56 @@ GO
 INSERT [dbo].[360QuestionToMark] ([Id], [QuestionId], [MarkId], [OrganizationId]) VALUES (29, 11, 5, 1)
 GO
 SET IDENTITY_INSERT [dbo].[360QuestionToMark] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Certificate] ON 
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (1, N'Microsoft Certified Azure Fundamentals', N'Microsoft', N'Azure', NULL, N'Foundation')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (2, N'Microsoft Certified: Azure Developer Associate', N'Microsoft', N'Azure', N'Development', N'Associate')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (4, N'Microsoft Certified: Azure Administrator Associate', N'Microsoft', N'Azure', N'Administration', N'Associate')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (5, N'Microsoft Certified: Azure Solutions Architect Expert', N'Microsoft', N'Azure', N'Development', N'Expert')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (6, N'Microsoft Certified: Azure DevOps Engineer Expert', N'Microsoft', N'Azure', N'Administraion', N'Expert')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (7, N'AWS Certified Cloud Practitioner', N'Amazon', N'AWS', NULL, N'Foundation')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (8, N'AWS Certified Developer – Associate', N'Amazon', N'AWS', N'Development', N'Associate')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (9, N'AWS Certified Solutions Architect – Associate', N'Amazon', N'AWS', N'Development', N'Associate')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (10, N'AWS Certified SysOps Administrator – Associate', N'Amazon', N'AWS', N'Administration', N'Associate')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (11, N'AWS Certified Solutions Architect – Professional', N'Amazon', N'AWS', N'Development', N'Expert')
+GO
+INSERT [dbo].[Certificate] ([Id], [Name], [Company], [Technology], [Stack], [CertificationLevel]) VALUES (12, N'AWS Certified DevOps Engineer – Professional', N'Amazon', N'AWS', N'Administration', N'Expert')
+GO
+SET IDENTITY_INSERT [dbo].[Certificate] OFF
+GO
+SET IDENTITY_INSERT [dbo].[CertificationExam] ON 
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (1, N'AZ-900', N'Microsoft Azure Fundamentals', 100)
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (4, N'AZ-203', N'Developing Solutions for Microsoft Azure', 165)
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (5, N'AZ-103', N'Microsoft Azure Administrator', 165)
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (6, N'AZ-300', N'Microsoft Azure Architect Technologies', 165)
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (7, N'AZ-301', N'Microsoft Azure Architect Design', 165)
+GO
+INSERT [dbo].[CertificationExam] ([Id], [Code], [Name], [Price]) VALUES (8, N'AZ-400', N'Microsoft Azure DevOps Solutions', 165)
+GO
+SET IDENTITY_INSERT [dbo].[CertificationExam] OFF
+GO
+SET IDENTITY_INSERT [dbo].[CompetenceCertificate] ON 
+GO
+INSERT [dbo].[CompetenceCertificate] ([Id], [CompetenceId], [CompetenceLevelId], [CertificateId], [OrganizationId]) VALUES (1, N'B1 ', 23, 1, 1)
+GO
+INSERT [dbo].[CompetenceCertificate] ([Id], [CompetenceId], [CompetenceLevelId], [CertificateId], [OrganizationId]) VALUES (2, N'B2 ', 24, 2, 1)
+GO
+SET IDENTITY_INSERT [dbo].[CompetenceCertificate] OFF
 GO
 SET IDENTITY_INSERT [dbo].[CustomerContact] ON 
 GO
@@ -1624,6 +1772,10 @@ INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [
 GO
 INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (15, N'A6 ', 15, 15)
 GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (16, N'B1 ', 24, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (17, N'B1 ', 23, 2)
+GO
 SET IDENTITY_INSERT [dbo].[RoleGradeCompetence] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Team] ON 
@@ -1748,6 +1900,26 @@ ALTER TABLE [dbo].[360QuestionToMark]  WITH CHECK ADD  CONSTRAINT [FK_360Questio
 REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[360QuestionToMark] CHECK CONSTRAINT [FK_360QuestionToMark_Organization]
+GO
+ALTER TABLE [dbo].[CompetenceCertificate]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceCertificate_Certificate] FOREIGN KEY([CertificateId])
+REFERENCES [dbo].[Certificate] ([Id])
+GO
+ALTER TABLE [dbo].[CompetenceCertificate] CHECK CONSTRAINT [FK_CompetenceCertificate_Certificate]
+GO
+ALTER TABLE [dbo].[CompetenceCertificate]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceCertificate_EcfCompetence] FOREIGN KEY([CompetenceId])
+REFERENCES [dbo].[EcfCompetence] ([Id])
+GO
+ALTER TABLE [dbo].[CompetenceCertificate] CHECK CONSTRAINT [FK_CompetenceCertificate_EcfCompetence]
+GO
+ALTER TABLE [dbo].[CompetenceCertificate]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceCertificate_EcfCompetenceLevel] FOREIGN KEY([CompetenceLevelId])
+REFERENCES [dbo].[EcfCompetenceLevel] ([Id])
+GO
+ALTER TABLE [dbo].[CompetenceCertificate] CHECK CONSTRAINT [FK_CompetenceCertificate_EcfCompetenceLevel]
+GO
+ALTER TABLE [dbo].[CompetenceCertificate]  WITH CHECK ADD  CONSTRAINT [FK_CompetenceCertificate_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[CompetenceCertificate] CHECK CONSTRAINT [FK_CompetenceCertificate_Organization]
 GO
 ALTER TABLE [dbo].[CustomerContact]  WITH CHECK ADD  CONSTRAINT [FK_CustomerContact_Organization] FOREIGN KEY([OrganizationId])
 REFERENCES [dbo].[Organization] ([Id])
@@ -1884,6 +2056,16 @@ REFERENCES [dbo].[Organization] ([Id])
 GO
 ALTER TABLE [dbo].[EvaluationSchedule] CHECK CONSTRAINT [FK_EvaluationSchedule_Organization]
 GO
+ALTER TABLE [dbo].[Pdp]  WITH CHECK ADD  CONSTRAINT [FK_Pdp_Certificate] FOREIGN KEY([CertificateId])
+REFERENCES [dbo].[Certificate] ([Id])
+GO
+ALTER TABLE [dbo].[Pdp] CHECK CONSTRAINT [FK_Pdp_Certificate]
+GO
+ALTER TABLE [dbo].[Pdp]  WITH CHECK ADD  CONSTRAINT [FK_Pdp_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[Pdp] CHECK CONSTRAINT [FK_Pdp_Organization]
+GO
 ALTER TABLE [dbo].[Position]  WITH CHECK ADD  CONSTRAINT [FK_Position_EmployeeCreatedBy] FOREIGN KEY([CreatedBy])
 REFERENCES [dbo].[Employee] ([Id])
 GO
@@ -1908,6 +2090,36 @@ ALTER TABLE [dbo].[PositionRole]  WITH CHECK ADD  CONSTRAINT [FK_PositionRole_Po
 REFERENCES [dbo].[Position] ([Id])
 GO
 ALTER TABLE [dbo].[PositionRole] CHECK CONSTRAINT [FK_PositionRole_Position]
+GO
+ALTER TABLE [dbo].[ProjectPosition]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPosition_Organization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[Organization] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPosition] CHECK CONSTRAINT [FK_ProjectPosition_Organization]
+GO
+ALTER TABLE [dbo].[ProjectPosition]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPosition_RoleGrade] FOREIGN KEY([RoleGradeId])
+REFERENCES [dbo].[RoleGrade] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPosition] CHECK CONSTRAINT [FK_ProjectPosition_RoleGrade]
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPositionCompetence_EcfCompetence] FOREIGN KEY([CompetenceId])
+REFERENCES [dbo].[EcfCompetence] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence] CHECK CONSTRAINT [FK_ProjectPositionCompetence_EcfCompetence]
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPositionCompetence_EcfCompetenceLevel] FOREIGN KEY([CompetenceLevelId])
+REFERENCES [dbo].[EcfCompetenceLevel] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence] CHECK CONSTRAINT [FK_ProjectPositionCompetence_EcfCompetenceLevel]
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPositionCompetence_ProjectPosition] FOREIGN KEY([ProjectPositionId])
+REFERENCES [dbo].[ProjectPosition] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence] CHECK CONSTRAINT [FK_ProjectPositionCompetence_ProjectPosition]
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence]  WITH CHECK ADD  CONSTRAINT [FK_ProjectPositionCompetence_RoleGrade] FOREIGN KEY([RoleGradeId])
+REFERENCES [dbo].[RoleGrade] ([Id])
+GO
+ALTER TABLE [dbo].[ProjectPositionCompetence] CHECK CONSTRAINT [FK_ProjectPositionCompetence_RoleGrade]
 GO
 ALTER TABLE [dbo].[RoleGrade]  WITH CHECK ADD  CONSTRAINT [FK_CareerPath_EmployeeType] FOREIGN KEY([EmployeeTypeId])
 REFERENCES [dbo].[EmployeeType] ([Id])

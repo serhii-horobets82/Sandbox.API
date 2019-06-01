@@ -37,6 +37,8 @@ namespace Evoflare.API.Controllers
         {
             return await _context.EcfCompetence
                 .Include(level => level.EcfCompetenceLevel)
+                    .ThenInclude(l => l.CompetenceCertificate)
+                        .ThenInclude(c => c.Certificate)
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 

@@ -15,6 +15,9 @@ namespace Evoflare.API.Models
         {
         }
 
+        public virtual DbSet<Certificate> Certificate { get; set; }
+        public virtual DbSet<CertificationExam> CertificationExam { get; set; }
+        public virtual DbSet<CompetenceCertificate> CompetenceCertificate { get; set; }
         public virtual DbSet<CustomerContact> CustomerContact { get; set; }
         public virtual DbSet<EcfCompetence> EcfCompetence { get; set; }
         public virtual DbSet<EcfCompetenceLevel> EcfCompetenceLevel { get; set; }
@@ -28,9 +31,12 @@ namespace Evoflare.API.Models
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
         public virtual DbSet<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
+        public virtual DbSet<Pdp> Pdp { get; set; }
         public virtual DbSet<Position> Position { get; set; }
         public virtual DbSet<PositionRole> PositionRole { get; set; }
         public virtual DbSet<Project> Project { get; set; }
+        public virtual DbSet<ProjectPosition> ProjectPosition { get; set; }
+        public virtual DbSet<ProjectPositionCompetence> ProjectPositionCompetence { get; set; }
         public virtual DbSet<RoleGrade> RoleGrade { get; set; }
         public virtual DbSet<RoleGradeCompetence> RoleGradeCompetence { get; set; }
         public virtual DbSet<Team> Team { get; set; }
@@ -55,6 +61,64 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+
+            modelBuilder.Entity<Certificate>(entity =>
+            {
+                entity.Property(e => e.CertificationLevel).HasMaxLength(200);
+
+                entity.Property(e => e.Company).HasMaxLength(200);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Stack).HasMaxLength(200);
+
+                entity.Property(e => e.Technology).HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<CertificationExam>(entity =>
+            {
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<CompetenceCertificate>(entity =>
+            {
+                entity.Property(e => e.CompetenceId)
+                    .IsRequired()
+                    .HasMaxLength(3)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Certificate)
+                    .WithMany(p => p.CompetenceCertificate)
+                    .HasForeignKey(d => d.CertificateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CompetenceCertificate_Certificate");
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.CompetenceCertificate)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CompetenceCertificate_EcfCompetence");
+
+                entity.HasOne(d => d.CompetenceLevel)
+                    .WithMany(p => p.CompetenceCertificate)
+                    .HasForeignKey(d => d.CompetenceLevelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CompetenceCertificate_EcfCompetenceLevel");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.CompetenceCertificate)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CompetenceCertificate_Organization");
+            });
 
             modelBuilder.Entity<CustomerContact>(entity =>
             {
@@ -322,6 +386,32 @@ namespace Evoflare.API.Models
                     .HasMaxLength(100);
             });
 
+            modelBuilder.Entity<Pdp>(entity =>
+            {
+                entity.Property(e => e.AssessmentStartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ClassroomStartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ExamDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.StudyStartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Certificate)
+                    .WithMany(p => p.Pdp)
+                    .HasForeignKey(d => d.CertificateId)
+                    .HasConstraintName("FK_Pdp_Certificate");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Pdp)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Pdp_Organization");
+            });
+
             modelBuilder.Entity<Position>(entity =>
             {
                 entity.Property(e => e.CreatedDate)
@@ -375,6 +465,57 @@ namespace Evoflare.API.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<ProjectPosition>(entity =>
+            {
+                entity.Property(e => e.PositionName)
+                    .IsRequired()
+                    .HasMaxLength(120);
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.ProjectPosition)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPosition_Organization");
+
+                entity.HasOne(d => d.RoleGrade)
+                    .WithMany(p => p.ProjectPosition)
+                    .HasForeignKey(d => d.RoleGradeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPosition_RoleGrade");
+            });
+
+            modelBuilder.Entity<ProjectPositionCompetence>(entity =>
+            {
+                entity.Property(e => e.CompetenceId)
+                    .IsRequired()
+                    .HasMaxLength(3)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.ProjectPositionCompetence)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPositionCompetence_EcfCompetence");
+
+                entity.HasOne(d => d.CompetenceLevel)
+                    .WithMany(p => p.ProjectPositionCompetence)
+                    .HasForeignKey(d => d.CompetenceLevelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPositionCompetence_EcfCompetenceLevel");
+
+                entity.HasOne(d => d.ProjectPosition)
+                    .WithMany(p => p.ProjectPositionCompetence)
+                    .HasForeignKey(d => d.ProjectPositionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPositionCompetence_ProjectPosition");
+
+                entity.HasOne(d => d.RoleGrade)
+                    .WithMany(p => p.ProjectPositionCompetence)
+                    .HasForeignKey(d => d.RoleGradeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPositionCompetence_RoleGrade");
             });
 
             modelBuilder.Entity<RoleGrade>(entity =>

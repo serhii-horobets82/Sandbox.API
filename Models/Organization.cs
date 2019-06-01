@@ -7,6 +7,7 @@ namespace Evoflare.API.Models
     {
         public Organization()
         {
+            CompetenceCertificate = new HashSet<CompetenceCertificate>();
             CustomerContact = new HashSet<CustomerContact>();
             EcfEmployeeEvaluation = new HashSet<EcfEmployeeEvaluation>();
             Employee = new HashSet<Employee>();
@@ -14,6 +15,8 @@ namespace Evoflare.API.Models
             EmployeeRelations = new HashSet<EmployeeRelations>();
             EmployeeType = new HashSet<EmployeeType>();
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
+            Pdp = new HashSet<Pdp>();
+            ProjectPosition = new HashSet<ProjectPosition>();
             RoleGrade = new HashSet<RoleGrade>();
             Team = new HashSet<Team>();
             _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
@@ -28,6 +31,7 @@ namespace Evoflare.API.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public virtual ICollection<CompetenceCertificate> CompetenceCertificate { get; set; }
         public virtual ICollection<CustomerContact> CustomerContact { get; set; }
         public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluation { get; set; }
         public virtual ICollection<Employee> Employee { get; set; }
@@ -35,6 +39,8 @@ namespace Evoflare.API.Models
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual ICollection<EmployeeType> EmployeeType { get; set; }
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
+        public virtual ICollection<Pdp> Pdp { get; set; }
+        public virtual ICollection<ProjectPosition> ProjectPosition { get; set; }
         public virtual ICollection<RoleGrade> RoleGrade { get; set; }
         public virtual ICollection<Team> Team { get; set; }
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }

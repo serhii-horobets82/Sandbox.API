@@ -38,13 +38,13 @@ namespace Evoflare.API.Controllers
             return _context.Employee.Where(e => e.IsManager);
         }
 
-        [HttpGet("type/:typeId")]
+        [HttpGet("roles/:typeId")]
         public IEnumerable<Employee> GetEmployeesByType(int employeeType)
         {
             return _context.Employee.Where(e => e.EmployeeTypeId == employeeType);
         }
 
-        [HttpGet("types")]
+        [HttpGet("roles")]
         public IEnumerable<EmployeeType> GetEmployeeTypes()
         {
             return _context.EmployeeType;

@@ -19,7 +19,18 @@ namespace Evoflare.API.Controllers
         {
             _context = context;
         }
+        /*
+        // GET: api/Positions/project/1/role-grades
+        /// <summary>
+        /// Get list of all available positions across the Organization
+        /// </summary>
+        //[HttpGet("project/{id}/role-grades")]
+        //public async Task<IEnumerable<>> GetRoleGradesByProjectId(int id)
+        //{
 
+        //    return await LoadPositions();
+        //}
+        */
         // GET: api/Positions
         /// <summary>
         /// Get list of all available positions across the Organization

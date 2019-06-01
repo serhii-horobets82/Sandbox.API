@@ -192,8 +192,13 @@ namespace Evoflare.API.Controllers
             public int RoleGradeCompetenceId { get; set; }
             public object Id { get; set; }
             public string Name { get; set; }
-            public bool[] Levels { get; set; }
+            public LevelInfo[] Levels { get; set; }
             public int CompetenceLevel { get; set; }
+
+            public class LevelInfo
+            {
+                public IEnumerable<Certificate> Certificates { get; set; }
+            }
         }
         // GET: api/RoleGrades/1/competences
         [HttpGet("{roleId}/competences")]
@@ -203,8 +208,12 @@ namespace Evoflare.API.Controllers
                 .Include(r => r.RoleGradeCompetence)
                 .Where(c => c.EmployeeTypeId == roleId)
                 .ToListAsync();
-            var skills = await _context.EcfCompetence.Include(c => c.EcfCompetenceLevel).ToListAsync();
-            var skillsById = skills.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel.Select(l => l.Level).ToArray());
+            var skills = await _context.EcfCompetence
+                .Include(c => c.EcfCompetenceLevel)
+                    .ThenInclude(l => l.CompetenceCertificate)
+                        .ThenInclude(c => c.Certificate)
+                .ToListAsync();
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel);
             var result = grades
                 .Select(g => new
                 {
@@ -215,7 +224,63 @@ namespace Evoflare.API.Controllers
                         Id = c.CompetenceId,
                         Name = c.Competence.Name,
                         CompetenceLevel = c.CompetenceLevel.Level,
-                        Levels = Enumerable.Range(1, 5).Select(i => skillsById[c.CompetenceId].Contains(i)).ToArray()
+                        Levels = Enumerable.Range(1, 5)
+                            .Select(i =>
+                            {
+                                var level = skillsById[c.CompetenceId].FirstOrDefault(cl => cl.Level == i);
+                                if (level == null) return null;
+                                return new CompetenceRow.LevelInfo
+                                {
+                                    Certificates = level.CompetenceCertificate.Any() 
+                                        ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                        : null
+                                };
+                            })
+                            .ToArray()
+                    })
+                })
+                .ToDictionary(g => g.GradeId);
+            return Ok(result);
+        }
+
+        // GET: api/RoleGrades/1/competences
+        [HttpGet("{roleId}/{gradeId}")]
+        public async Task<IActionResult> GetCompetencesByRoleAndGrade(int roleId, int gradeId)
+        {
+            var grades = await _context.RoleGrade
+                .Where(g => g.Id == gradeId)
+                .Include(r => r.RoleGradeCompetence)
+                //.Where(c => c.EmployeeTypeId == roleId)
+                .ToListAsync();
+            var skills = await _context.EcfCompetence
+                .Include(c => c.EcfCompetenceLevel)
+                    .ThenInclude(l => l.CompetenceCertificate)
+                        .ThenInclude(c => c.Certificate)
+                .ToListAsync();
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel);
+            var result = grades
+                .Select(g => new
+                {
+                    GradeId = g.Id,
+                    Rows = g.RoleGradeCompetence.Select(c => new CompetenceRow
+                    {
+                        RoleGradeCompetenceId = c.Id,
+                        Id = c.CompetenceId,
+                        Name = c.Competence.Name,
+                        CompetenceLevel = c.CompetenceLevel.Level,
+                        Levels = Enumerable.Range(1, 5)
+                            .Select(i =>
+                            {
+                                var level = skillsById[c.CompetenceId].FirstOrDefault(cl => cl.Level == i);
+                                if (level == null) return null;
+                                return new CompetenceRow.LevelInfo
+                                {
+                                    Certificates = level.CompetenceCertificate.Any()
+                                        ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                        : null
+                                };
+                            })
+                            .ToArray()
                     })
                 })
                 .ToDictionary(g => g.GradeId);
@@ -272,15 +337,32 @@ namespace Evoflare.API.Controllers
                 }
             });
             await _context.SaveChangesAsync();
-            var skills = await _context.EcfCompetence.Include(c => c.EcfCompetenceLevel).ToListAsync();
-            var skillsById = skills.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel.Select(l => l.Level).ToArray());
+            var skills = await _context.EcfCompetence
+                .Include(c => c.EcfCompetenceLevel)
+                    .ThenInclude(l => l.CompetenceCertificate)
+                        .ThenInclude(c => c.Certificate)
+                .ToListAsync();
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel);
             var result = rows.Select(c => new CompetenceRow
             {
                 RoleGradeCompetenceId = c.Id,
                 Id = c.CompetenceId,
                 Name = c.Competence.Name,
                 CompetenceLevel = c.CompetenceLevel.Level,
-                Levels = Enumerable.Range(1, 5).Select(i => skillsById[c.CompetenceId].Contains(i)).ToArray()
+                Levels = Enumerable.Range(1, 5)
+                    .Select(i =>
+                    {
+                        var level = skillsById[c.CompetenceId].FirstOrDefault(cl => cl.Level == i);
+                        if (level == null) return null;
+
+                        return new CompetenceRow.LevelInfo
+                        {
+                            Certificates = level.CompetenceCertificate.Any()
+                                ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                : null
+                        };
+                    })
+                    .ToArray()
             });
             return Ok(result);
         }
