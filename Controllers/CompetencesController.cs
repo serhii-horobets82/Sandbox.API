@@ -42,33 +42,45 @@ namespace Evoflare.API.Controllers
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public class EcfCompetenceRow
+        public class CompetenceRow
         {
             public string Id { get; set; }
             public string Name { get; set; }
             public int? CompetenceLevel { get; set; }
             public int? RoleLevel { get; set; }
-            public List<bool> Levels { get; set; }
-            //public class RowLevel
-            //{
-            //    public int Level { get; set; }
-            //}
+            public List<LevelInfo> Levels { get; set; }
+
+            public class LevelInfo
+            {
+                public IEnumerable<Certificate> Certificates { get; set; }
+            }
         }
 
         [HttpGet("rows")]
-        public async Task<List<EcfCompetenceRow>> GetCompetences([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<List<CompetenceRow>> GetCompetences([FromHeader(Name = "_EmployeeId")] int id)
         {
             // getting all the competences from DB
             var competences = await _context.EcfCompetence
                 .Include(c => c.EcfCompetenceLevel)
+                    .ThenInclude(l => l.CompetenceCertificate)
+                        .ThenInclude(c => c.Certificate)
                 .ToListAsync();
-            return competences.Select(c => new EcfCompetenceRow
+            return competences.Select(c => new CompetenceRow
             {
                 Id = c.Id,
                 Name = c.Name,
                 Levels = Enumerable.Range(1, 5)
-                    .Select(i => c.EcfCompetenceLevel.Any(l => l.Level == i))
-                    //.Select(i => new EcfCompetenceRow.RowLevel { Level = i ? 1 : 0 })
+                    .Select(i =>
+                    {
+                        var level = c.EcfCompetenceLevel.FirstOrDefault(cl => cl.Level == i);
+                        if (level == null) return null;
+                        return new CompetenceRow.LevelInfo
+                        {
+                            Certificates = level.CompetenceCertificate.Any()
+                                ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                : null
+                        };
+                    })
                     .ToList()
             }).ToList();
         }

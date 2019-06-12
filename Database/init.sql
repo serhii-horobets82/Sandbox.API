@@ -1776,6 +1776,144 @@ INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [
 GO
 INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (17, N'B1 ', 23, 2)
 GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (18, N'B1 ', 23, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (19, N'B3 ', 29, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (20, N'B5 ', 36, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (21, N'C1 ', 41, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (22, N'A6 ', 14, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (23, N'B1 ', 23, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (24, N'B2 ', 26, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (25, N'B3 ', 29, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (26, N'B4 ', 33, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (27, N'B5 ', 36, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (28, N'C1 ', 41, 2)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (29, N'A5 ', 11, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (30, N'A6 ', 15, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (31, N'B1 ', 24, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (32, N'B2 ', 27, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (33, N'B3 ', 30, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (34, N'B4 ', 34, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (35, N'B5 ', 37, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (36, N'C4 ', 49, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (37, N'A5 ', 11, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (38, N'A6 ', 15, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (39, N'B1 ', 24, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (40, N'B2 ', 27, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (41, N'B3 ', 30, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (42, N'B4 ', 34, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (43, N'B5 ', 37, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (44, N'C1 ', 41, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (45, N'C4 ', 49, 3)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (46, N'A4 ', 8, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (47, N'A5 ', 12, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (48, N'A6 ', 16, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (49, N'A7 ', 17, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (50, N'B1 ', 25, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (51, N'B2 ', 28, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (52, N'B3 ', 30, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (53, N'B4 ', 34, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (54, N'B5 ', 38, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (55, N'C1 ', 42, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (56, N'C3 ', 46, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (57, N'C4 ', 49, 4)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (58, N'A4 ', 9, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (59, N'E4 ', 92, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (60, N'E3 ', 89, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (61, N'D9 ', 71, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (62, N'D5 ', 61, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (63, N'D11', 78, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (64, N'D10', 74, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (65, N'C4 ', 50, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (66, N'C3 ', 47, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (67, N'C1 ', 42, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (68, N'B6 ', 39, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (69, N'B5 ', 38, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (70, N'B4 ', 35, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (71, N'B3 ', 30, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (72, N'B2 ', 28, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (73, N'B1 ', 25, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (74, N'A9 ', 21, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (75, N'A7 ', 18, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (76, N'A6 ', 16, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (77, N'A5 ', 12, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (78, N'E5 ', 94, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (79, N'E8 ', 102, 5)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (80, N'B2 ', 26, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (81, N'B3 ', 29, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (82, N'B5 ', 36, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (83, N'C1 ', 41, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (84, N'B2 ', 26, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (85, N'B3 ', 29, 1)
+GO
+INSERT [dbo].[RoleGradeCompetence] ([Id], [CompetenceId], [CompetenceLevelId], [RoleGradeId]) VALUES (86, N'B5 ', 36, 1)
+GO
 SET IDENTITY_INSERT [dbo].[RoleGradeCompetence] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Team] ON 
