@@ -8,6 +8,7 @@ namespace Evoflare.API.Models
         public EmployeeType()
         {
             Employee = new HashSet<Employee>();
+            ProjectCareerPath = new HashSet<ProjectCareerPath>();
             RoleGrade = new HashSet<RoleGrade>();
         }
 
@@ -17,6 +18,7 @@ namespace Evoflare.API.Models
 
         public virtual Organization Organization { get; set; }
         public virtual ICollection<Employee> Employee { get; set; }
+        public virtual ICollection<ProjectCareerPath> ProjectCareerPath { get; set; }
         public virtual ICollection<RoleGrade> RoleGrade { get; set; }
     }
 }

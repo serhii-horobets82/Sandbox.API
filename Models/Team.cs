@@ -8,6 +8,7 @@ namespace Evoflare.API.Models
         public Team()
         {
             EmployeeRelations = new HashSet<EmployeeRelations>();
+            ProjectCareerPath = new HashSet<ProjectCareerPath>();
         }
 
         public int Id { get; set; }
@@ -18,5 +19,6 @@ namespace Evoflare.API.Models
         public virtual Organization Organization { get; set; }
         public virtual Project Project { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
+        public virtual ICollection<ProjectCareerPath> ProjectCareerPath { get; set; }
     }
 }

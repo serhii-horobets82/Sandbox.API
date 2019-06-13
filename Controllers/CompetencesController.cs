@@ -77,7 +77,18 @@ namespace Evoflare.API.Controllers
                         return new CompetenceRow.LevelInfo
                         {
                             Certificates = level.CompetenceCertificate.Any()
-                                ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                ? level.CompetenceCertificate
+                                    .Select(cc => cc.Certificate)
+                                    .Select(cc => new Certificate
+                                    {
+                                        Id = cc.Id,
+                                        Name = cc.Name,
+                                        Company = cc.Company,
+                                        Technology = cc.Technology,
+                                        Stack = cc.Stack,
+                                        CertificationLevel = cc.CertificationLevel
+                                    })
+                                    .ToList()
                                 : null
                         };
                     })

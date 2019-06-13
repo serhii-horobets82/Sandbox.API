@@ -35,6 +35,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<Position> Position { get; set; }
         public virtual DbSet<PositionRole> PositionRole { get; set; }
         public virtual DbSet<Project> Project { get; set; }
+        public virtual DbSet<ProjectCareerPath> ProjectCareerPath { get; set; }
         public virtual DbSet<ProjectPosition> ProjectPosition { get; set; }
         public virtual DbSet<ProjectPositionCompetence> ProjectPositionCompetence { get; set; }
         public virtual DbSet<RoleGrade> RoleGrade { get; set; }
@@ -467,17 +468,55 @@ namespace Evoflare.API.Models
                     .HasMaxLength(100);
             });
 
+            modelBuilder.Entity<ProjectCareerPath>(entity =>
+            {
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.ProjectCareerPath)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectCareerPath_Organization");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.ProjectCareerPath)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectCareerPath_Project");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.ProjectCareerPath)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectCareerPath_Role");
+
+                entity.HasOne(d => d.Team)
+                    .WithMany(p => p.ProjectCareerPath)
+                    .HasForeignKey(d => d.TeamId)
+                    .HasConstraintName("FK_ProjectCareerPath_Team");
+            });
+
             modelBuilder.Entity<ProjectPosition>(entity =>
             {
-                entity.Property(e => e.PositionName)
-                    .IsRequired()
-                    .HasMaxLength(120);
+                entity.HasOne(d => d.CareerPath)
+                    .WithMany(p => p.ProjectPosition)
+                    .HasForeignKey(d => d.CareerPathId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPosition_ProjectCareerPath");
 
                 entity.HasOne(d => d.Organization)
                     .WithMany(p => p.ProjectPosition)
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ProjectPosition_Organization");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.ProjectPosition)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProjectPosition_Project");
 
                 entity.HasOne(d => d.RoleGrade)
                     .WithMany(p => p.ProjectPosition)

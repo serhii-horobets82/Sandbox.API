@@ -194,6 +194,7 @@ namespace Evoflare.API.Controllers
             public string Name { get; set; }
             public LevelInfo[] Levels { get; set; }
             public int CompetenceLevel { get; set; }
+            public int CompetenceLevelId { get; set; }
 
             public class LevelInfo
             {
@@ -224,6 +225,7 @@ namespace Evoflare.API.Controllers
                         Id = c.CompetenceId,
                         Name = c.Competence.Name,
                         CompetenceLevel = c.CompetenceLevel.Level,
+                        CompetenceLevelId = c.CompetenceLevelId,
                         Levels = Enumerable.Range(1, 5)
                             .Select(i =>
                             {
@@ -232,7 +234,18 @@ namespace Evoflare.API.Controllers
                                 return new CompetenceRow.LevelInfo
                                 {
                                     Certificates = level.CompetenceCertificate.Any() 
-                                        ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                        ? level.CompetenceCertificate
+                                            .Select(cc => cc.Certificate)
+                                            .Select(cc => new Certificate
+                                            {
+                                                Id = cc.Id,
+                                                Name = cc.Name,
+                                                Company = cc.Company,
+                                                Technology = cc.Technology,
+                                                Stack = cc.Stack,
+                                                CertificationLevel = cc.CertificationLevel
+                                            })
+                                            .ToList()
                                         : null
                                 };
                             })
@@ -268,6 +281,7 @@ namespace Evoflare.API.Controllers
                         Id = c.CompetenceId,
                         Name = c.Competence.Name,
                         CompetenceLevel = c.CompetenceLevel.Level,
+                        CompetenceLevelId = c.CompetenceLevelId,
                         Levels = Enumerable.Range(1, 5)
                             .Select(i =>
                             {
@@ -276,7 +290,18 @@ namespace Evoflare.API.Controllers
                                 return new CompetenceRow.LevelInfo
                                 {
                                     Certificates = level.CompetenceCertificate.Any()
-                                        ? level.CompetenceCertificate.Select(cc => cc.Certificate).ToList()
+                                        ? level.CompetenceCertificate
+                                            .Select(cc => cc.Certificate)
+                                            .Select(cc => new Certificate
+                                            {
+                                                Id = cc.Id,
+                                                Name = cc.Name,
+                                                Company = cc.Company,
+                                                Technology = cc.Technology,
+                                                Stack = cc.Stack,
+                                                CertificationLevel = cc.CertificationLevel
+                                            })
+                                            .ToList()
                                         : null
                                 };
                             })
