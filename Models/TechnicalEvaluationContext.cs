@@ -55,13 +55,13 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=localhost;Database=TechnicalEvaluation;User ID=sa;Password=123");
+                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB;User ID=sa;Password=DatgE66VbHy7");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<Certificate>(entity =>
             {
@@ -236,7 +236,7 @@ namespace Evoflare.API.Models
             modelBuilder.Entity<EcfRole>(entity =>
             {
                 entity.HasIndex(e => e.RoleId)
-                    .HasName("IX_Role")
+                    .HasName("UQ__EcfRole__8AFACE1BD5CC4583")
                     .IsUnique();
 
                 entity.Property(e => e.Name)
@@ -267,9 +267,15 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<Employee>(entity =>
             {
+                entity.Property(e => e.HiringDate).HasColumnType("date");
+
+                entity.Property(e => e.Name).HasMaxLength(30);
+
                 entity.Property(e => e.NameTemp)
                     .IsRequired()
                     .HasMaxLength(100);
+
+                entity.Property(e => e.Surname).HasMaxLength(30);
 
                 entity.Property(e => e.UserId).HasMaxLength(10);
 

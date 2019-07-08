@@ -28,6 +28,9 @@ namespace Evoflare.API.Models
         public int EmployeeTypeId { get; set; }
         public int OrganizationId { get; set; }
         public string NameTemp { get; set; }
+        public DateTime? HiringDate { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
 
         public virtual EmployeeType EmployeeType { get; set; }
         public virtual Organization Organization { get; set; }
