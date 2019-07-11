@@ -1168,21 +1168,21 @@ INSERT [dbo].[EcfRoleCompetence] ([Id], [RoleId], [CompetenceId], [CompetenceLev
 SET IDENTITY_INSERT [dbo].[EcfRoleCompetence] OFF
 SET IDENTITY_INSERT [dbo].[Employee] ON 
 
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (1, NULL, 1, 1, 1, N'John Manager', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (2, NULL, 1, 1, 1, N'Bob Manager', CAST(N'2011-12-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (3, NULL, 0, 3, 1, N'Karl QA', CAST(N'2017-11-21' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (4, NULL, 0, 4, 1, N'Marta AutoQA', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (6, NULL, 0, 2, 1, N'Linus Developer', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (7, NULL, 0, 2, 1, N'Mark Developer', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (10, NULL, 1, 1, 1, N'Petra Manager', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (11, NULL, 1, 1, 1, N'Barak MEGA Manager', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (12, NULL, 0, 3, 1, N'Tapak QA', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (13, NULL, 0, 3, 1, N'Mikki QA', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (15, NULL, 0, 4, 1, N'Billy AutoQA', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (16, NULL, 0, 2, 1, N'Todd Developer', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (17, NULL, 0, 2, 1, N'Riana Developer', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (18, NULL, 0, 2, 1, N'Mila Developer', CAST(N'2010-02-01' AS Date), NULL, NULL)
-INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (21, NULL, 0, 2, 1, N'Alex Took', CAST(N'2010-02-01' AS Date), NULL, NULL)
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (1, NULL, 1, 1, 1, N'John Manager', CAST(N'2010-02-01' AS Date), N'John', N'Manager')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (2, NULL, 1, 1, 1, N'Bob Manager', CAST(N'2011-12-01' AS Date), N'Bob', N'Manager')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (3, NULL, 0, 3, 1, N'Karl QA', CAST(N'2017-11-21' AS Date), N'Karl', N'QA')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (4, NULL, 0, 4, 1, N'Marta AutoQA', CAST(N'2010-02-02' AS Date), N'Marta', N'AutoQA')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (6, NULL, 0, 2, 1, N'Linus Developer', CAST(N'2010-02-03' AS Date), N'Linus', N'Developer')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (7, NULL, 0, 2, 1, N'Mark Developer', CAST(N'2010-04-04' AS Date), N'Mark', N'Developer')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (10, NULL, 1, 1, 1, N'Petra Manager', CAST(N'2010-05-05' AS Date), N'Petra', N'Manager')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (11, NULL, 1, 1, 1, N'Barak MEGA Manager', CAST(N'2010-02-11' AS Date), N'Barak', N'MEGA Manager')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (12, NULL, 0, 3, 1, N'Tapak QA', CAST(N'2010-01-01' AS Date), N'Tapak', N'QA')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (13, NULL, 0, 3, 1, N'Mikki QA', CAST(N'2010-04-15' AS Date), N'Mikki', N'QA')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (15, NULL, 0, 4, 1, N'Billy AutoQA', CAST(N'2010-05-01' AS Date), N'Billy', N'AutoQA')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (16, NULL, 0, 2, 1, N'Todd Developer', CAST(N'2010-06-03' AS Date), N'Todd', N'Developer')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (17, NULL, 0, 2, 1, N'Riana Developer', CAST(N'2010-07-04' AS Date), N'Riana', N'Developer')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (18, NULL, 0, 2, 1, N'Mila Developer', CAST(N'2010-12-05' AS Date), N'Mila', N'Developer')
+INSERT [dbo].[Employee] ([Id], [UserId], [IsManager], [EmployeeTypeId], [OrganizationId], [NameTemp], [HiringDate], [Name], [Surname]) VALUES (21, NULL, 0, 2, 1, N'Alex Took', CAST(N'2010-05 -17' AS Date), N'Alex', N'Took')
 SET IDENTITY_INSERT [dbo].[Employee] OFF
 SET IDENTITY_INSERT [dbo].[EmployeeEvaluation] ON 
 
