@@ -30,6 +30,12 @@ namespace Evoflare.API.Models
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
         public virtual DbSet<EvaluationSchedule> EvaluationSchedule { get; set; }
+        public virtual DbSet<Idea> Idea { get; set; }
+        public virtual DbSet<IdeaComment> IdeaComment { get; set; }
+        public virtual DbSet<IdeaLike> IdeaLike { get; set; }
+        public virtual DbSet<IdeaTag> IdeaTag { get; set; }
+        public virtual DbSet<IdeaTagRef> IdeaTagRef { get; set; }
+        public virtual DbSet<IdeaView> IdeaView { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
         public virtual DbSet<Pdp> Pdp { get; set; }
         public virtual DbSet<Position> Position { get; set; }
@@ -61,7 +67,7 @@ namespace Evoflare.API.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<Certificate>(entity =>
             {
@@ -236,7 +242,7 @@ namespace Evoflare.API.Models
             modelBuilder.Entity<EcfRole>(entity =>
             {
                 entity.HasIndex(e => e.RoleId)
-                    .HasName("UQ__EcfRole__8AFACE1BD5CC4583")
+                    .HasName("IX_Role")
                     .IsUnique();
 
                 entity.Property(e => e.Name)
@@ -384,6 +390,109 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_EvaluationSchedule_Organization");
+            });
+
+            modelBuilder.Entity<Idea>(entity =>
+            {
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).IsRequired();
+
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.CreatedBy)
+                    .WithMany(p => p.Idea)
+                    .HasForeignKey(d => d.CreatedById)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Idea_Employee");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Idea)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Idea_Organization");
+            });
+
+            modelBuilder.Entity<IdeaComment>(entity =>
+            {
+                entity.Property(e => e.Comment).IsRequired();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.CreatedBy)
+                    .WithMany(p => p.IdeaComment)
+                    .HasForeignKey(d => d.CreatedById)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaComment_Employee");
+
+                entity.HasOne(d => d.Idea)
+                    .WithMany(p => p.IdeaComment)
+                    .HasForeignKey(d => d.IdeaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaComment_Idea");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.IdeaComment)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaComment_Organization");
+
+                entity.HasOne(d => d.ParentComment)
+                    .WithMany(p => p.InverseParentComment)
+                    .HasForeignKey(d => d.ParentCommentId)
+                    .HasConstraintName("FK_IdeaComment_ParentIdeaComment");
+            });
+
+            modelBuilder.Entity<IdeaLike>(entity =>
+            {
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.IdeaLike)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaLike_Employee");
+
+                entity.HasOne(d => d.Idea)
+                    .WithMany(p => p.IdeaLike)
+                    .HasForeignKey(d => d.IdeaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaLike_Idea");
+            });
+
+            modelBuilder.Entity<IdeaTag>(entity =>
+            {
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<IdeaTagRef>(entity =>
+            {
+                entity.HasOne(d => d.Idea)
+                    .WithMany(p => p.IdeaTagRef)
+                    .HasForeignKey(d => d.IdeaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaTagRef_Idea");
+
+                entity.HasOne(d => d.Tag)
+                    .WithMany(p => p.IdeaTagRef)
+                    .HasForeignKey(d => d.TagId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaTagRef_IdeaTag");
+            });
+
+            modelBuilder.Entity<IdeaView>(entity =>
+            {
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.IdeaView)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaView_Employee");
+
+                entity.HasOne(d => d.Idea)
+                    .WithMany(p => p.IdeaView)
+                    .HasForeignKey(d => d.IdeaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IdeaView_Idea");
             });
 
             modelBuilder.Entity<Organization>(entity =>

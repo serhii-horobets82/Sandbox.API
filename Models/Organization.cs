@@ -15,6 +15,8 @@ namespace Evoflare.API.Models
             EmployeeRelations = new HashSet<EmployeeRelations>();
             EmployeeType = new HashSet<EmployeeType>();
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
+            Idea = new HashSet<Idea>();
+            IdeaComment = new HashSet<IdeaComment>();
             Pdp = new HashSet<Pdp>();
             ProjectCareerPath = new HashSet<ProjectCareerPath>();
             ProjectPosition = new HashSet<ProjectPosition>();
@@ -40,6 +42,8 @@ namespace Evoflare.API.Models
         public virtual ICollection<EmployeeRelations> EmployeeRelations { get; set; }
         public virtual ICollection<EmployeeType> EmployeeType { get; set; }
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
+        public virtual ICollection<Idea> Idea { get; set; }
+        public virtual ICollection<IdeaComment> IdeaComment { get; set; }
         public virtual ICollection<Pdp> Pdp { get; set; }
         public virtual ICollection<ProjectCareerPath> ProjectCareerPath { get; set; }
         public virtual ICollection<ProjectPosition> ProjectPosition { get; set; }

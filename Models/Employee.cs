@@ -16,6 +16,10 @@ namespace Evoflare.API.Models
             EmployeeRelationsEmployee = new HashSet<EmployeeRelations>();
             EmployeeRelationsManager = new HashSet<EmployeeRelations>();
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
+            Idea = new HashSet<Idea>();
+            IdeaComment = new HashSet<IdeaComment>();
+            IdeaLike = new HashSet<IdeaLike>();
+            IdeaView = new HashSet<IdeaView>();
             PositionCreatedByNavigation = new HashSet<Position>();
             PositionUpdatedByNavigation = new HashSet<Position>();
             _360employeeEvaluation = new HashSet<_360employeeEvaluation>();
@@ -43,6 +47,10 @@ namespace Evoflare.API.Models
         public virtual ICollection<EmployeeRelations> EmployeeRelationsEmployee { get; set; }
         public virtual ICollection<EmployeeRelations> EmployeeRelationsManager { get; set; }
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
+        public virtual ICollection<Idea> Idea { get; set; }
+        public virtual ICollection<IdeaComment> IdeaComment { get; set; }
+        public virtual ICollection<IdeaLike> IdeaLike { get; set; }
+        public virtual ICollection<IdeaView> IdeaView { get; set; }
         public virtual ICollection<Position> PositionCreatedByNavigation { get; set; }
         public virtual ICollection<Position> PositionUpdatedByNavigation { get; set; }
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
