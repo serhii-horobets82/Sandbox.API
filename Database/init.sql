@@ -486,6 +486,39 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+CREATE TABLE [dbo].[Notification](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Type] [int] NOT NULL,
+	[EmployeeId] [int] NOT NULL,
+	[Data] [nvarchar](max) NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[Active] [bit] NOT NULL,
+	[ViewDate] [datetime] NULL,
+ CONSTRAINT [PK_Notification] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[NotificationType](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](max) NOT NULL,
+	[Template] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_NotificationType] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE TABLE [dbo].[Organization](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](100) NOT NULL,
@@ -1253,6 +1286,61 @@ INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (6, N'OPERAT
 INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (8, N'Performance Engineer', 1)
 INSERT [dbo].[EmployeeType] ([Id], [Type], [OrganizationId]) VALUES (9, N'Another role', 1)
 SET IDENTITY_INSERT [dbo].[EmployeeType] OFF
+SET IDENTITY_INSERT [dbo].[Idea] ON 
+
+INSERT [dbo].[Idea] ([Id], [Name], [Description], [CreatedById], [CreatedDate], [Price], [OrganizationId]) VALUES (1, N'Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing', N'New York (CNN Business)America''s business leaders are growing more worried that the United States will enter a recession by the end of 2020. Their primary fear: protectionist trade policy.
+
+That is the topline finding of a report released Monday by the National Association for Business Economics. The survey, based on responses by 53 economists, is a leading barometer of where the US business community thinks the economy is headed.
+"Increased trade protectionism is considered the primary downwide risk to growth by a majority of the respondents," Gregory Daco, chief US economist for Oxford Economics, said in a statement. The report found what it called a "surge" in recession fears among the economists.
+The report comes as the United States ratchets up its trade war with China and has gone after other major trading partners, including Mexico and India.
+The risk of recession happening soon remains low but will "rise rapidly" next year. The survey''s respondents said the risk of recession starting in 2019 is only 15% but 60% by the end of 2020. About a third of respondents forecast a recession will begin halfway through next year.
+According to the survey, the median forecast for gross domestic product growth in the last quarter of 2020 was 1.9%. That would be a big drop from the most recent estimate of current US economic growth — 3.1% in the first three months of 2019.
+The United States is probably somewhere in the last stages of an epic run of economic growth that began in 2009. Dramatic and coordinated responses by the Federal Reserve, Congress and the Obama administration helped pull the country up from the Great Recession.', 1, CAST(N'2019-07-15T16:33:59.897' AS DateTime), NULL, 1)
+INSERT [dbo].[Idea] ([Id], [Name], [Description], [CreatedById], [CreatedDate], [Price], [OrganizationId]) VALUES (4, N'Do smth nice', N'Descriptive description', 1, CAST(N'2019-07-15T19:03:48.963' AS DateTime), NULL, 1)
+INSERT [dbo].[Idea] ([Id], [Name], [Description], [CreatedById], [CreatedDate], [Price], [OrganizationId]) VALUES (5, N'Do smth with table and trees', N'Miusov, as a man man of breeding and deilcacy, could not but feel some inwrd qualms, when he reached the Father Superior''s with Ivan: he felt ashamed of havin lost his temper. He felt that he ought to have disdaimed that despicable wretch, Fyodor Pavlovitch, too much to have been upset by him in Father Zossima''s cell, and so to have forgotten himself. "Teh monks were not to blame, in any case," he reflceted, on the steps. "And if they''re decent people here (and the Father Superior, I understand, is a nobleman) why not be friendly and courteous withthem? I won''t argue, I''ll fall in with everything, I''ll win them by politness, and show them that I''ve nothing to do with that Aesop, thta buffoon, that Pierrot, and have merely been takken in over this affair, just as they have."', 1, CAST(N'2019-07-15T20:41:54.087' AS DateTime), 300, 1)
+SET IDENTITY_INSERT [dbo].[Idea] OFF
+SET IDENTITY_INSERT [dbo].[IdeaComment] ON 
+
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (1, 5, N'First comment', 1, CAST(N'2019-07-15T20:58:58.633' AS DateTime), NULL, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (2, 5, N'Second!', 1, CAST(N'2019-07-15T21:06:23.377' AS DateTime), NULL, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (3, 5, N'Third..', 1, CAST(N'2019-07-15T21:07:51.587' AS DateTime), NULL, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (4, 5, N'another', 1, CAST(N'2019-07-15T21:09:51.157' AS DateTime), NULL, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (5, 5, N'Second reply', 1, CAST(N'2019-07-15T21:30:39.167' AS DateTime), 2, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (6, 5, N'Third reply', 1, CAST(N'2019-07-15T21:34:38.920' AS DateTime), 3, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (7, 5, N'another reply', 1, CAST(N'2019-07-15T21:36:31.627' AS DateTime), 4, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (8, 5, N'first reply', 1, CAST(N'2019-07-15T21:45:34.157' AS DateTime), 1, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (9, 5, N'second reply 2', 1, CAST(N'2019-07-15T21:48:32.167' AS DateTime), 2, 1)
+INSERT [dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES (10, 5, N'second reply to reply', 1, CAST(N'2019-07-15T21:50:56.790' AS DateTime), 5, 1)
+SET IDENTITY_INSERT [dbo].[IdeaComment] OFF
+SET IDENTITY_INSERT [dbo].[IdeaTag] ON 
+
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (1, N'office')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (2, N'lunch')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (3, N'business')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (4, N'tea')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (5, N'ice')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (6, N'office')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (7, N'office')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (8, N'table')
+INSERT [dbo].[IdeaTag] ([Id], [Name]) VALUES (9, N'trees')
+SET IDENTITY_INSERT [dbo].[IdeaTag] OFF
+SET IDENTITY_INSERT [dbo].[IdeaTagRef] ON 
+
+INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (2, 4, 7)
+INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (3, 5, 8)
+INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (4, 5, 9)
+SET IDENTITY_INSERT [dbo].[IdeaTagRef] OFF
+SET IDENTITY_INSERT [dbo].[Notification] ON 
+
+INSERT [dbo].[Notification] ([Id], [Type], [EmployeeId], [Data], [CreatedDate], [CreatedBy], [Active], [ViewDate]) VALUES (1, 1, 21, N'{"name": "You", "project":"Cool project"}', CAST(N'2019-07-12T19:26:00.000' AS DateTime), 1, 1, NULL)
+INSERT [dbo].[Notification] ([Id], [Type], [EmployeeId], [Data], [CreatedDate], [CreatedBy], [Active], [ViewDate]) VALUES (3, 3, 21, N'{"name":"Some Manager", "project":"Cool project", "managerId":"1"}', CAST(N'2019-07-12T19:20:00.000' AS DateTime), 1, 1, NULL)
+SET IDENTITY_INSERT [dbo].[Notification] OFF
+SET IDENTITY_INSERT [dbo].[NotificationType] ON 
+
+INSERT [dbo].[NotificationType] ([Id], [Name], [Template]) VALUES (1, N'ProjectJoin', N'${name} has joined a project ${project}')
+INSERT [dbo].[NotificationType] ([Id], [Name], [Template]) VALUES (4, N'ProjectLeave', N'${name} has left a project ${project}')
+INSERT [dbo].[NotificationType] ([Id], [Name], [Template]) VALUES (5, N'ProjectManagerAssignToTeam', N'${name} has been assigned as a Manager to a project ${project}')
+SET IDENTITY_INSERT [dbo].[NotificationType] OFF
 SET IDENTITY_INSERT [dbo].[Organization] ON 
 
 INSERT [dbo].[Organization] ([Id], [Name]) VALUES (1, N'Smart CORP')
