@@ -17,8 +17,9 @@ namespace Evoflare.API.Data
             try
             {
                 context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfCompetence] ON");
+                
             }
-            catch { } // TODO find better solution 
+            catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
             {

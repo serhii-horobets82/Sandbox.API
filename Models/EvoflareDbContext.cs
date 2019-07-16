@@ -4,7 +4,31 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Evoflare.API.Models
 {
-    public partial class EvoflareDbContext : IdentityDbContext<ApplicationUser>
+
+    public class BaseDbContext : IdentityDbContext<ApplicationUser>
+    {
+
+        public BaseDbContext()
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //Configure default schema
+            //var coreSchema = configuration.GetValue("AppSettings:DbCoreSchema", "core");
+            modelBuilder.HasDefaultSchema("core");
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.HasDefaultSchema("dbo");
+        }
+
+        public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options)
+        {
+        }
+
+    }
+
+
+    public partial class EvoflareDbContext : BaseDbContext //IdentityDbContext<ApplicationUser>
     {
         public EvoflareDbContext()
         {

@@ -6,6 +6,45 @@ using Microsoft.Extensions.Configuration;
 
 namespace Evoflare.API.Models
 {
+
+    public partial class BaseDbContext222 : IdentityDbContext<ApplicationUser>
+    {
+        public DbSet<UserProfile> Profile { get; set; }
+
+        public virtual DbSet<Auth.Models.ActivityLog> ActivityLogs { get; set; }
+        public virtual DbSet<AppVersion> AppVersion { get; set; }
+
+        public BaseDbContext222()
+        {
+        }
+
+        public BaseDbContext222(DbContextOptions<BaseDbContext222> options) : base(options)
+        {
+        }
+
+         protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+
+
+    public class AppDbContext : BaseDbContext222
+    {
+        
+
+        public AppDbContext(DbContextOptions<BaseDbContext222> options)
+                     : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+
+
     // public partial class TechnicalEvaluationContext : DbContext
     // {
     //     public DbSet<UserProfile> Profile { get; set; }

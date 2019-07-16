@@ -132,6 +132,8 @@ namespace Evoflare.API.Data
             // version in database table AppVersion
             var previousVersion = string.Empty;
 
+            //var appContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
@@ -207,46 +209,46 @@ namespace Evoflare.API.Data
                 AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName, Gender.Male, 20);
             }
 
-            SeedOrganization(applicationContext);
-            SeedEmployeeType(applicationContext);
-            SeedEmployee(applicationContext);
-            SeedEmployeeEvaluation(applicationContext);
+            //SeedOrganization(applicationContext);
+            //SeedEmployeeType(applicationContext);
+            //SeedEmployee(applicationContext);
+            //SeedEmployeeEvaluation(applicationContext);
             
-            SeedCertificationExam(applicationContext);
+            //SeedCertificationExam(applicationContext);
             
-            SeedEcfCompetence(applicationContext);
-            SeedEcfCompetenceLevel(applicationContext);
-            SeedEcfEmployeeEvaluation(applicationContext);
-            SeedEcfEvaluationResult(applicationContext);
-            SeedEcfRole(applicationContext);
-            SeedEcfRoleCompetence(applicationContext);
+            //SeedEcfCompetence(applicationContext);
+            //SeedEcfCompetenceLevel(applicationContext);
+            //SeedEcfEmployeeEvaluation(applicationContext);
+            //SeedEcfEvaluationResult(applicationContext);
+            //SeedEcfRole(applicationContext);
+            //SeedEcfRoleCompetence(applicationContext);
 
-            SeedProject(applicationContext);
-            SeedPosition(applicationContext);
-            SeedPositionRole(applicationContext);
-            SeedProjectCareerPath(applicationContext);
+            //SeedProject(applicationContext);
+            //SeedPosition(applicationContext);
+            //SeedPositionRole(applicationContext);
+            //SeedProjectCareerPath(applicationContext);
             
             
-            SeedRoleGrade(applicationContext);
-            SeedRoleGradeCompetence(applicationContext);
-            SeedTeam(applicationContext);
-            SeedProjectPosition(applicationContext);
-            SeedProjectPositionCompetence(applicationContext);
+            //SeedRoleGrade(applicationContext);
+            //SeedRoleGradeCompetence(applicationContext);
+            //SeedTeam(applicationContext);
+            //SeedProjectPosition(applicationContext);
+            //SeedProjectPositionCompetence(applicationContext);
 
-            Seed_360feedbackGroup(applicationContext);
-            Seed_360feedbackMark(applicationContext);
-            Seed_360questionarie(applicationContext);
-            Seed_360questionToMark(applicationContext);
-            Seed_360question(applicationContext);
+            //Seed_360feedbackGroup(applicationContext);
+            //Seed_360feedbackMark(applicationContext);
+            //Seed_360questionarie(applicationContext);
+            //Seed_360questionToMark(applicationContext);
+            //Seed_360question(applicationContext);
             
-            Seed_360employeeEvaluation(applicationContext);
-            Seed_360evaluation(applicationContext);
+            //Seed_360employeeEvaluation(applicationContext);
+            //Seed_360evaluation(applicationContext);
 
-            SeedCustomerContact(applicationContext);
-            SeedCertificate(applicationContext);
-            SeedCompetenceCertificate(applicationContext);
+            //SeedCustomerContact(applicationContext);
+            //SeedCertificate(applicationContext);
+            //SeedCompetenceCertificate(applicationContext);
             
-            SeedEmployeeRelations(applicationContext);
+            //SeedEmployeeRelations(applicationContext);
 
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)

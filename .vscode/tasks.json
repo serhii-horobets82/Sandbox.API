@@ -2,6 +2,38 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Full scaffold database",
+            "type": "shell",
+            "command": "echo Scaffold database done ",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Scffold database",
+                "Delete extra models"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Delete extra models",
+            "type": "shell",
+            "command": "Remove-Item",
+            "args": [
+               "Models\\AspNet*.cs,",
+               "Models\\ActivityLogs.cs,",
+               "Models\\Groups.cs,",
+               "Models\\Profile.cs",
+               "-force"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Three",
+            "type": "shell",
+            "command": "echo Three ",
+            "problemMatcher": []
+        },
+
+
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",
@@ -34,7 +66,7 @@
             "problemMatcher": "$tsc"
         },
         {
-            "label": "Scaffold database",
+            "label": "Scffold database",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -50,6 +82,8 @@
                 "-v",
                 "--context-dir",
                 "Data",
+                "--schema",
+                "dbo",
                 "--force"
             ],
             "problemMatcher": []
@@ -57,12 +91,12 @@
         {
             "label": "Build and run DB container",
             "type": "process",
-            "command": "start-docker-sql.cmd", 
+            "command": "start-docker-sql.cmd",
             "group": "build",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Docker"
@@ -77,7 +111,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Docker"
@@ -94,7 +128,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "problemMatcher": []
         },
@@ -108,7 +142,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "problemMatcher": []
         },
@@ -122,7 +156,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "problemMatcher": []
         },
@@ -136,7 +170,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "group" : "docker"
+                "group": "docker"
             },
             "problemMatcher": []
         }

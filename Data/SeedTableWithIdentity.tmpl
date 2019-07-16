@@ -18,7 +18,7 @@ namespace Evoflare.API.Data
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [{1}] ON");
 			}
-            catch { } // TODO find better solution 
+            catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
             {{
