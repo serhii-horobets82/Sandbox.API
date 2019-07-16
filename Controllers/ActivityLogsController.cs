@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]")]
     public class ActivityLogsController
     {
-        readonly ApplicationDbContext context;
+        readonly EvoflareDbContext context;
 
-        public ActivityLogsController(ApplicationDbContext context)
+        public ActivityLogsController(EvoflareDbContext context)
         {
             this.context = context;
         }

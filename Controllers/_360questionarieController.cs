@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class _360questionarieController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public _360questionarieController(TechnicalEvaluationContext context)
+        public _360questionarieController(EvoflareDbContext context)
         {
             _context = context;
         }

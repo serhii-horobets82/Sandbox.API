@@ -20,9 +20,9 @@ namespace Evoflare.API.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly ClaimsPrincipal _caller;
-        private readonly ApplicationDbContext _appDbContext;
+        private readonly EvoflareDbContext _appDbContext;
 
-        public DashboardController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext, IHttpContextAccessor httpContextAccessor)
+        public DashboardController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext, IHttpContextAccessor httpContextAccessor)
         {
             _caller = httpContextAccessor.HttpContext.User;
             _appDbContext = appDbContext;

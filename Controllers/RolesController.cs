@@ -12,9 +12,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext db;
+        private readonly EvoflareDbContext db;
 
-        public RolesController(TechnicalEvaluationContext db)
+        public RolesController(EvoflareDbContext db)
         {
             this.db = db;
         }

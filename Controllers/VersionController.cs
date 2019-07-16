@@ -14,9 +14,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
-        private readonly ApplicationDbContext db;
+        private readonly EvoflareDbContext db;
 
-        public VersionController(ApplicationDbContext db)
+        public VersionController(EvoflareDbContext db)
         {
             this.db = db;
         }

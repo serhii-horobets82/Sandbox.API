@@ -7,10 +7,10 @@ namespace Evoflare.API.Services
 {
     public class ActivityLogService : IActivityLogService
     {
-        private readonly ApplicationDbContext context;
+        private readonly EvoflareDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ActivityLogService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public ActivityLogService(UserManager<ApplicationUser> userManager, EvoflareDbContext context)
         {
             this.userManager = userManager;
             this.context = context;

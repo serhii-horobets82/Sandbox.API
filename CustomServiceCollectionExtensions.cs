@@ -45,15 +45,19 @@ namespace Evoflare.API
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName();
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
-                configuration.GetConnectionString(connectionName),
-                sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
+            // services.AddDbContext<EvoflareDBContext>(options => options.UseSqlServer(
+            //     configuration.GetConnectionString(connectionName),
+            //     sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
 
-            services.AddDbContext<TechnicalEvaluationContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
-                    // start migration
-                    optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
-            );
+            services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
+            configuration.GetConnectionString(connectionName),
+            sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
+
+            // services.AddDbContext<TechnicalEvaluationContext>(
+            //     options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
+            //         // start migration
+            //         optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
+            // );
             return services;
         }
 
@@ -114,7 +118,7 @@ namespace Evoflare.API
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ApiUser",
-                    policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol,Constants.JwtClaims.ApiAccess));
+                    policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess));
             });
 
             // add identity
@@ -132,7 +136,7 @@ namespace Evoflare.API
                     options.ClaimsIdentity.UserIdClaimType = Constants.JwtClaimIdentifiers.Id;
                 })
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<EvoflareDbContext>()
                 .AddDefaultTokenProviders();
 
             return services;

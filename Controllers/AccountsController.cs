@@ -14,10 +14,10 @@ namespace Evoflare.API.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IActivityLogService activityLogService;
-        private readonly ApplicationDbContext appDbContext;
+        private readonly EvoflareDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public AccountsController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext,
+        public AccountsController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext,
             IActivityLogService activityLogService)
         {
             this.userManager = userManager;

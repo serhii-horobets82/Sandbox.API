@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Evoflare.API.Models
 {
+    /* 
     public partial class TechnicalEvaluationContext : DbContext
     {
         public TechnicalEvaluationContext()
@@ -920,4 +921,5 @@ namespace Evoflare.API.Models
             });
         }
     }
+    */
 }

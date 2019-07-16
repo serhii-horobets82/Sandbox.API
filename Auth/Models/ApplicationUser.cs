@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Evoflare.API.Constants;
 using Microsoft.AspNetCore.Identity;
-
 namespace Evoflare.API.Auth.Models
 {
     public class ApplicationUser : IdentityUser

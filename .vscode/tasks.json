@@ -27,10 +27,118 @@
             "type": "process",
             "args": [
                 "watch",
+                "--urls http://*:5000",
                 "run",
                 "${workspaceFolder}/Evoflare.API.csproj"
             ],
             "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Scaffold database",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "ef",
+                "dbcontext",
+                "scaffold",
+                "\"${config:mssql.connections.0.connectionString}\"",
+                "Microsoft.EntityFrameworkCore.SqlServer",
+                "-c",
+                "EvoflareDbContext",
+                "-o",
+                "Models",
+                "-v",
+                "--context-dir",
+                "Data",
+                "--force"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and run DB container",
+            "type": "process",
+            "command": "start-docker-sql.cmd", 
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and run API container",
+            "type": "process",
+            "command": "start-docker-api.cmd",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start DB container",
+            "type": "shell",
+            "command": "docker start evoflare-db",
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Stop DB container",
+            "type": "shell",
+            "command": "docker stop evoflare-db",
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Stop API container",
+            "type": "shell",
+            "command": "docker stop evoflare-api",
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start API container",
+            "type": "shell",
+            "command": "docker start evoflare-api",
+            "options": {
+                "cwd": "${workspaceRoot}/Docker"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "group" : "docker"
+            },
+            "problemMatcher": []
         }
     ]
-}
+} 

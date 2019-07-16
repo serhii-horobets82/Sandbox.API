@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class EcfRolesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public EcfRolesController(TechnicalEvaluationContext context)
+        public EcfRolesController(EvoflareDbContext context)
         {
             _context = context;
         }

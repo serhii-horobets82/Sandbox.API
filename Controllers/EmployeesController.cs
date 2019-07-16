@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class EmployeesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public EmployeesController(TechnicalEvaluationContext context)
+        public EmployeesController(EvoflareDbContext context)
         {
             _context = context;
         }
@@ -31,6 +31,14 @@ namespace Evoflare.API.Controllers
             }
             return employees;
         }
+
+        [HttpGet("salary")]
+        public IEnumerable<Employee> GetEmployeesSalary()
+        {
+            var employees = _context.Employee.Include(e => e.EmployeeType);
+            return employees;
+        }
+
 
         [HttpGet("managers")]
         public IEnumerable<Employee> GetManagers()
