@@ -30,7 +30,7 @@
     {
       "label": "Scaffold database (main)",
       "type": "shell",
-      "command": "echo Scaffold and patch context file done",
+      "command": "echo Done",
       "dependsOrder": "sequence",
       "dependsOn": ["Scaffold database(dbo schema)", "Patch EvofalreDbContext file"],
       "problemMatcher": []
