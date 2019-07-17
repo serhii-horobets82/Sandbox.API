@@ -263,6 +263,7 @@ namespace Evoflare.API.Data
                         Name = assemblyInfo.Name,
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
+                        Organization = applicationContext.Organization.FirstOrDefault().Name,
                         Database = $"{connection.DataSource}, v.{connection.ServerVersion}"
                     };
 

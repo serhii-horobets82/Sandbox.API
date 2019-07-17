@@ -1,6 +1,49 @@
 {
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "migrationName",
+      "type": "promptString",
+      "description": "Name of migration",
+      "default": "Initial"
+    }
+  ],
   "tasks": [
+    {
+      "label": "ef::Context info",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "dbcontext", "info", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Create migration",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "ef",
+        "migrations",
+        "add",
+        "${input:migrationName}",
+        "--context",
+        "EvoflareDbContext"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Update database",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "database", "update", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Remove migration",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "migrations", "remove", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
     {
       "label": "build",
       "command": "dotnet",
@@ -32,7 +75,10 @@
       "type": "shell",
       "command": "echo Done",
       "dependsOrder": "sequence",
-      "dependsOn": ["Scaffold database(dbo schema)", "Patch EvofalreDbContext file"],
+      "dependsOn": [
+        "Scaffold database(dbo schema)",
+        "Patch EvofalreDbContext file"
+      ],
       "problemMatcher": []
     },
     {

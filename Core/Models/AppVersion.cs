@@ -9,5 +9,6 @@ namespace Evoflare.API.Core.Models
         public string Version { get; set; }
         public string Database { get; set; }
         public DateTime CreationDate { get; set; }
+        public string Organization { get; set; }
     }
 }
