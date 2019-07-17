@@ -14,7 +14,11 @@ namespace Evoflare.API.Data
         {
             if (context.CompetenceCertificate.Any()) return false;
             var trans = context.Database.BeginTransaction();
-            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CompetenceCertificate] ON");
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CompetenceCertificate] ON");
+			}
+            catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
             {
@@ -25,8 +29,14 @@ namespace Evoflare.API.Data
             context.CompetenceCertificate.AddRange(items);
 
             context.SaveChanges();
-			context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CompetenceCertificate] OFF");
-            trans.Commit();
+
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CompetenceCertificate] OFF");
+				trans.Commit();
+			}
+            catch { } // TODO find better solution 
+            
             return true;
         }
     }

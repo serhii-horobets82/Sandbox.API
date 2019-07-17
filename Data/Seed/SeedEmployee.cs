@@ -14,7 +14,11 @@ namespace Evoflare.API.Data
         {
             if (context.Employee.Any()) return false;
             var trans = context.Database.BeginTransaction();
-            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] ON");
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] ON");
+			}
+            catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
             {
@@ -38,8 +42,14 @@ namespace Evoflare.API.Data
             context.Employee.AddRange(items);
 
             context.SaveChanges();
-			context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] OFF");
-            trans.Commit();
+
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] OFF");
+				trans.Commit();
+			}
+            catch { } // TODO find better solution 
+            
             return true;
         }
     }

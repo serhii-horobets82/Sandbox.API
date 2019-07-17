@@ -14,7 +14,11 @@ namespace Evoflare.API.Data
         {
             if (context._360evaluation.Any()) return false;
             var trans = context.Database.BeginTransaction();
-            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360evaluation] ON");
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360evaluation] ON");
+			}
+            catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
             {
@@ -27,8 +31,14 @@ namespace Evoflare.API.Data
             context._360evaluation.AddRange(items);
 
             context.SaveChanges();
-			context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360evaluation] OFF");
-            trans.Commit();
+
+			try
+            {
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360evaluation] OFF");
+				trans.Commit();
+			}
+            catch { } // TODO find better solution 
+            
             return true;
         }
     }

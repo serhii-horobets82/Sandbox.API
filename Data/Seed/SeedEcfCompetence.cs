@@ -14,11 +14,10 @@ namespace Evoflare.API.Data
         {
             if (context.EcfCompetence.Any()) return false;
             var trans = context.Database.BeginTransaction();
-            try
+			try
             {
-                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfCompetence] ON");
-                
-            }
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfCompetence] ON");
+			}
             catch { trans.Rollback(); } // TODO find better solution 
 
             var items = new[]
@@ -68,12 +67,14 @@ namespace Evoflare.API.Data
             context.EcfCompetence.AddRange(items);
 
             context.SaveChanges();
-            try
+
+			try
             {
-                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfCompetence] OFF");
-                trans.Commit();
-            }
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfCompetence] OFF");
+				trans.Commit();
+			}
             catch { } // TODO find better solution 
+            
             return true;
         }
     }

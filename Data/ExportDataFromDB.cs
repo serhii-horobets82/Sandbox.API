@@ -86,7 +86,7 @@ namespace Evoflare.API.Data
             var tmplSeedClass = File.ReadAllText($"{currDirectory}\\Data\\SeedTableWithIdentity.tmpl");
 
             //var exportList = new string [] { "Organization", "EmployeeType", "Employee", "EmployeeEvaluation", "EmployeeRelations" };
-            var excludeList = new string[] { "ActivityLog", "AppVersion", "ApplicationUser", "UserProfile", "IdentityRole", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1" };// "AspNetRoleClaims", "AspNetRoles", "AspNetUserClaims", "AspNetUserLogins", "AspNetUserRoles", "AspNetUsers", "AspNetUserTokens"};
+            var excludeList = new string[] { "ActivityLog", "AppVersion", "ApplicationRole", "ApplicationUser", "UserProfile", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1" };
             // list of all context DbSet
             var entityTypes = context.Model.GetEntityTypes().Where(i => !excludeList.Contains(i.ClrType.Name));
 

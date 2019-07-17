@@ -43,7 +43,7 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<Auth.Models.UserProfile>(entity =>
             {
-                entity.ToTable("Profile", "core");
+                entity.ToTable("Profile", CoreSchemaName);
 
                 entity.HasIndex(e => e.IdentityId);
             });
