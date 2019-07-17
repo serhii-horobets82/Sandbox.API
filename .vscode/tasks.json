@@ -30,9 +30,9 @@
     {
       "label": "Scaffold database (main)",
       "type": "shell",
-      "command": "echo Scaffold database done ",
+      "command": "echo Scaffold and patch context file done",
       "dependsOrder": "sequence",
-      "dependsOn": ["Scaffold database(dbo schema)", "Patch context file"],
+      "dependsOn": ["Scaffold database(dbo schema)", "Patch EvofalreDbContext file"],
       "problemMatcher": []
     },
     {
@@ -54,6 +54,7 @@
         "Data",
         "--schema",
         "dbo",
+        "--data-annotations",
         "--force"
       ],
       "problemMatcher": []
@@ -61,7 +62,7 @@
     {
       "label": "Patch EvofalreDbContext file",
       "type": "shell",
-      "command": "((Get-Content -path EvoflareDbContext.cs -Raw) -replace ': DbContext',': BaseDbContext') | Out-File EvoflareDbContext.cs",
+      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace ' modelBuilder.HasAnnotation','base.OnModelCreating(modelBuilder);\n\rmodelBuilder.HasAnnotation' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
       "options": {
         "cwd": "${workspaceRoot}/Data"
       },
