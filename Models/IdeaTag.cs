@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
@@ -13,6 +15,7 @@ namespace Evoflare.API.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
+        [InverseProperty("Tag")]
         public virtual ICollection<IdeaTagRef> IdeaTagRef { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
@@ -9,7 +11,11 @@ namespace Evoflare.API.Models
         public int IdeaId { get; set; }
         public int TagId { get; set; }
 
+        [ForeignKey("IdeaId")]
+        [InverseProperty("IdeaTagRef")]
         public virtual Idea Idea { get; set; }
+        [ForeignKey("TagId")]
+        [InverseProperty("IdeaTagRef")]
         public virtual IdeaTag Tag { get; set; }
     }
 }
