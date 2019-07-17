@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 

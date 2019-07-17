@@ -122,7 +122,7 @@ namespace Evoflare.API
             });
 
             // add identity
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
                 {
                     // configure identity options
                     options.Password.RequireDigit = false;
@@ -135,7 +135,7 @@ namespace Evoflare.API
                     // Set for correct userManager.GetUserAsync execution
                     options.ClaimsIdentity.UserIdClaimType = Constants.JwtClaimIdentifiers.Id;
                 })
-                .AddRoles<IdentityRole>()
+                //.AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<EvoflareDbContext>()
                 .AddDefaultTokenProviders();
 

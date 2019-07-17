@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Models;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

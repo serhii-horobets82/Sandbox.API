@@ -1,4 +1,5 @@
 ﻿using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Constants;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
@@ -29,14 +30,14 @@ namespace Evoflare.API.Data
         /// <param name="roleName">Role Name</param>
         private static void CreateRole(IServiceProvider serviceProvider, string roleName)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
             var roleExists = roleManager.RoleExistsAsync(roleName);
             roleExists.Wait();
 
             if (roleExists.Result) return;
 
-            var roleResult = roleManager.CreateAsync(new IdentityRole(roleName));
+            var roleResult = roleManager.CreateAsync(new ApplicationRole(roleName, "Global"));
             roleResult.Wait();
         }
 

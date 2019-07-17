@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Evoflare.API.Models
+namespace Evoflare.API.Core.Models
 {
     public partial class AppVersion
     {

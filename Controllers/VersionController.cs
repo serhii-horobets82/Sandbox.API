@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Evoflare.API.Models;
-using Microsoft.AspNetCore.Authorization;
+using Evoflare.API.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +12,18 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
-        private readonly EvoflareDbContext db;
+        private readonly EvoflareDbContext appContext;
 
-        public VersionController(EvoflareDbContext db)
+        public VersionController(EvoflareDbContext appContext)
         {
-            this.db = db;
+            this.appContext = appContext;
         }
 
         [HttpGet(Name = "GetAppVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(string))]
         public async Task<AppVersion> GetAppVersion()
         {
-            return await db.AppVersion.FirstOrDefaultAsync();
+            return await appContext.AppVersion.FirstOrDefaultAsync();
         }
     }
 }
