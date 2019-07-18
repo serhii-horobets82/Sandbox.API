@@ -19,7 +19,7 @@ namespace Evoflare.API.Controllers
     public class ExternalAuthController : Controller
     {
         private static readonly HttpClient Client = new HttpClient();
-        private readonly ApplicationDbContext appDbContext;
+        private readonly EvoflareDbContext appDbContext;
         private readonly FacebookAuthSettings fbAuthSettings;
         private readonly GithubAuthSettings githubAuthSettings;
         private readonly IJwtFactory jwtFactory;
@@ -30,7 +30,7 @@ namespace Evoflare.API.Controllers
             IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
             IOptions<GithubAuthSettings> githubAuthSettingsAccessor,
             UserManager<ApplicationUser> userManager,
-            ApplicationDbContext appDbContext,
+            EvoflareDbContext appDbContext,
             IJwtFactory jwtFactory,
             IOptions<JwtIssuerOptions> jwtOptions)
         {

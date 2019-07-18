@@ -1,36 +1,204 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/Evoflare.API.csproj"
-            ],
-            "problemMatcher": "$tsc"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/Evoflare.API.csproj"
-            ],
-            "problemMatcher": "$tsc"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "${workspaceFolder}/Evoflare.API.csproj"
-            ],
-            "problemMatcher": "$tsc"
-        }
-    ]
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "migrationName",
+      "type": "promptString",
+      "description": "Name of migration",
+      "default": "Initial"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "ef::Context info",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "dbcontext", "info", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Create migration",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "ef",
+        "migrations",
+        "add",
+        "${input:migrationName}",
+        "--context",
+        "EvoflareDbContext"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Update database",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "database", "update", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
+    {
+      "label": "ef::Remove migration",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["ef", "migrations", "remove", "--context", "EvoflareDbContext"],
+      "problemMatcher": []
+    },
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/Evoflare.API.csproj"],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "publish",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["publish", "${workspaceFolder}/Evoflare.API.csproj"],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "--urls http://*:5000",
+        "run",
+        "${workspaceFolder}/Evoflare.API.csproj"
+      ],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Scaffold database (main)",
+      "type": "shell",
+      "command": "echo Done",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Scaffold database(dbo schema)",
+        "Patch EvofalreDbContext file"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Scaffold database(dbo schema)",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "ef",
+        "dbcontext",
+        "scaffold",
+        "\"${config:mssql.connections.0.connectionString}\"",
+        "Microsoft.EntityFrameworkCore.SqlServer",
+        "-c",
+        "EvoflareDbContext",
+        "-o",
+        "Models",
+        "-v",
+        "--context-dir",
+        "Data",
+        "--schema",
+        "dbo",
+        "--data-annotations",
+        "--force"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Patch EvofalreDbContext file",
+      "type": "shell",
+      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace ' modelBuilder.HasAnnotation','base.OnModelCreating(modelBuilder);\n\rmodelBuilder.HasAnnotation' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
+      "options": {
+        "cwd": "${workspaceRoot}/Data"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build and run DB container",
+      "type": "process",
+      "command": "start-docker-sql.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build and run API container",
+      "type": "process",
+      "command": "start-docker-api.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start DB container",
+      "type": "shell",
+      "command": "docker start evoflare-db",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop DB container",
+      "type": "shell",
+      "command": "docker stop evoflare-db",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop API container",
+      "type": "shell",
+      "command": "docker stop evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start API container",
+      "type": "shell",
+      "command": "docker start evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    }
+  ]
 }

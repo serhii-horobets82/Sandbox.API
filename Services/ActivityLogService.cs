@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -7,10 +8,10 @@ namespace Evoflare.API.Services
 {
     public class ActivityLogService : IActivityLogService
     {
-        private readonly ApplicationDbContext context;
+        private readonly EvoflareDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ActivityLogService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public ActivityLogService(UserManager<ApplicationUser> userManager, EvoflareDbContext context)
         {
             this.userManager = userManager;
             this.context = context;

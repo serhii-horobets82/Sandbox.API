@@ -1,12 +1,5 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using Evoflare.API.Auth.Models;
+﻿using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Constants;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
@@ -14,10 +7,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using System;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 
 namespace Evoflare.API.Data
 {
-    public static class DbInitializer
+    public static partial class DbInitializer
     {
         private const string DefaultPassword = "qwerty";
         private const string DefaultLocation = "Ukraine";
@@ -32,14 +30,14 @@ namespace Evoflare.API.Data
         /// <param name="roleName">Role Name</param>
         private static void CreateRole(IServiceProvider serviceProvider, string roleName)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
             var roleExists = roleManager.RoleExistsAsync(roleName);
             roleExists.Wait();
 
             if (roleExists.Result) return;
 
-            var roleResult = roleManager.CreateAsync(new IdentityRole(roleName));
+            var roleResult = roleManager.CreateAsync(new ApplicationRole(roleName, "Global"));
             roleResult.Wait();
         }
 
@@ -58,8 +56,7 @@ namespace Evoflare.API.Data
             string roleName, string firstName, string lastName, Gender gender, int age)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var appDbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
-
+            var appDbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
             var checkAppUser = userManager.FindByEmailAsync(userEmail);
             checkAppUser.Wait();
 
@@ -88,12 +85,12 @@ namespace Evoflare.API.Data
 
                 // Add random profile
                 appDbContext.Profile.Add(new UserProfile
-                    {
-                        IdentityId = newAppUser.Id,
-                        Location = DefaultLocation,
-                        Locale = DefaultLocale,
-                        PictureUrl = DefaultPictureUrl
-                    }
+                {
+                    IdentityId = newAppUser.Id,
+                    Location = DefaultLocation,
+                    Locale = DefaultLocale,
+                    PictureUrl = DefaultPictureUrl
+                }
                 );
             }
 
@@ -136,12 +133,23 @@ namespace Evoflare.API.Data
             // version in database table AppVersion
             var previousVersion = string.Empty;
 
+            //var appContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+
+            // main context, user\roles\auth
+            var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
+
+            var exportData = configuration.GetValue("AppSettings:ExportData", false);
             // flag from config - recreate DB on application starts (if true) 
             var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
             var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
 
-            // main context, user\roles\auth
-            var applicationContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            if (exportData)
+            {
+                // generate seed-clasess in Data\Seed folder
+                ExportDataFromDB.Run(applicationContext);
+                // can't proceed with starup, we need stop running API 
+                throw new Exception("Disable ExportData parameter in appsetings and restart API");
+            }
 
             if (recreateDatabase)
                 RecreateDatabase(applicationContext, retryTimeout);
@@ -202,6 +210,46 @@ namespace Evoflare.API.Data
                 AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName, Gender.Male, 20);
             }
 
+            SeedOrganization(applicationContext);
+            SeedEmployeeType(applicationContext);
+            SeedEmployee(applicationContext);
+            SeedEmployeeEvaluation(applicationContext);
+            
+            SeedCertificationExam(applicationContext);
+            
+            SeedEcfCompetence(applicationContext);
+            SeedEcfCompetenceLevel(applicationContext);
+            SeedEcfEmployeeEvaluation(applicationContext);
+            SeedEcfEvaluationResult(applicationContext);
+            SeedEcfRole(applicationContext);
+            SeedEcfRoleCompetence(applicationContext);
+
+            SeedProject(applicationContext);
+            SeedPosition(applicationContext);
+            SeedPositionRole(applicationContext);
+            SeedProjectCareerPath(applicationContext);
+            
+            SeedRoleGrade(applicationContext);
+            SeedRoleGradeCompetence(applicationContext);
+            SeedTeam(applicationContext);
+            SeedProjectPosition(applicationContext);
+            SeedProjectPositionCompetence(applicationContext);
+
+            Seed_360feedbackGroup(applicationContext);
+            Seed_360feedbackMark(applicationContext);
+            Seed_360questionarie(applicationContext);
+            Seed_360questionToMark(applicationContext);
+            Seed_360question(applicationContext);
+            
+            Seed_360employeeEvaluation(applicationContext);
+            Seed_360evaluation(applicationContext);
+
+            SeedCustomerContact(applicationContext);
+            SeedCertificate(applicationContext);
+            SeedCompetenceCertificate(applicationContext);
+            
+            SeedEmployeeRelations(applicationContext);
+
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)
                 using (var connection = applicationContext.Database.GetDbConnection())
@@ -215,6 +263,7 @@ namespace Evoflare.API.Data
                         Name = assemblyInfo.Name,
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
+                        Organization = applicationContext.Organization.FirstOrDefault().Name,
                         Database = $"{connection.DataSource}, v.{connection.ServerVersion}"
                     };
 
@@ -227,7 +276,7 @@ namespace Evoflare.API.Data
                     applicationContext.SaveChanges();
 
                     #region  Process with sql files
-
+                    /*
                     // directory with sql files (copied to release folder)
                     var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
 
@@ -244,7 +293,7 @@ namespace Evoflare.API.Data
                         command.CommandText = sql;
                         try
                         {
-                            command.ExecuteNonQuery();
+                            //command.ExecuteNonQuery();
                         }
                         catch (SqlException ex)
                         {
@@ -271,7 +320,7 @@ namespace Evoflare.API.Data
                             }
                         }
                     }
-
+                    */
                     #endregion
                 }
         }

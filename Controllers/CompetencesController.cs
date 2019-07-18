@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class CompetencesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public CompetencesController(TechnicalEvaluationContext context)
+        public CompetencesController(EvoflareDbContext context)
         {
             this._context = context;
         }

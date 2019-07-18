@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class PositionsController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public PositionsController(TechnicalEvaluationContext context)
+        public PositionsController(EvoflareDbContext context)
         {
             _context = context;
         }

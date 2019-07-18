@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Models;
 using Evoflare.API.Models;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]")]
     public class ActivityLogsController
     {
-        readonly ApplicationDbContext context;
+        readonly EvoflareDbContext context;
 
-        public ActivityLogsController(ApplicationDbContext context)
+        public ActivityLogsController(EvoflareDbContext context)
         {
             this.context = context;
         }

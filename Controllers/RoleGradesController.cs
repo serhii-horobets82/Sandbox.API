@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class RoleGradesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public RoleGradesController(TechnicalEvaluationContext context)
+        public RoleGradesController(EvoflareDbContext context)
         {
             _context = context;
         }

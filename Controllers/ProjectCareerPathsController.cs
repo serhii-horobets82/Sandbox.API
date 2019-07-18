@@ -14,9 +14,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class ProjectCareerPathsController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public ProjectCareerPathsController(TechnicalEvaluationContext context)
+        public ProjectCareerPathsController(EvoflareDbContext context)
         {
             _context = context;
         }

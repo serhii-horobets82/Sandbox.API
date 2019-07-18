@@ -15,10 +15,10 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]/[action]")]
     public class ProfileController : ControllerBase
     {
-        private readonly ApplicationDbContext appDbContext;
+        private readonly EvoflareDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext appDbContext)
+        public ProfileController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext)
         {
             this.userManager = userManager;
             this.appDbContext = appDbContext;

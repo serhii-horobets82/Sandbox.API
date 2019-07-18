@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class PdpsController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public PdpsController(TechnicalEvaluationContext context)
+        public PdpsController(EvoflareDbContext context)
         {
             _context = context;
         }

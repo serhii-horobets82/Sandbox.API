@@ -20,12 +20,12 @@ namespace Evoflare.API.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly ApplicationDbContext context;
+        private readonly EvoflareDbContext context;
 
         public UsersController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ApplicationDbContext context)
+            EvoflareDbContext context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -38,7 +38,7 @@ namespace Evoflare.API.Controllers
             var hasPermission = await UserHasRole(Constants.Roles.Admin);
             if (!hasPermission) return null;
 
-            return await context.ApplicationUsers.Select(c => new JObject
+            return await context.Users.Select(c => new JObject
             {
                 { "id",  c.Id },
                 { "email",  c.Email },

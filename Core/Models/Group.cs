@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Evoflare.API.Auth.Models
+namespace Evoflare.API.Core.Models
 {
     public class Group
     {

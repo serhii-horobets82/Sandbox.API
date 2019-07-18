@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
@@ -27,33 +29,60 @@ namespace Evoflare.API.Models
         }
 
         public int Id { get; set; }
+        [StringLength(10)]
         public string UserId { get; set; }
         public bool IsManager { get; set; }
         public int EmployeeTypeId { get; set; }
         public int OrganizationId { get; set; }
+        [Required]
+        [StringLength(100)]
         public string NameTemp { get; set; }
+        [Column(TypeName = "date")]
         public DateTime? HiringDate { get; set; }
+        [StringLength(30)]
         public string Name { get; set; }
+        [StringLength(30)]
         public string Surname { get; set; }
 
+        [ForeignKey("EmployeeTypeId")]
+        [InverseProperty("Employee")]
         public virtual EmployeeType EmployeeType { get; set; }
+        [ForeignKey("OrganizationId")]
+        [InverseProperty("Employee")]
         public virtual Organization Organization { get; set; }
+        [InverseProperty("EndBy")]
         public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationEndBy { get; set; }
+        [InverseProperty("Evaluator")]
         public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationEvaluator { get; set; }
+        [InverseProperty("StartBy")]
         public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationStartBy { get; set; }
+        [InverseProperty("Employee")]
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEmployee { get; set; }
+        [InverseProperty("EndedBy")]
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationEndedBy { get; set; }
+        [InverseProperty("StartedBy")]
         public virtual ICollection<EmployeeEvaluation> EmployeeEvaluationStartedBy { get; set; }
+        [InverseProperty("Employee")]
         public virtual ICollection<EmployeeRelations> EmployeeRelationsEmployee { get; set; }
+        [InverseProperty("Manager")]
         public virtual ICollection<EmployeeRelations> EmployeeRelationsManager { get; set; }
+        [InverseProperty("Employee")]
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
+        [InverseProperty("CreatedBy")]
         public virtual ICollection<Idea> Idea { get; set; }
+        [InverseProperty("CreatedBy")]
         public virtual ICollection<IdeaComment> IdeaComment { get; set; }
+        [InverseProperty("Employee")]
         public virtual ICollection<IdeaLike> IdeaLike { get; set; }
+        [InverseProperty("Employee")]
         public virtual ICollection<IdeaView> IdeaView { get; set; }
+        [InverseProperty("CreatedByNavigation")]
         public virtual ICollection<Position> PositionCreatedByNavigation { get; set; }
+        [InverseProperty("UpdatedByNavigation")]
         public virtual ICollection<Position> PositionUpdatedByNavigation { get; set; }
+        [InverseProperty("EvaluatorEmployee")]
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
+        [InverseProperty("Evaluator")]
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
     }
 }

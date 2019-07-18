@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class CertificatesController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public CertificatesController(TechnicalEvaluationContext context)
+        public CertificatesController(EvoflareDbContext context)
         {
             _context = context;
         }

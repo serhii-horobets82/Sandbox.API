@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Evoflare.API.Models
+namespace Evoflare.API.Core.Models
 {
     public partial class AppVersion
     {
@@ -9,5 +9,6 @@ namespace Evoflare.API.Models
         public string Version { get; set; }
         public string Database { get; set; }
         public DateTime CreationDate { get; set; }
+        public string Organization { get; set; }
     }
 }
