@@ -5,19 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class IdeaTag
+    public partial class NotificationType
     {
-        public IdeaTag()
-        {
-            IdeaTagRef = new HashSet<IdeaTagRef>();
-        }
-
         public int Id { get; set; }
         [Required]
-        [StringLength(50)]
         public string Name { get; set; }
-
-        [InverseProperty("Tag")]
-        public virtual ICollection<IdeaTagRef> IdeaTagRef { get; set; }
+        [Required]
+        public string Template { get; set; }
     }
 }
