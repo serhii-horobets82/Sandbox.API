@@ -39,6 +39,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<Notification> Notification { get; set; }
         public virtual DbSet<NotificationType> NotificationType { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
+        public virtual DbSet<OrganizationStructureType> OrganizationStructureType { get; set; }
         public virtual DbSet<Pdp> Pdp { get; set; }
         public virtual DbSet<Position> Position { get; set; }
         public virtual DbSet<PositionRole> PositionRole { get; set; }
@@ -63,7 +64,7 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB04;User Id=sa;Password=DatgE66VbHy7");
+                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User ID=sa;Password=DatgE66VbHy7");
             }
         }
 

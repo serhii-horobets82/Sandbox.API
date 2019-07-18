@@ -250,6 +250,13 @@ namespace Evoflare.API.Data
             
             SeedEmployeeRelations(applicationContext);
 
+            SeedIdea(applicationContext);
+            SeedIdeaComment(applicationContext);
+            SeedIdeaTag(applicationContext);
+            SeedIdeaTagRef(applicationContext);
+
+            SeedOrganizationStructureType(applicationContext);
+
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)
                 using (var connection = applicationContext.Database.GetDbConnection())
