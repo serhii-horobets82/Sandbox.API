@@ -16,7 +16,8 @@ namespace Evoflare.API.Data
             var trans = context.Database.BeginTransaction();
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] ON");
+                if(context.Database.IsSqlServer())
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] ON");
 			}
             catch { trans.Rollback(); } // TODO find better solution 
 
@@ -44,7 +45,8 @@ namespace Evoflare.API.Data
 
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] OFF");
+				if(context.Database.IsSqlServer())
+					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] OFF");
 				trans.Commit();
 			}
             catch { } // TODO find better solution 

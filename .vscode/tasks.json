@@ -10,14 +10,14 @@
   ],
   "tasks": [
     {
-      "label": "ef::Context info",
+      "label": "ef: Context info",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "dbcontext", "info", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "ef::Create migration",
+      "label": "ef: Create migration",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -31,35 +31,49 @@
       "problemMatcher": []
     },
     {
-      "label": "ef::Update database",
+      "label": "ef: Update database",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "database", "update", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "ef::Remove migration",
+      "label": "ef: Remove migration",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "migrations", "remove", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "build",
+      "label": "app: Build",
       "command": "dotnet",
       "type": "process",
       "args": ["build", "${workspaceFolder}/Evoflare.API.csproj"],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "publish",
+      "label": "app: Run",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["run", "${workspaceFolder}/Evoflare.API.csproj"],
+      "problemMatcher": []
+    },
+    {
+      "label": "app: Run and generate seed",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["run", "${workspaceFolder}/Evoflare.API.csproj", "export-data=true"],
+      "problemMatcher": []
+    },
+    { 
+      "label": "app: Publish",
       "command": "dotnet",
       "type": "process",
       "args": ["publish", "${workspaceFolder}/Evoflare.API.csproj"],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "watch",
+      "label": "app: Watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -68,10 +82,10 @@
         "run",
         "${workspaceFolder}/Evoflare.API.csproj"
       ],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "Scaffold database (main)",
+      "label": "app: Scaffold database",
       "type": "shell",
       "command": "echo Done",
       "dependsOrder": "sequence",
@@ -82,7 +96,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Scaffold database(dbo schema)",
+      "label": "child-task: Scaffold database(dbo schema)",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -106,7 +120,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Patch EvofalreDbContext file",
+      "label": "child-task: Patch EvofalreDbContext file",
       "type": "shell",
       "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace ' modelBuilder.HasAnnotation','base.OnModelCreating(modelBuilder);\n\rmodelBuilder.HasAnnotation' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
       "options": {
@@ -115,7 +129,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Build and run DB container",
+      "label": "docker: Build and run DB(mssql) container",
       "type": "process",
       "command": "start-docker-sql.cmd",
       "group": "build",
@@ -130,7 +144,22 @@
       "problemMatcher": []
     },
     {
-      "label": "Build and run API container",
+      "label": "docker: Build and run DB(postgres) container",
+      "type": "process",
+      "command": "start-docker-postgres.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Build and run API container",
       "type": "process",
       "command": "start-docker-api.cmd",
       "group": "build",
@@ -145,7 +174,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Start DB container",
+      "label": "docker: Start DB(mssql) container",
       "type": "shell",
       "command": "docker start evoflare-db",
       "options": {
@@ -159,7 +188,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Stop DB container",
+      "label": "docker: Stop DB(mssql) container",
       "type": "shell",
       "command": "docker stop evoflare-db",
       "options": {
@@ -173,7 +202,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Stop API container",
+      "label": "docker: Stop API container",
       "type": "shell",
       "command": "docker stop evoflare-api",
       "options": {
@@ -187,7 +216,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Start API container",
+      "label": "docker: Start API container",
       "type": "shell",
       "command": "docker start evoflare-api",
       "options": {

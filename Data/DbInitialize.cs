@@ -12,6 +12,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Evoflare.API.Data
 {
@@ -133,22 +134,25 @@ namespace Evoflare.API.Data
             // version in database table AppVersion
             var previousVersion = string.Empty;
 
-            //var appContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
-
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
-            var exportData = configuration.GetValue("AppSettings:ExportData", false);
+            var exportData = configuration.GetValue("AppSettings:ExportData", false) || configuration.GetValue("export-data", false);
             // flag from config - recreate DB on application starts (if true) 
             var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
             var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
 
             if (exportData)
             {
+                Log.Information("Start generate seed classes");
                 // generate seed-clasess in Data\Seed folder
                 ExportDataFromDB.Run(applicationContext);
+                Log.Information("Finish generate seed classes");
+
+                Program.Shutdown();
                 // can't proceed with starup, we need stop running API 
-                throw new Exception("Disable ExportData parameter in appsetings and restart API");
+                return;
+                //throw new Exception("Disable ExportData parameter in appsetings and restart API");
             }
 
             if (recreateDatabase)

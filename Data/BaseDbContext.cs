@@ -1,15 +1,28 @@
+using Boxed.AspNetCore;
 using Evoflare.API.Auth.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Evoflare.API.Configuration;
 using Evoflare.API.Core.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace Evoflare.API.Models
 {
     public class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
+        private readonly IConfiguration configuration;
+
         public BaseDbContext() { }
         public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options) { }
+
+        public BaseDbContext(DbContextOptions<EvoflareDbContext> options, [FromServices]IConfiguration configuration) : base(options)
+        {
+            this.configuration = configuration;
+        }
+
 
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
@@ -18,6 +31,26 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var appSettings = configuration.GetSection<AppSettings>();
+            var dbType = appSettings.DataBaseType;
+
+            if (dbType == DataBaseType.POSTGRES)
+            {
+                // postgress workaround
+                foreach (var pb in modelBuilder.Model
+                    .GetEntityTypes()
+                    .SelectMany(t => t.GetProperties())
+                    .Where(p => p.GetAnnotations().Any(b => b.Name == "Relational:ColumnType" && b.Value.ToString() == "datetime"))
+                    .Select(p =>
+                        modelBuilder.Entity(p.DeclaringEntityType.ClrType).Property(p.Name))
+                    )
+                {
+                    pb.HasColumnType("date");
+                    if(pb.Metadata.Name == "Position" || pb.Metadata.Name == "PositionRole") // TODO FInd better way
+                    pb.HasDefaultValueSql("now()");
+                }
+            }
 
             const string CoreSchemaName = "core";
             const string SecuritySchemaName = "security";

@@ -24,7 +24,7 @@ namespace Evoflare.API.Data
                 }
                 else if (arg is String)
                 {
-                    return $"\"{arg}\"".Replace(Environment.NewLine, "\\n");
+                    return $"\"{arg}\"".Replace("\n", "\\n");
                 }
                 else if (arg is bool)
                 {

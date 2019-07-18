@@ -16,7 +16,8 @@ namespace Evoflare.API.Data
             var trans = context.Database.BeginTransaction();
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CertificationExam] ON");
+                if(context.Database.IsSqlServer())
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CertificationExam] ON");
 			}
             catch { trans.Rollback(); } // TODO find better solution 
 
@@ -36,7 +37,8 @@ namespace Evoflare.API.Data
 
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CertificationExam] OFF");
+				if(context.Database.IsSqlServer())
+					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CertificationExam] OFF");
 				trans.Commit();
 			}
             catch { } // TODO find better solution 

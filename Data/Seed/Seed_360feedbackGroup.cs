@@ -16,7 +16,8 @@ namespace Evoflare.API.Data
             var trans = context.Database.BeginTransaction();
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360feedbackGroup] ON");
+                if(context.Database.IsSqlServer())
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360feedbackGroup] ON");
 			}
             catch { trans.Rollback(); } // TODO find better solution 
 
@@ -34,7 +35,8 @@ namespace Evoflare.API.Data
 
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360feedbackGroup] OFF");
+				if(context.Database.IsSqlServer())
+					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360feedbackGroup] OFF");
 				trans.Commit();
 			}
             catch { } // TODO find better solution 

@@ -57,3 +57,10 @@ mssql-scripter -S localhost,14330 -d EvoflareDB -U sa -PDatgE66VbHy7 --schema-an
 ```cmd
 Backup-SqlDatabase -ServerInstance localhost,14330 -Database EvoflareDB -BackupAction Database
 ```
+
+
+## Postgress
+
+```sql
+psql -h localhost -p 54320 -U postgres -d postgres
+```

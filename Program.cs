@@ -10,10 +10,18 @@ namespace Evoflare.API
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Serilog;
+    using System.Threading;
     using Serilog.Core;
 
     public sealed class Program
     {
+        private static CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+
+        public static void Shutdown()
+        {
+            cancelTokenSource.Cancel();
+        }
+
         public static int Main(string[] args) => LogAndRun(CreateWebHostBuilder(args).Build());
 
         public static int LogAndRun(IWebHost webHost)
@@ -23,7 +31,7 @@ namespace Evoflare.API
             try
             {
                 Log.Information("Starting application");
-                webHost.Run();
+                webHost.RunAsync(cancelTokenSource.Token).GetAwaiter().GetResult();
                 Log.Information("Stopped application");
                 return 0;
             }

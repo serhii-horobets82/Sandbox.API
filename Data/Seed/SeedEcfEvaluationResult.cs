@@ -16,7 +16,8 @@ namespace Evoflare.API.Data
             var trans = context.Database.BeginTransaction();
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfEvaluationResult] ON");
+                if(context.Database.IsSqlServer())
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfEvaluationResult] ON");
 			}
             catch { trans.Rollback(); } // TODO find better solution 
 
@@ -62,7 +63,8 @@ namespace Evoflare.API.Data
 
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfEvaluationResult] OFF");
+				if(context.Database.IsSqlServer())
+					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EcfEvaluationResult] OFF");
 				trans.Commit();
 			}
             catch { } // TODO find better solution 

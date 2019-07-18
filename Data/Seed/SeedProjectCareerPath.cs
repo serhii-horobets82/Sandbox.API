@@ -16,7 +16,8 @@ namespace Evoflare.API.Data
             var trans = context.Database.BeginTransaction();
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectCareerPath] ON");
+                if(context.Database.IsSqlServer())
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectCareerPath] ON");
 			}
             catch { trans.Rollback(); } // TODO find better solution 
 
@@ -32,7 +33,8 @@ namespace Evoflare.API.Data
 
 			try
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectCareerPath] OFF");
+				if(context.Database.IsSqlServer())
+					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectCareerPath] OFF");
 				trans.Commit();
 			}
             catch { } // TODO find better solution 
