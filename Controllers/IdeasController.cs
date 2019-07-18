@@ -13,9 +13,9 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class IdeasController : ControllerBase
     {
-        private readonly TechnicalEvaluationContext _context;
+        private readonly EvoflareDbContext _context;
 
-        public IdeasController(TechnicalEvaluationContext context)
+        public IdeasController(EvoflareDbContext context)
         {
             _context = context;
         }

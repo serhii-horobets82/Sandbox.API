@@ -102,8 +102,4 @@ https://evoflare-secondary.z19.web.core.windows.net</Description>
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Seed\" />
-  </ItemGroup>
-
 </Project>
