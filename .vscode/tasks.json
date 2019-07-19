@@ -63,10 +63,14 @@
       "command": "dotnet",
       "type": "process",
       "group": "build",
-      "args": ["run", "${workspaceFolder}/Evoflare.API.csproj", "export-data=true"],
+      "args": [
+        "run",
+        "${workspaceFolder}/Evoflare.API.csproj",
+        "export-data=true"
+      ],
       "problemMatcher": []
     },
-    { 
+    {
       "label": "app: Publish",
       "command": "dotnet",
       "type": "process",
@@ -161,21 +165,6 @@
       "problemMatcher": []
     },
     {
-      "label": "docker: Build and run API container",
-      "type": "process",
-      "command": "start-docker-api.cmd",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "docker: Start DB(mssql) container",
       "type": "shell",
       "command": "docker start evoflare-db",
@@ -204,7 +193,51 @@
       "problemMatcher": []
     },
     {
-      "label": "docker: Stop API container",
+      "label": "heroku(API): Build and push",
+      "type": "process",
+      "command": "push-to-heroku.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(API): Build and run container",
+      "type": "process",
+      "command": "start-docker-api.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(API): Attach to container",
+      "type": "shell",
+      "command": "docker attach --sig-proxy evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(API): Stop container",
       "type": "shell",
       "command": "docker stop evoflare-api",
       "options": {
@@ -218,7 +251,7 @@
       "problemMatcher": []
     },
     {
-      "label": "docker: Start API container",
+      "label": "docker(API): Start container",
       "type": "shell",
       "command": "docker start evoflare-api",
       "options": {

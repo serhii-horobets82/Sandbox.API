@@ -34,16 +34,22 @@ Scaffold-DbContext "Server=localhost,14330;Database=EvoflareDB;User ID=sa;Passwo
 
 ### Generate models from DB (command line)
 
-Use **VS Code** task *"Scaffold database (main)"* or  
+Use **VS Code** task *"app: Scaffold database"* or  
 
 ```cmd
 dotnet ef dbcontext scaffold "Server=localhost,14330;Database=EvoflareDB;User ID=sa;Password=DatgE66VbHy7" Microsoft.EntityFrameworkCore.SqlServer -c EvoflareDbContext -o Models -v --context-dir Data --schema dbo --data-annotations --force"
 ```
 
-### Connect to DB
+### Connect to DB (MSSQL)
 
 ```cmd
 sqlcmd -S localhost,14330 -d EvoflareDB -U sa -PDatgE66VbHy7
+```
+
+### Connect to DB (POSTGRES)
+
+```cmd
+psql -h ec2-174-129-41-127.compute-1.amazonaws.com -p 5432 -U wktwispbsmilsd -d d86q4skiq33jf4
 ```
 
 ### Generate script from DB
@@ -57,7 +63,6 @@ mssql-scripter -S localhost,14330 -d EvoflareDB -U sa -PDatgE66VbHy7 --schema-an
 ```cmd
 Backup-SqlDatabase -ServerInstance localhost,14330 -Database EvoflareDB -BackupAction Database
 ```
-
 
 ## Postgress
 
