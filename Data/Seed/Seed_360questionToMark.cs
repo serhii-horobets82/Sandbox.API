@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,14 +14,13 @@ namespace Evoflare.API.Data
 		public static bool Seed_360questionToMark(EvoflareDbContext context)
         {
             if (context._360questionToMark.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-                if(context.Database.IsSqlServer())
-                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360questionToMark] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360questionToMark] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
 				new _360questionToMark {Id = 4, QuestionId = 4, MarkId = 1, OrganizationId = 1 },
@@ -53,13 +53,11 @@ namespace Evoflare.API.Data
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
-				if(context.Database.IsSqlServer())
-					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360questionToMark] OFF");
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [360questionToMark] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

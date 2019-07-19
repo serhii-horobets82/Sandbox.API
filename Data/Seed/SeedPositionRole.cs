@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,14 +14,13 @@ namespace Evoflare.API.Data
 		public static bool SeedPositionRole(EvoflareDbContext context)
         {
             if (context.PositionRole.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-                if(context.Database.IsSqlServer())
-                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
 				new PositionRole {Id = 1, PositionId = 1, RoleId = 1, DateTime = DateTime.ParseExact("2019-02-26T18:14:57.7170000", "O", CultureInfo.InvariantCulture) },
@@ -43,13 +43,11 @@ namespace Evoflare.API.Data
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
-				if(context.Database.IsSqlServer())
-					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] OFF");
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [PositionRole] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

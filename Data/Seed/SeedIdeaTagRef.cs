@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,22 +14,29 @@ namespace Evoflare.API.Data
 		public static bool SeedIdeaTagRef(EvoflareDbContext context)
         {
             if (context.IdeaTagRef.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaTagRef] ON");
+			}
+            var items = new[]
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaTagRef] ON");
-                context.Database.ExecuteSqlCommand("INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (2, 4, 7)");
-                context.Database.ExecuteSqlCommand("INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (3, 5, 8)");
-                context.Database.ExecuteSqlCommand("INSERT [dbo].[IdeaTagRef] ([Id], [IdeaId], [TagId]) VALUES (4, 5, 9)");
-            }
-            catch { trans.Rollback(); } // TODO find better solution 
+				new IdeaTagRef {Id = 2, IdeaId = 4, TagId = 7 },
+				new IdeaTagRef {Id = 3, IdeaId = 5, TagId = 8 },
+				new IdeaTagRef {Id = 4, IdeaId = 5, TagId = 9 },
 
-			try
+            };
+            context.IdeaTagRef.AddRange(items);
+
+            context.SaveChanges();
+
+			if(true && context.Database.IsSqlServer())
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaTagRef] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

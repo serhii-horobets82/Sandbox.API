@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,29 +14,36 @@ namespace Evoflare.API.Data
 		public static bool SeedIdeaComment(EvoflareDbContext context)
         {
             if (context.IdeaComment.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaComment] ON");
+			}
+            var items = new[]
             {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaComment] ON");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment]([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(1, 5, N'First comment', 1, CAST(N'2019-07-15T20:58:58.633' AS DateTime), NULL, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(2, 5, N'Second!', 1, CAST(N'2019-07-15T21:06:23.377' AS DateTime), NULL, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(3, 5, N'Third..', 1, CAST(N'2019-07-15T21:07:51.587' AS DateTime), NULL, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(4, 5, N'another', 1, CAST(N'2019-07-15T21:09:51.157' AS DateTime), NULL, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(5, 5, N'Second reply', 1, CAST(N'2019-07-15T21:30:39.167' AS DateTime), 2, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(6, 5, N'Third reply', 1, CAST(N'2019-07-15T21:34:38.920' AS DateTime), 3, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(7, 5, N'another reply', 1, CAST(N'2019-07-15T21:36:31.627' AS DateTime), 4, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(8, 5, N'first reply', 1, CAST(N'2019-07-15T21:45:34.157' AS DateTime), 1, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(9, 5, N'second reply 2', 1, CAST(N'2019-07-15T21:48:32.167' AS DateTime), 2, 1)");
-                context.Database.ExecuteSqlCommand("INSERT[dbo].[IdeaComment] ([Id], [IdeaId], [Comment], [CreatedById], [CreatedDate], [ParentCommentId], [OrganizationId]) VALUES(10, 5, N'second reply to reply', 1, CAST(N'2019-07-15T21:50:56.790' AS DateTime), 5, 1)");
-            }
-            catch { trans.Rollback(); } // TODO find better solution 
+				new IdeaComment {Id = 1, IdeaId = 5, Comment = @"First comment", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T20:58:58.6330000", "O", CultureInfo.InvariantCulture), ParentCommentId = null, OrganizationId = 1 },
+				new IdeaComment {Id = 2, IdeaId = 5, Comment = @"Second!", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:06:23.3770000", "O", CultureInfo.InvariantCulture), ParentCommentId = null, OrganizationId = 1 },
+				new IdeaComment {Id = 3, IdeaId = 5, Comment = @"Third..", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:07:51.5870000", "O", CultureInfo.InvariantCulture), ParentCommentId = null, OrganizationId = 1 },
+				new IdeaComment {Id = 4, IdeaId = 5, Comment = @"another", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:09:51.1570000", "O", CultureInfo.InvariantCulture), ParentCommentId = null, OrganizationId = 1 },
+				new IdeaComment {Id = 5, IdeaId = 5, Comment = @"Second reply", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:30:39.1670000", "O", CultureInfo.InvariantCulture), ParentCommentId = 2, OrganizationId = 1 },
+				new IdeaComment {Id = 6, IdeaId = 5, Comment = @"Third reply", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:34:38.9200000", "O", CultureInfo.InvariantCulture), ParentCommentId = 3, OrganizationId = 1 },
+				new IdeaComment {Id = 7, IdeaId = 5, Comment = @"another reply", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:36:31.6270000", "O", CultureInfo.InvariantCulture), ParentCommentId = 4, OrganizationId = 1 },
+				new IdeaComment {Id = 8, IdeaId = 5, Comment = @"first reply", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:45:34.1570000", "O", CultureInfo.InvariantCulture), ParentCommentId = 1, OrganizationId = 1 },
+				new IdeaComment {Id = 9, IdeaId = 5, Comment = @"second reply 2", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:48:32.1670000", "O", CultureInfo.InvariantCulture), ParentCommentId = 2, OrganizationId = 1 },
+				new IdeaComment {Id = 10, IdeaId = 5, Comment = @"second reply to reply", CreatedById = 1, CreatedDate = DateTime.ParseExact("2019-07-15T21:50:56.7900000", "O", CultureInfo.InvariantCulture), ParentCommentId = 5, OrganizationId = 1 },
 
-			try
+            };
+            context.IdeaComment.AddRange(items);
+
+            context.SaveChanges();
+
+			if(true && context.Database.IsSqlServer())
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [IdeaComment] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

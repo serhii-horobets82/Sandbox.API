@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,14 +14,13 @@ namespace Evoflare.API.Data
 		public static bool SeedEmployeeEvaluation(EvoflareDbContext context)
         {
             if (context.EmployeeEvaluation.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-                if(context.Database.IsSqlServer())
-                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeEvaluation] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeEvaluation] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
 				new EmployeeEvaluation {Id = 3, EmployeeId = 21, StartDate = DateTime.ParseExact("2019-03-02T13:53:39.6700000", "O", CultureInfo.InvariantCulture), StartedById = 11, EndDate = null, EndedById = null, OrganizationId = 1, Archived = false },
@@ -33,13 +33,11 @@ namespace Evoflare.API.Data
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
-				if(context.Database.IsSqlServer())
-					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeEvaluation] OFF");
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeEvaluation] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

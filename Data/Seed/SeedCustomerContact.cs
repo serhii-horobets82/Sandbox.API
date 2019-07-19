@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,30 +14,27 @@ namespace Evoflare.API.Data
 		public static bool SeedCustomerContact(EvoflareDbContext context)
         {
             if (context.CustomerContact.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-                if(context.Database.IsSqlServer())
-                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CustomerContact] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CustomerContact] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
-				new CustomerContact {Id = 2, Name = "Name namin", Email = "mail@mail.com", Phone = "+242342343", ProjectId = 3, OrganizationId = 1 },
+				new CustomerContact {Id = 2, Name = @"Name namin", Email = @"mail@mail.com", Phone = @"+242342343", ProjectId = 3, OrganizationId = 1 },
 
             };
             context.CustomerContact.AddRange(items);
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
-				if(context.Database.IsSqlServer())
-					context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CustomerContact] OFF");
+				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [CustomerContact] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }
