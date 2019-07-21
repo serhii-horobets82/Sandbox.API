@@ -70,6 +70,7 @@ namespace Evoflare.API
                 .AddCustomApiVersioning()
                 .AddVersionedApiExplorer(x => x.GroupNameFormat = "'v'VVV") // Version format: 'v'major[.minor][-status]
                 .AddCustomAuthentication(this.configuration)
+                .AddCustomPolicies(this.configuration)
                 .AddMvcCore()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                     .AddApiExplorer()

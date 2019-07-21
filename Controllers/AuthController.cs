@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
@@ -59,6 +60,8 @@ namespace Evoflare.API.Controllers
 
             // get the user to verify
             var userToVerify = await userManager.FindByNameAsync(userName);
+
+            IEnumerable<string> roles = await userManager.GetRolesAsync(userToVerify);
 
             if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);
 

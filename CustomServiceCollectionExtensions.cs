@@ -47,7 +47,8 @@ namespace Evoflare.API
 
         protected override RelationalTypeMapping FindMapping(in RelationalTypeMappingInfo mappingInfo)
         {
-            if (mappingInfo.StoreTypeName == "datetime") {
+            if (mappingInfo.StoreTypeName == "datetime")
+            {
             }
             return base.FindMapping(mappingInfo);
         }
@@ -141,6 +142,8 @@ namespace Evoflare.API
                 configureOptions.SaveToken = true;
             });
 
+
+            //services.SetupPolicies();    
             // api user claim policy
             services.AddAuthorization(options =>
             {
@@ -157,6 +160,14 @@ namespace Evoflare.API
                     options.Password.RequireUppercase = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 0;
+
+                    // Lockout settings.
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.AllowedForNewUsers = true;
+
+                    options.User.RequireUniqueEmail = true;
 
                     options.SignIn.RequireConfirmedEmail = true;
                     // Set for correct userManager.GetUserAsync execution

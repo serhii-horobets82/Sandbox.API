@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
+using Evoflare.API.Core.Permissions;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -33,6 +34,7 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PolicyTypes.AdminPolicy.View)]
         public async Task<IEnumerable<JObject>> GetAsync()
         {
             var hasPermission = await UserHasRole(Constants.Roles.Admin);
@@ -43,7 +45,10 @@ namespace Evoflare.API.Controllers
                 { "id",  c.Id },
                 { "email",  c.Email },
                 { "firstName",  c.FirstName },
-                { "lastName",  c.LastName }
+                { "lastName",  c.LastName },
+                { "accessFailedCount",  c.AccessFailedCount },
+                { "gender",  c.Gender.ToString() },
+                { "age",  c.Age }
             }).ToListAsync();
         }
 

@@ -14,7 +14,11 @@ using System.Reflection;
 using System.Threading;
 using Boxed.AspNetCore;
 using Evoflare.API.Configuration;
-
+using System.Collections.Generic;
+using Evoflare.API.Core.Permissions;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Evoflare.API.Auth;
 
 namespace Evoflare.API.Data
 {
@@ -40,8 +44,109 @@ namespace Evoflare.API.Data
 
             if (roleExists.Result) return;
 
-            var roleResult = roleManager.CreateAsync(new ApplicationRole(roleName, "Global"));
+            var roleResult = roleManager.CreateAsync(new ApplicationRole(roleName));
             roleResult.Wait();
+        }
+
+        private static async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            var roles = new List<ApplicationRole>
+            {
+                new ApplicationRole { Name = Constants.Roles.SysAdmin, DefaultPermission = AccessFlag.GodMode,  PolicyName="SysPolicy" },
+                new ApplicationRole { Name = Constants.Roles.Admin, DefaultPermission = AccessFlag.Manage,  PolicyName="AdminPolicy" },
+                new ApplicationRole { Name = Constants.Roles.ChiefManager, DefaultPermission = AccessFlag.Manage, PolicyName="ManagerPolicy" },
+                new ApplicationRole { Name = Constants.Roles.Manager, DefaultPermission = AccessFlag.Read | AccessFlag.Create  | AccessFlag.Edit | AccessFlag.Details, PolicyName="ManagerPolicy" },
+                new ApplicationRole { Name = Constants.Roles.ChiefHR, DefaultPermission = AccessFlag.Manage, PolicyName="HrPolicy" },
+                new ApplicationRole { Name = Constants.Roles.HR, DefaultPermission = AccessFlag.Read | AccessFlag.Create | AccessFlag.Edit, PolicyName="HrPolicy" },
+                new ApplicationRole { Name = Constants.Roles.User },
+            };
+
+            foreach (var role in roles)
+            {
+                var result = await roleManager.RoleExistsAsync(role.Name);
+                if (!result)
+                {
+                    await roleManager.CreateAsync(role);
+
+                    var foundRole = await roleManager.FindByNameAsync(role.Name);
+
+                    switch (foundRole.Name)
+                    {
+                        case Constants.Roles.SysAdmin:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SystemPermission.Manage));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Manage));
+                            break;
+
+                        case Constants.Roles.Admin:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SystemPermission.Manage));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+
+                            break;
+                        case Constants.Roles.ChiefManager:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+
+                            break;
+                        case Constants.Roles.Manager:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+
+                            break;
+                        case Constants.Roles.ChiefHR:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Delete));
+
+                            break;
+                        case Constants.Roles.HR:
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.View));
+
+                            break;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -55,46 +160,46 @@ namespace Evoflare.API.Data
         /// <param name="lastName">Last Name</param>
         /// <param name="gender"></param>
         /// <param name="age"></param>
-        private static void AddUserToRole(IServiceProvider serviceProvider, string userEmail, string userPwd,
+        private static async Task AddUserToRole(IServiceProvider serviceProvider, string userEmail, string userPwd,
             string roleName, string firstName, string lastName, Gender gender, int age)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var appDbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
-            var checkAppUser = userManager.FindByEmailAsync(userEmail);
-            checkAppUser.Wait();
+            var dbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
+            var checkAppUser = await userManager.FindByEmailAsync(userEmail);
 
-            var appUser = checkAppUser.Result;
+            var appUser = checkAppUser;
 
-            if (checkAppUser.Result == null)
+            if (appUser == null)
             {
-                var newAppUser = new ApplicationUser
+                var user = new ApplicationUser
                 {
                     UserName = userEmail,
-                    NormalizedUserName = userEmail,
                     Email = userEmail,
-                    NormalizedEmail = userEmail,
                     FirstName = firstName,
                     LastName = lastName,
                     EmailConfirmed = true,
                     LockoutEnabled = false,
                     Gender = gender,
-                    Age = age,
-                    SecurityStamp = Guid.NewGuid().ToString()
+                    Age = age
                 };
 
-                var task = userManager.CreateAsync(newAppUser, userPwd);
-                task.Wait();
-                if (task.Result.Succeeded) appUser = newAppUser;
+                var result = await userManager.CreateAsync(user, userPwd);
+
+                if (result.Succeeded) appUser = user;
+
+                await userManager.AddClaimsAsync(user, new Claim[]{
+                        new Claim(JwtClaimTypes.Name, $"{firstName} {lastName}"),
+                        new Claim(JwtClaimTypes.Email, userEmail),
+                });
 
                 // Add random profile
-                appDbContext.Profile.Add(new UserProfile
+                dbContext.Profile.Add(new UserProfile
                 {
-                    IdentityId = newAppUser.Id,
+                    IdentityId = user.Id,
                     Location = DefaultLocation,
                     Locale = DefaultLocale,
                     PictureUrl = DefaultPictureUrl
-                }
-                );
+                });
             }
 
             if (!string.IsNullOrEmpty(roleName))
@@ -171,6 +276,7 @@ namespace Evoflare.API.Data
 
                 // workaround to update db without migration 
                 applicationContext.Users.Where(e => e.Age > 0).ToList();
+                applicationContext.Roles.Where(e => e.DefaultPermission > 0).ToList();
             }
             catch
             {
@@ -182,39 +288,22 @@ namespace Evoflare.API.Data
             // check for roles
             if (!applicationContext.Roles.Any())
             {
-                CreateRole(serviceProvider, Constants.Roles.Admin);
-                CreateRole(serviceProvider, Constants.Roles.Manager);
-                CreateRole(serviceProvider, Constants.Roles.HR);
+                CreateRoles(serviceProvider).Wait();
             }
 
             // check for users
             if (!applicationContext.Users.Any())
             {
-                var userEmail = "admin@evoflare.com";
-                var userFirstName = "Super";
-                var userLastName = "Admin";
+                AddUserToRole(serviceProvider, "admin@evoflare.com", DefaultPassword, Constants.Roles.Admin, "Regular", "Admin", Gender.Male, 30).Wait();
+                AddUserToRole(serviceProvider, "sysadmin@evoflare.com", DefaultPassword, Constants.Roles.SysAdmin, "System", "Admin", Gender.Male, 50).Wait();
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.Admin, userFirstName, userLastName, Gender.Male, 30);
+                AddUserToRole(serviceProvider, "chief.manager@evoflare.com", DefaultPassword, Constants.Roles.ChiefManager, "Chief", "Manager", Gender.Female, 25).Wait();
+                AddUserToRole(serviceProvider, "manager@evoflare.com", DefaultPassword, Constants.Roles.Manager, "Regular", "Manager", Gender.Female, 25).Wait();
 
-                userEmail = "manager@evoflare.com";
-                userFirstName = "Local";
-                userLastName = "Manager";
+                AddUserToRole(serviceProvider, "chief.hr@evoflare.com", DefaultPassword, Constants.Roles.ChiefHR, "Chief", "HR", Gender.Female, 25).Wait();
+                AddUserToRole(serviceProvider, "hr@evoflare.com", DefaultPassword, Constants.Roles.HR, "Regular", "HR", Gender.Female, 25).Wait();
 
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.Manager, userFirstName,
-                    userLastName, Gender.Female, 25);
-
-                userEmail = "hr@evoflare.com";
-                userFirstName = "Human";
-                userLastName = "Resources";
-
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, Constants.Roles.HR, userFirstName,
-                    userLastName, Gender.Female, 30);
-
-                userEmail = "user@evoflare.com";
-                userFirstName = "Typical";
-                userLastName = "User";
-
-                AddUserToRole(serviceProvider, userEmail, DefaultPassword, "", userFirstName, userLastName, Gender.Male, 20);
+                AddUserToRole(serviceProvider, "user@evoflare.com", DefaultPassword, Constants.Roles.User, "Typical", "User", Gender.Male, 20).Wait();
             }
 
             SeedOrganization(applicationContext);
@@ -280,64 +369,64 @@ namespace Evoflare.API.Data
                         Organization = applicationContext.Organization.FirstOrDefault().Name,
                         Database = $"{connection.DataSource}, v.{connection.ServerVersion}",
                         DatabaseType = dbType.ToString()
-                };
+                    };
 
-            // initial insert
-            if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
-                applicationContext.AppVersion.Add(appAppVersion);
-            else
-                applicationContext.AppVersion.Update(appAppVersion);
+                    // initial insert
+                    if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
+                        applicationContext.AppVersion.Add(appAppVersion);
+                    else
+                        applicationContext.AppVersion.Update(appAppVersion);
 
-            applicationContext.SaveChanges();
+                    applicationContext.SaveChanges();
 
-            #region  Process with sql files
-            /*
-            // directory with sql files (copied to release folder)
-            var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
+                    #region  Process with sql files
+                    /*
+                    // directory with sql files (copied to release folder)
+                    var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
 
-            foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
-            {
-                var sql = File.ReadAllText(file, Encoding.UTF8);
-                sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
-                sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
-                sql = sql.Replace("\r\nGO", "\r\n"); // remove last lines with GO commands 
-                sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
-                sql = sql.Replace("[TechnicalEvaluation]",
-                    $"[{connection.Database}]"); // replace database name 
-
-                command.CommandText = sql;
-                try
-                {
-                    //command.ExecuteNonQuery();
-                }
-                catch (SqlException ex)
-                {
-                    if (ex.Number == 3726
-                    ) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
+                    foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
                     {
-                        // TODO: temporary solution for deleting all table retry 3 times
-                        var retryExecution = 2;
-                        do
+                        var sql = File.ReadAllText(file, Encoding.UTF8);
+                        sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
+                        sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
+                        sql = sql.Replace("\r\nGO", "\r\n"); // remove last lines with GO commands 
+                        sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
+                        sql = sql.Replace("[TechnicalEvaluation]",
+                            $"[{connection.Database}]"); // replace database name 
+
+                        command.CommandText = sql;
+                        try
                         {
-                            try
+                            //command.ExecuteNonQuery();
+                        }
+                        catch (SqlException ex)
+                        {
+                            if (ex.Number == 3726
+                            ) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
                             {
-                                command.ExecuteNonQuery();
+                                // TODO: temporary solution for deleting all table retry 3 times
+                                var retryExecution = 2;
+                                do
+                                {
+                                    try
+                                    {
+                                        command.ExecuteNonQuery();
+                                    }
+                                    catch
+                                    {
+                                        // ignored
+                                    }
+                                } while (retryExecution-- > 0);
                             }
-                            catch
+                            else if (ex.Number != 2714) // "There is already an object named ..
                             {
-                                // ignored
+                                throw;
                             }
-                        } while (retryExecution-- > 0);
+                        }
                     }
-                    else if (ex.Number != 2714) // "There is already an object named ..
-                    {
-                        throw;
-                    }
+                    */
+                    #endregion
                 }
-            }
-            */
-            #endregion
         }
     }
-}
 }
