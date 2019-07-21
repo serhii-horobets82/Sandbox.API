@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -17,5 +18,7 @@ namespace Evoflare.API.Data
 
             return method.Invoke(context, null) as IQueryable;
         }
+
+        public static IConfiguration Configuration;
     }
 }

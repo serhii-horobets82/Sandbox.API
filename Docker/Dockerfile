@@ -10,5 +10,5 @@ EXPOSE $PORT
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
-CMD ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS=http://*:$PORT dotnet Evoflare.API.dll
+CMD ASPNETCORE_ENVIRONMENT=Docker ASPNETCORE_URLS=http://*:$PORT dotnet Evoflare.API.dll
  

@@ -12,7 +12,9 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Microsoft.EntityFrameworkCore.Storage;
+using Boxed.AspNetCore;
+using Evoflare.API.Configuration;
+
 
 namespace Evoflare.API.Data
 {
@@ -137,6 +139,9 @@ namespace Evoflare.API.Data
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
+            var appSettings = configuration.GetSection<AppSettings>();
+            var dbType = appSettings.DataBaseType;
+
             var exportData = configuration.GetValue("AppSettings:ExportData", false) || configuration.GetValue("export-data", false);
             // flag from config - recreate DB on application starts (if true) 
             var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
@@ -150,9 +155,7 @@ namespace Evoflare.API.Data
                 Log.Information("Finish generate seed classes");
 
                 Program.Shutdown();
-                // can't proceed with starup, we need stop running API 
                 return;
-                //throw new Exception("Disable ExportData parameter in appsetings and restart API");
             }
 
             if (recreateDatabase)
@@ -218,9 +221,9 @@ namespace Evoflare.API.Data
             SeedEmployeeType(applicationContext);
             SeedEmployee(applicationContext);
             SeedEmployeeEvaluation(applicationContext);
-            
+
             SeedCertificationExam(applicationContext);
-            
+
             SeedEcfCompetence(applicationContext);
             SeedEcfCompetenceLevel(applicationContext);
             SeedEcfEmployeeEvaluation(applicationContext);
@@ -232,7 +235,7 @@ namespace Evoflare.API.Data
             SeedPosition(applicationContext);
             SeedPositionRole(applicationContext);
             SeedProjectCareerPath(applicationContext);
-            
+
             SeedRoleGrade(applicationContext);
             SeedRoleGradeCompetence(applicationContext);
             SeedTeam(applicationContext);
@@ -244,14 +247,14 @@ namespace Evoflare.API.Data
             Seed_360questionarie(applicationContext);
             Seed_360questionToMark(applicationContext);
             Seed_360question(applicationContext);
-            
+
             Seed_360employeeEvaluation(applicationContext);
             Seed_360evaluation(applicationContext);
 
             SeedCustomerContact(applicationContext);
             SeedCertificate(applicationContext);
             SeedCompetenceCertificate(applicationContext);
-            
+
             SeedEmployeeRelations(applicationContext);
 
             SeedIdea(applicationContext);
@@ -275,65 +278,66 @@ namespace Evoflare.API.Data
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
                         Organization = applicationContext.Organization.FirstOrDefault().Name,
-                        Database = $"{connection.DataSource}, v.{connection.ServerVersion}"
-                    };
+                        Database = $"{connection.DataSource}, v.{connection.ServerVersion}",
+                        DatabaseType = dbType.ToString()
+                };
 
-                    // initial insert
-                    if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
-                        applicationContext.AppVersion.Add(appAppVersion);
-                    else
-                        applicationContext.AppVersion.Update(appAppVersion);
+            // initial insert
+            if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
+                applicationContext.AppVersion.Add(appAppVersion);
+            else
+                applicationContext.AppVersion.Update(appAppVersion);
 
-                    applicationContext.SaveChanges();
+            applicationContext.SaveChanges();
 
-                    #region  Process with sql files
-                    /*
-                    // directory with sql files (copied to release folder)
-                    var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
+            #region  Process with sql files
+            /*
+            // directory with sql files (copied to release folder)
+            var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database");
 
-                    foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
-                    {
-                        var sql = File.ReadAllText(file, Encoding.UTF8);
-                        sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
-                        sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
-                        sql = sql.Replace("\r\nGO", "\r\n"); // remove last lines with GO commands 
-                        sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
-                        sql = sql.Replace("[TechnicalEvaluation]",
-                            $"[{connection.Database}]"); // replace database name 
+            foreach (var file in Directory.GetFiles(baseDir, "*.sql"))
+            {
+                var sql = File.ReadAllText(file, Encoding.UTF8);
+                sql = sql.Replace("CREATE DATABASE", "--"); // comment creation statement (already exists)
+                sql = sql.Replace("GO\r\n", "\r\n"); // remove lines with GO commands 
+                sql = sql.Replace("\r\nGO", "\r\n"); // remove last lines with GO commands 
+                sql = sql.Replace("USE [", "--"); // comment USE statement (Azure DB issue)
+                sql = sql.Replace("[TechnicalEvaluation]",
+                    $"[{connection.Database}]"); // replace database name 
 
-                        command.CommandText = sql;
-                        try
-                        {
-                            //command.ExecuteNonQuery();
-                        }
-                        catch (SqlException ex)
-                        {
-                            if (ex.Number == 3726
-                            ) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
-                            {
-                                // TODO: temporary solution for deleting all table retry 3 times
-                                var retryExecution = 2;
-                                do
-                                {
-                                    try
-                                    {
-                                        command.ExecuteNonQuery();
-                                    }
-                                    catch
-                                    {
-                                        // ignored
-                                    }
-                                } while (retryExecution-- > 0);
-                            }
-                            else if (ex.Number != 2714) // "There is already an object named ..
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                    */
-                    #endregion
+                command.CommandText = sql;
+                try
+                {
+                    //command.ExecuteNonQuery();
                 }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 3726
+                    ) // "Could not drop object 'xxx' because it is referenced by a FOREIGN KEY constraint.
+                    {
+                        // TODO: temporary solution for deleting all table retry 3 times
+                        var retryExecution = 2;
+                        do
+                        {
+                            try
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                            catch
+                            {
+                                // ignored
+                            }
+                        } while (retryExecution-- > 0);
+                    }
+                    else if (ex.Number != 2714) // "There is already an object named ..
+                    {
+                        throw;
+                    }
+                }
+            }
+            */
+            #endregion
         }
     }
+}
 }

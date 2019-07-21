@@ -13,16 +13,8 @@ namespace Evoflare.API.Models
 {
     public class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
-        private readonly IConfiguration configuration;
-
         public BaseDbContext() { }
         public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options) { }
-
-        public BaseDbContext(DbContextOptions<EvoflareDbContext> options, [FromServices]IConfiguration configuration) : base(options)
-        {
-            this.configuration = configuration;
-        }
-
 
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
@@ -31,6 +23,8 @@ namespace Evoflare.API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var configuration = Evoflare.API.Data.Extensions.Configuration;
 
             var appSettings = configuration.GetSection<AppSettings>();
             var dbType = appSettings.DataBaseType;
@@ -46,9 +40,13 @@ namespace Evoflare.API.Models
                         modelBuilder.Entity(p.DeclaringEntityType.ClrType).Property(p.Name))
                     )
                 {
-                    pb.HasColumnType("date");
-                    if(pb.Metadata.Name == "Position" || pb.Metadata.Name == "PositionRole") // TODO FInd better way
-                    pb.HasDefaultValueSql("now()");
+                    pb.HasColumnType("timestamp"); // MSSQL datetime maped to PG timestamp
+                    if (pb.Metadata.DeclaringEntityType.Name == "Evoflare.API.Models.Position" || pb.Metadata.DeclaringEntityType.Name == "Evoflare.API.Models.PositionRole")
+                    {
+                        var defaultValueSql = pb.Metadata.Relational().DefaultValueSql;
+                        if (defaultValueSql != null)
+                            pb.HasDefaultValueSql(defaultValueSql.Replace("getutcdate", "now")); // MSSQL getutcdate() maped to PG now()
+                    }
                 }
             }
 

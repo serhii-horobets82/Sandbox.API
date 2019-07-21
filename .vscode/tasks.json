@@ -96,8 +96,8 @@
       "group": "build",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "Scaffold database(dbo schema)",
-        "Patch EvofalreDbContext file"
+        "child-task: Scaffold database(dbo schema)",
+        "child-task: Patch EvofalreDbContext file"
       ],
       "problemMatcher": []
     },
@@ -128,7 +128,7 @@
     {
       "label": "child-task: Patch EvofalreDbContext file",
       "type": "shell",
-      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace ' modelBuilder.HasAnnotation','base.OnModelCreating(modelBuilder);\n\rmodelBuilder.HasAnnotation' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
+      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace '}\\);.\n          ','});\n\r            base.OnModelCreating(modelBuilder);\n' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
       "options": {
         "cwd": "${workspaceRoot}/Data"
       },
@@ -261,6 +261,66 @@
         "reveal": "always",
         "panel": "shared",
         "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Deploy",
+      "type": "shell",
+      "command": "echo Done",
+      "group": "build",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "child-task: Push to heroku",
+        "child-task: Release to heroku",
+        "heroku(API): Logs",
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Push to heroku",
+      "type": "shell",
+      "command": "heroku container:push web -a evoflare-api --context-path ..\\",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Release to heroku",
+      "type": "shell",
+      "command": "heroku container:release web -a evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Logs",
+      "type": "shell",
+      "command": "heroku logs -a evoflare-api --tail ",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
       },
       "problemMatcher": []
     }

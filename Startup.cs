@@ -36,6 +36,8 @@ namespace Evoflare.API
         {
             this.configuration = configuration;
             this.hostingEnvironment = hostingEnvironment;
+            // share configuration through a static class
+            Evoflare.API.Data.Extensions.Configuration = configuration;
         }
 
         /// <summary>
