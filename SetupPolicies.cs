@@ -1,5 +1,6 @@
 using Evoflare.API.Constants;
 using Evoflare.API.Core.Permissions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,8 +17,10 @@ namespace Evoflare.API
                         policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess));
 
                     #region Admin policy    
+
                     options.AddPolicy(PolicyTypes.AdminPolicy.Crud, policy =>
                     {
+                        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                         policy.RequireClaim(
                             CustomClaims.Permission,
                             AppPermissions.AdminPermission.Add,
@@ -28,6 +31,7 @@ namespace Evoflare.API
 
                     options.AddPolicy(PolicyTypes.AdminPolicy.Cru, policy =>
                     {
+                        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                         policy.RequireClaim(
                             CustomClaims.Permission,
                             AppPermissions.AdminPermission.Add,
@@ -37,6 +41,7 @@ namespace Evoflare.API
 
                     options.AddPolicy(PolicyTypes.AdminPolicy.View, policy =>
                     {
+                        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                         policy.RequireClaim(
                             CustomClaims.Permission,
                             AppPermissions.AdminPermission.View);

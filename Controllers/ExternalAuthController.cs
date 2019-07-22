@@ -24,7 +24,7 @@ namespace Evoflare.API.Controllers
         private readonly GithubAuthSettings githubAuthSettings;
         private readonly IJwtFactory jwtFactory;
         private readonly JwtIssuerOptions jwtOptions;
-        public readonly UserManager<ApplicationUser> UserManager;
+        public readonly UserManager<ApplicationUser> userManager;
 
         public ExternalAuthController(
             IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
@@ -36,7 +36,7 @@ namespace Evoflare.API.Controllers
         {
             fbAuthSettings = fbAuthSettingsAccessor.Value;
             githubAuthSettings = githubAuthSettingsAccessor.Value;
-            UserManager = userManager;
+            this.userManager = userManager;
             this.appDbContext = appDbContext;
             this.jwtFactory = jwtFactory;
             this.jwtOptions = jwtOptions.Value;
@@ -54,7 +54,7 @@ namespace Evoflare.API.Controllers
                 $"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={appAccessToken.AccessToken}");
             var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
 
-            var user = await UserManager.FindByEmailAsync(userInfo.Email);
+            var user = await userManager.FindByEmailAsync(userInfo.Email);
 
             if (user == null)
             {
@@ -67,7 +67,7 @@ namespace Evoflare.API.Controllers
                     UserName = userInfo.Email
                 };
 
-                var result = await UserManager.CreateAsync(appUser,
+                var result = await userManager.CreateAsync(appUser,
                     Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
 
                 if (!result.Succeeded)
@@ -83,17 +83,17 @@ namespace Evoflare.API.Controllers
                 await appDbContext.SaveChangesAsync();
             }
 
-            var localUser = await UserManager.FindByNameAsync(userInfo.Email);
+            user = await userManager.FindByNameAsync(userInfo.Email);
 
-            if (localUser == null)
-                return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.",
-                    ModelState));
-
-            var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
-                jwtFactory, localUser.UserName, jwtOptions,
-                new JsonSerializerSettings { Formatting = Formatting.Indented });
-
-            return new OkObjectResult(jwt);
+            if (user != null)
+            {
+                // get all user roles
+                var userRoles = await userManager.GetRolesAsync(user);
+                var userClaims = await userManager.GetClaimsAsync(user);
+                var authToken = await jwtFactory.GenerateAuthToken(user, userRoles, userClaims);
+                return new OkObjectResult(authToken);
+            }
+            return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.", ModelState));
         }
 
         [HttpPost]
@@ -111,7 +111,7 @@ namespace Evoflare.API.Controllers
 
                 var userInfoResponse = await Client.GetStringAsync($"https://api.github.com/user?access_token={appAccessToken.AccessToken}");
                 var userInfo = JsonConvert.DeserializeObject<GithubUserData>(userInfoResponse);
-                var user = await UserManager.FindByEmailAsync(userInfo.Email);
+                var user = await userManager.FindByEmailAsync(userInfo.Email);
 
                 if (user == null)
                 {
@@ -122,7 +122,7 @@ namespace Evoflare.API.Controllers
                         UserName = userInfo.Email
                     };
 
-                    var result = await UserManager.CreateAsync(appUser,
+                    var result = await userManager.CreateAsync(appUser,
                         Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
 
                     if (!result.Succeeded)
@@ -137,17 +137,17 @@ namespace Evoflare.API.Controllers
                     await appDbContext.SaveChangesAsync();
                 }
 
-                var localUser = await UserManager.FindByNameAsync(userInfo.Email);
+                user = await userManager.FindByNameAsync(userInfo.Email);
 
-                if (localUser == null)
-                    return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.",
-                        ModelState));
-
-                var jwt = await Tokens.GenerateJwt(jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id),
-                    jwtFactory, localUser.UserName, jwtOptions,
-                    new JsonSerializerSettings { Formatting = Formatting.Indented });
-
-                return new OkObjectResult(jwt);
+                if (user != null)
+                {
+                    // get all user roles
+                    var userRoles = await userManager.GetRolesAsync(user);
+                    var userClaims = await userManager.GetClaimsAsync(user);
+                    var authToken = await jwtFactory.GenerateAuthToken(user, userRoles, userClaims);
+                    return new OkObjectResult(authToken);
+                }
+                return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.", ModelState));
             }
             catch (Exception e)
             {

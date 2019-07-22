@@ -91,7 +91,6 @@ namespace Evoflare.API.Data
                             break;
 
                         case Constants.Roles.Admin:
-                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SystemPermission.Manage));
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Add));
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
@@ -150,7 +149,7 @@ namespace Evoflare.API.Data
         }
 
         /// <summary>
-        ///     Add user to a role if the user exists, otherwise, create the user and adds him to the role.
+        /// Add user to a role if the user exists, otherwise, create the user and adds him to the role.
         /// </summary>
         /// <param name="serviceProvider">Service Provider</param>
         /// <param name="userEmail">User Email</param>
@@ -165,13 +164,11 @@ namespace Evoflare.API.Data
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
-            var checkAppUser = await userManager.FindByEmailAsync(userEmail);
+            var user = await userManager.FindByEmailAsync(userEmail);
 
-            var appUser = checkAppUser;
-
-            if (appUser == null)
+            if (user == null)
             {
-                var user = new ApplicationUser
+                user = new ApplicationUser
                 {
                     UserName = userEmail,
                     Email = userEmail,
@@ -185,11 +182,9 @@ namespace Evoflare.API.Data
 
                 var result = await userManager.CreateAsync(user, userPwd);
 
-                if (result.Succeeded) appUser = user;
-
                 await userManager.AddClaimsAsync(user, new Claim[]{
                         new Claim(JwtClaimTypes.Name, $"{firstName} {lastName}"),
-                        new Claim(JwtClaimTypes.Email, userEmail),
+                        new Claim(JwtClaimTypes.Email, userEmail)
                 });
 
                 // Add random profile
@@ -201,11 +196,7 @@ namespace Evoflare.API.Data
                     PictureUrl = DefaultPictureUrl
                 });
             }
-
-            if (!string.IsNullOrEmpty(roleName))
-            {
-                userManager.AddToRoleAsync(appUser, roleName).Wait();
-            }
+            await userManager.AddToRoleAsync(user, roleName);
         }
 
         private static void RecreateDatabase(DbContext context, int timeout)
@@ -294,8 +285,10 @@ namespace Evoflare.API.Data
             // check for users
             if (!applicationContext.Users.Any())
             {
-                AddUserToRole(serviceProvider, "admin@evoflare.com", DefaultPassword, Constants.Roles.Admin, "Regular", "Admin", Gender.Male, 30).Wait();
                 AddUserToRole(serviceProvider, "sysadmin@evoflare.com", DefaultPassword, Constants.Roles.SysAdmin, "System", "Admin", Gender.Male, 50).Wait();
+                AddUserToRole(serviceProvider, "sysadmin@evoflare.com", DefaultPassword, Constants.Roles.Admin, "System", "Admin", Gender.Male, 50).Wait();
+                
+                AddUserToRole(serviceProvider, "admin@evoflare.com", DefaultPassword, Constants.Roles.Admin, "Regular", "Admin", Gender.Male, 30).Wait();
 
                 AddUserToRole(serviceProvider, "chief.manager@evoflare.com", DefaultPassword, Constants.Roles.ChiefManager, "Chief", "Manager", Gender.Female, 25).Wait();
                 AddUserToRole(serviceProvider, "manager@evoflare.com", DefaultPassword, Constants.Roles.Manager, "Regular", "Manager", Gender.Female, 25).Wait();

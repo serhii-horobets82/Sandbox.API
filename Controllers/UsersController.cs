@@ -37,9 +37,6 @@ namespace Evoflare.API.Controllers
         [Authorize(Policy = PolicyTypes.AdminPolicy.View)]
         public async Task<IEnumerable<JObject>> GetAsync()
         {
-            var hasPermission = await UserHasRole(Constants.Roles.Admin);
-            if (!hasPermission) return null;
-
             return await context.Users.Select(c => new JObject
             {
                 { "id",  c.Id },
@@ -59,6 +56,5 @@ namespace Evoflare.API.Controllers
 
             return roles.Contains(role);
         }
-
     }
 }

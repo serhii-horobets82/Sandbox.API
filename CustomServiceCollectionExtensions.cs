@@ -89,8 +89,6 @@ namespace Evoflare.API
             return services;
         }
 
-        //AddCustomAuthentication
-
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
             IConfiguration configuration)
         {
@@ -105,7 +103,6 @@ namespace Evoflare.API
             // Register the ConfigurationBuilder instance of FacebookAuthSettings
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
             services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
-
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -134,21 +131,13 @@ namespace Evoflare.API
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(configureOptions =>
+            }).AddJwtBearer(cfg =>
             {
-                configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                configureOptions.TokenValidationParameters = tokenValidationParameters;
-                configureOptions.SaveToken = true;
-            });
-
-
-            //services.SetupPolicies();    
-            // api user claim policy
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiUser",
-                    policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess));
+                cfg.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                cfg.TokenValidationParameters = tokenValidationParameters;
+                cfg.SaveToken = true;
             });
 
             // add identity
@@ -162,7 +151,7 @@ namespace Evoflare.API
                     options.Password.RequiredLength = 6;
                     options.Password.RequiredUniqueChars = 0;
 
-                    // Lockout settings.
+                    // Lockout settings
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                     options.Lockout.MaxFailedAccessAttempts = 5;
                     options.Lockout.AllowedForNewUsers = true;
