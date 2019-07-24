@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,13 +14,13 @@ namespace Evoflare.API.Data
 		public static bool SeedProjectPosition(EvoflareDbContext context)
         {
             if (context.ProjectPosition.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectPosition] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectPosition] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
 				new ProjectPosition {Id = 1, ProjectId = 1, CareerPathId = 1, RoleGradeId = 2, OrganizationId = 1 },
@@ -31,12 +32,11 @@ namespace Evoflare.API.Data
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [ProjectPosition] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

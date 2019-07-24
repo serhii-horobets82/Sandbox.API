@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Evoflare.API.Data
 {
@@ -24,7 +25,7 @@ namespace Evoflare.API.Data
                 }
                 else if (arg is String)
                 {
-                    return $"\"{arg}\"".Replace(Environment.NewLine, "\\n");
+                    return $"@\"{arg.ToString().Replace("\"","\"\"")}\"";
                 }
                 else if (arg is bool)
                 {
@@ -47,38 +48,6 @@ namespace Evoflare.API.Data
             }
         }
 
-        private static void GenerateSeedClass(EvoflareDbContext context, string tmplSeedClass, string currDirectory)
-        {
-
-            if (context.Employee.Any())
-            {
-                var tableName = "Employee";
-                var sb = new StringBuilder();
-
-                // list of non-virtual properties
-                var props = typeof(Employee).GetProperties().Where(e => !e.GetAccessors()[0].IsVirtual);
-                // construct string with formatting like "fieldName1 = {field1Index}, fieldName2 = {field2Index} ... "
-                var format = String.Join(", ", props.Select((x, i) => $"{x.Name} = {{{i}}}"));
-
-                foreach (var item in context.Employee)
-                {
-                    sb.Append($"\t\t\t\tnew {tableName} {{");
-
-                    // list of values in same order
-                    var values = props.Select(x => x.GetValue(item)).ToArray();
-                    // fill format string with values 
-                    sb.Append(string.Format(new CustomFormatter(), format, values));
-
-                    //sb.Append(string.Format(new CustomFormatter(), formatString.ToString(), fields.Values.Select(x => x.GetValue(item)).ToArray()));
-                    sb.Append(" },\n");
-                }
-                var content = string.Format(tmplSeedClass, tableName, sb.ToString());
-
-                File.WriteAllText($"{currDirectory}\\Data\\Seed\\Seed{tableName}.cs", content);
-            }
-        }
-
-
         public static void Run(EvoflareDbContext context)
         {
             // get solution root folder
@@ -95,6 +64,8 @@ namespace Evoflare.API.Data
                 // get DbSet by type
                 var dbSetType = entityType.ClrType;
                 var tableName = dbSetType.Name;
+
+                var hasIdentity = entityType.GetProperties().Where(p => p.ValueGenerated != ValueGenerated.Never).Count() > 0;
                 var sqlTableName = tableName;
                 // remove underscore symbol (_360* tables)
                 if (tableName.StartsWith("_"))
@@ -121,7 +92,7 @@ namespace Evoflare.API.Data
                 }
                 if (sb.Length > 0)
                 {
-                    var content = string.Format(tmplSeedClass, tableName, sqlTableName, sb.ToString());
+                    var content = string.Format(tmplSeedClass, tableName, sqlTableName, sb.ToString(), hasIdentity.ToString().ToLower());
                     File.WriteAllText($"{currDirectory}\\Data\\Seed\\Seed{tableName}.cs", content);
                 }
             }

@@ -10,14 +10,14 @@
   ],
   "tasks": [
     {
-      "label": "ef::Context info",
+      "label": "ef: Context info",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "dbcontext", "info", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "ef::Create migration",
+      "label": "ef: Create migration",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -31,35 +31,54 @@
       "problemMatcher": []
     },
     {
-      "label": "ef::Update database",
+      "label": "ef: Update database",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "database", "update", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "ef::Remove migration",
+      "label": "ef: Remove migration",
       "command": "dotnet",
       "type": "process",
       "args": ["ef", "migrations", "remove", "--context", "EvoflareDbContext"],
       "problemMatcher": []
     },
     {
-      "label": "build",
+      "label": "app: Build",
       "command": "dotnet",
       "type": "process",
       "args": ["build", "${workspaceFolder}/Evoflare.API.csproj"],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "publish",
+      "label": "app: Run",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["run", "${workspaceFolder}/Evoflare.API.csproj"],
+      "problemMatcher": []
+    },
+    {
+      "label": "app: Generate seed-classes",
+      "command": "dotnet",
+      "type": "process",
+      "group": "build",
+      "args": [
+        "run",
+        "${workspaceFolder}/Evoflare.API.csproj",
+        "export-data=true"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "app: Publish",
       "command": "dotnet",
       "type": "process",
       "args": ["publish", "${workspaceFolder}/Evoflare.API.csproj"],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "watch",
+      "label": "app: Watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -68,21 +87,22 @@
         "run",
         "${workspaceFolder}/Evoflare.API.csproj"
       ],
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
-      "label": "Scaffold database (main)",
+      "label": "app: Scaffold database",
       "type": "shell",
       "command": "echo Done",
+      "group": "build",
       "dependsOrder": "sequence",
       "dependsOn": [
-        "Scaffold database(dbo schema)",
-        "Patch EvofalreDbContext file"
+        "child-task: Scaffold database(dbo schema)",
+        "child-task: Patch EvofalreDbContext file"
       ],
       "problemMatcher": []
     },
     {
-      "label": "Scaffold database(dbo schema)",
+      "label": "child-task: Scaffold database(dbo schema)",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -106,16 +126,16 @@
       "problemMatcher": []
     },
     {
-      "label": "Patch EvofalreDbContext file",
+      "label": "child-task: Patch EvofalreDbContext file",
       "type": "shell",
-      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace ' modelBuilder.HasAnnotation','base.OnModelCreating(modelBuilder);\n\rmodelBuilder.HasAnnotation' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
+      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace '}\\);.\n          ','});\n\r            base.OnModelCreating(modelBuilder);\n' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
       "options": {
         "cwd": "${workspaceRoot}/Data"
       },
       "problemMatcher": []
     },
     {
-      "label": "Build and run DB container",
+      "label": "docker: Build and run DB(mssql) container",
       "type": "process",
       "command": "start-docker-sql.cmd",
       "group": "build",
@@ -130,7 +150,65 @@
       "problemMatcher": []
     },
     {
-      "label": "Build and run API container",
+      "label": "docker: Build and run DB(postgres) container",
+      "type": "process",
+      "command": "start-docker-postgres.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Start DB(mssql) container",
+      "type": "shell",
+      "command": "docker start evoflare-db",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Stop DB(mssql) container",
+      "type": "shell",
+      "command": "docker stop evoflare-db",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Build and push",
+      "type": "process",
+      "command": "push-to-heroku.cmd",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(API): Build and run container",
       "type": "process",
       "command": "start-docker-api.cmd",
       "group": "build",
@@ -145,9 +223,9 @@
       "problemMatcher": []
     },
     {
-      "label": "Start DB container",
+      "label": "docker(API): Attach to container",
       "type": "shell",
-      "command": "docker start evoflare-db",
+      "command": "docker attach --sig-proxy evoflare-api",
       "options": {
         "cwd": "${workspaceRoot}/Docker"
       },
@@ -159,21 +237,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Stop DB container",
-      "type": "shell",
-      "command": "docker stop evoflare-db",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Stop API container",
+      "label": "docker(API): Stop container",
       "type": "shell",
       "command": "docker stop evoflare-api",
       "options": {
@@ -187,7 +251,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Start API container",
+      "label": "docker(API): Start container",
       "type": "shell",
       "command": "docker start evoflare-api",
       "options": {
@@ -197,6 +261,66 @@
         "reveal": "always",
         "panel": "shared",
         "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Deploy",
+      "type": "shell",
+      "command": "echo Done",
+      "group": "build",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "child-task: Push to heroku",
+        "child-task: Release to heroku",
+        "heroku(API): Logs",
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Push to heroku",
+      "type": "shell",
+      "command": "heroku container:push web -a evoflare-api --context-path ..\\",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Release to heroku",
+      "type": "shell",
+      "command": "heroku container:release web -a evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Logs",
+      "type": "shell",
+      "command": "heroku logs -a evoflare-api --tail ",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
       },
       "problemMatcher": []
     }

@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Evoflare.API.Auth.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -17,5 +20,7 @@ namespace Evoflare.API.Data
 
             return method.Invoke(context, null) as IQueryable;
         }
+
+        public static IConfiguration Configuration;
     }
 }

@@ -16,14 +16,18 @@
     /// </summary>
     public class Roles
     {
+        public const string SysAdmin = "SysAdmin";
         public const string Admin = "Admin";
         public const string Manager = "Manager";
+        public const string ChiefManager = "ChiefManager";
         public const string HR = "HR";
+        public const string ChiefHR = "ChiefHR";
         public const string User = "User";
     }
 
     public static class JwtClaimIdentifiers
     {
+        public const string Roles = "roles";
         public const string Rol = "rol";
         public const string Id = "id";
     }
@@ -31,5 +35,11 @@
     public static class JwtClaims
     {
         public const string ApiAccess = "api_access";
+    }
+
+    public class CustomClaims
+    {
+        public const string Permission = "permission";
+
     }
 }

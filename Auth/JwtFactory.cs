@@ -1,55 +1,63 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using Evoflare.API.Auth.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Evoflare.API.Auth
 {
     public class JwtFactory : IJwtFactory
     {
         private readonly JwtIssuerOptions jwtOptions;
+        private readonly RoleManager<ApplicationRole> roleManager;
 
-        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions)
+        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions, RoleManager<ApplicationRole> roleManager)
         {
             this.jwtOptions = jwtOptions.Value;
             ThrowIfInvalidOptions(this.jwtOptions);
+            this.roleManager = roleManager;
         }
 
-        public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
+        public async Task<Token> GenerateAuthToken(ApplicationUser user, IList<string> userRoles, IList<Claim> userClaims)
         {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userName),
-                new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),
-                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(jwtOptions.IssuedAt).ToString(),
-                    ClaimValueTypes.Integer64),
-                identity.FindFirst(Constants.JwtClaimIdentifiers.Rol),
-                identity.FindFirst(Constants.JwtClaimIdentifiers.Id)
-            };
-
-            // Create the JWT security token and encode it.
-            var jwt = new JwtSecurityToken(
-                jwtOptions.Issuer,
-                jwtOptions.Audience,
-                claims,
-                jwtOptions.NotBefore,
-                jwtOptions.Expiration,
-                jwtOptions.SigningCredentials);
-
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return encodedJwt;
-        }
-
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
-        {
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
-            {
-                new Claim(Constants.JwtClaimIdentifiers.Id, id),
+            var claims = new List<Claim>(userClaims);
+            // common claims 
+            claims.AddRange(new[] {
+                new Claim(Constants.JwtClaimIdentifiers.Id, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess),
+                new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(jwtOptions.IssuedAt).ToString(),ClaimValueTypes.Integer64)
             });
+
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(Constants.JwtClaimIdentifiers.Roles, userRole));
+                var role = await roleManager.FindByNameAsync(userRole);
+                if (role != null)
+                {
+                    var roleClaims = await roleManager.GetClaimsAsync(role);
+                    claims.AddRange(roleClaims);
+                }
+            }
+            var token = new JwtSecurityToken(
+               jwtOptions.Issuer,
+               jwtOptions.Audience,
+               claims,
+               jwtOptions.NotBefore,
+               jwtOptions.Expiration,
+               jwtOptions.SigningCredentials);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return new Token()
+            {
+                Id = user.Id.ToString(),
+                AuthToken = jwt,
+                ExpiresIn = (int)jwtOptions.ValidFor.TotalSeconds
+            };
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

@@ -12,5 +12,11 @@ namespace Evoflare.API.Configuration
         public bool SeedDatabase { get; set; }
         public string DbCoreSchema { get; set; }
         public int RetryTimeout { get; set; }
+        public DataBaseType DataBaseType { get; set; }
+    }
+
+    public enum DataBaseType{
+        MSSQL,
+        POSTGRES
     }
 }

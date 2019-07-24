@@ -1,3 +1,4 @@
+using Evoflare.API.Core.Permissions;
 using Microsoft.AspNetCore.Identity;
 
 namespace Evoflare.API.Auth.Models
@@ -9,11 +10,8 @@ namespace Evoflare.API.Auth.Models
         {
             this.Name = name;
         }
-        public ApplicationRole(string name, string accessGroup) : this()
-        {
-            this.Name = name;
-            this.AccessGroup = accessGroup;
-        }
-        public string AccessGroup { get; set; }
+        public AccessFlag DefaultPermission { get; set; }
+
+        public string PolicyName { get; set; }
     }
 }

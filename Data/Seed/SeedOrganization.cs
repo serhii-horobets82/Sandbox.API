@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,28 +14,27 @@ namespace Evoflare.API.Data
 		public static bool SeedOrganization(EvoflareDbContext context)
         {
             if (context.Organization.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Organization] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Organization] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
-				new Organization {Id = 1, Name = "Smart CORP" },
+				new Organization {Id = 1, Name = @"Smart CORP" },
 
             };
             context.Organization.AddRange(items);
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Organization] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

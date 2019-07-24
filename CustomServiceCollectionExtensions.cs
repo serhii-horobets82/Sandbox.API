@@ -17,7 +17,6 @@ using Evoflare.API.Configuration;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
-using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +24,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -32,10 +32,31 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Evoflare.API
 {
+    public class ReplacementTypeMappingSource : NpgsqlTypeMappingSource
+    {
+        public ReplacementTypeMappingSource(
+            TypeMappingSourceDependencies dependencies,
+            RelationalTypeMappingSourceDependencies relationalDependencies,
+            ISqlGenerationHelper sqlGenerationHelper)
+            : base(dependencies, relationalDependencies, sqlGenerationHelper)
+        {
+        }
+
+        protected override RelationalTypeMapping FindMapping(in RelationalTypeMappingInfo mappingInfo)
+        {
+            if (mappingInfo.StoreTypeName == "datetime")
+            {
+            }
+            return base.FindMapping(mappingInfo);
+        }
+    }
+
+
     /// <summary>
     ///     <see cref="IServiceCollection" /> extension methods which extend ASP.NET Core services.
     /// </summary>
@@ -44,25 +65,31 @@ namespace Evoflare.API
         public static IServiceCollection AddDatabaseContexts(this IServiceCollection services,
             IConfiguration configuration, string connectionName = "DefaultConnection")
         {
+            var appSettings = configuration.GetSection<AppSettings>();
+            var dbType = appSettings.DataBaseType;
+
             var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            if (dbType == DataBaseType.MSSQL)
+            {
+                services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
+                    configuration.GetConnectionString("DefaultConnection"),
+                    sqlServerOptions => sqlServerOptions.CommandTimeout(300))
+                );
+            }
+            else
+            {
+                //var mapping = services.AddEntityFrameworkNpgsql().AddDbContext<EvoflareDbContext>(options => options.ReplaceService<IRelationalTypeMappingSource, ReplacementTypeMappingSource>().UseNpgsql(
+                //    configuration.GetConnectionString("DefaultConnectionPostgres"),
+                //    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
+                //).BuildServiceProvider().GetRequiredService<IRelationalTypeMappingSource>();
+                services.AddDbContext<EvoflareDbContext>(options => options.UseNpgsql(
+                    configuration.GetConnectionString("DefaultConnectionPostgres"),
+                    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
+                );
+            }
 
-            // services.AddDbContext<EvoflareDBContext>(options => options.UseSqlServer(
-            //     configuration.GetConnectionString(connectionName),
-            //     sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
-
-            services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
-            configuration.GetConnectionString(connectionName),
-            sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
-
-            // services.AddDbContext<TechnicalEvaluationContext>(
-            //     options => options.UseSqlServer(configuration.GetConnectionString(connectionName),
-            //         // start migration
-            //         optionsBuilder => optionsBuilder.MigrationsAssembly(assemblyName.Name))
-            // );
             return services;
         }
-
-        //AddCustomAuthentication
 
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
             IConfiguration configuration)
@@ -78,7 +105,6 @@ namespace Evoflare.API
             // Register the ConfigurationBuilder instance of FacebookAuthSettings
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
             services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
-
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -107,6 +133,7 @@ namespace Evoflare.API
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(configureOptions =>
@@ -138,13 +165,6 @@ namespace Evoflare.API
                 };
             });
 
-            // api user claim policy
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiUser",
-                    policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess));
-            });
-
             // add identity
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
                 {
@@ -154,12 +174,19 @@ namespace Evoflare.API
                     options.Password.RequireUppercase = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 0;
+
+                    // Lockout settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.AllowedForNewUsers = true;
+
+                    options.User.RequireUniqueEmail = true;
 
                     options.SignIn.RequireConfirmedEmail = true;
                     // Set for correct userManager.GetUserAsync execution
                     options.ClaimsIdentity.UserIdClaimType = Constants.JwtClaimIdentifiers.Id;
                 })
-                //.AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<EvoflareDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -237,9 +264,9 @@ namespace Evoflare.API
                     {
                         // Add additional MIME types (other than the built in defaults) to enable GZIP compression for.
                         var customMimeTypes = services
-                                                  .BuildServiceProvider()
-                                                  .GetRequiredService<CompressionOptions>()
-                                                  .MimeTypes ?? Enumerable.Empty<string>();
+                                              .BuildServiceProvider()
+                                              .GetRequiredService<CompressionOptions>()
+                                              .MimeTypes ?? Enumerable.Empty<string>();
                         options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(customMimeTypes);
                     })
                 .Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);

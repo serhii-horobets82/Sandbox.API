@@ -1,8 +1,9 @@
 using Evoflare.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
+using System.Linq;
 
 
 namespace Evoflare.API.Data
@@ -13,13 +14,13 @@ namespace Evoflare.API.Data
 		public static bool SeedEmployeeRelations(EvoflareDbContext context)
         {
             if (context.EmployeeRelations.Any()) return false;
-            var trans = context.Database.BeginTransaction();
-			try
-            {
-				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeRelations] ON");
+            IDbContextTransaction trans = null;
+            
+			if(true && context.Database.IsSqlServer())
+			{
+			    trans = context.Database.BeginTransaction();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeRelations] ON");
 			}
-            catch { trans.Rollback(); } // TODO find better solution 
-
             var items = new[]
             {
 				new EmployeeRelations {Id = 1, EmployeeId = null, ManagerId = 1, TeamId = 1, ProjectId = 1, PositionId = null, OrganizationId = 1, Archived = false },
@@ -49,12 +50,11 @@ namespace Evoflare.API.Data
 
             context.SaveChanges();
 
-			try
+			if(true && context.Database.IsSqlServer())
             {
 				context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [EmployeeRelations] OFF");
 				trans.Commit();
 			}
-            catch { } // TODO find better solution 
             
             return true;
         }

@@ -37,6 +37,8 @@ namespace Evoflare.API
         {
             this.configuration = configuration;
             this.hostingEnvironment = hostingEnvironment;
+            // share configuration through a static class
+            Evoflare.API.Data.Extensions.Configuration = configuration;
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace Evoflare.API
                 .AddCustomApiVersioning()
                 .AddVersionedApiExplorer(x => x.GroupNameFormat = "'v'VVV") // Version format: 'v'major[.minor][-status]
                 .AddCustomAuthentication(this.configuration)
+                .AddCustomPolicies(this.configuration)
                 .AddMvcCore()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                     .AddApiExplorer()
