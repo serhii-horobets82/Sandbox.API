@@ -16,6 +16,7 @@ namespace Evoflare.API
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using System;
+    using Evoflare.API.Hubs;
 
     /// <summary>
     /// The main start-up class for the application.
@@ -43,7 +44,8 @@ namespace Evoflare.API
         /// called by the ASP.NET runtime. See
         /// http://blogs.msdn.com/b/webdev/archive/2014/06/17/dependency-injection-in-asp-net-vnext.aspx
         /// </summary>
-        public IServiceProvider ConfigureServices(IServiceCollection services) =>
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
             services
                 .AddDatabaseContexts(this.configuration)
                 .AddCorrelationIdFluent()
@@ -80,23 +82,28 @@ namespace Evoflare.API
                     .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    })
-                .Services
+                    });
+
+            services.AddSignalR();
+
+            return services
                 .AddProjectCommands()
                 .AddProjectMappers()
                 .AddProjectRepositories()
                 .AddProjectServices()
                 .BuildServiceProvider();
+        }
 
         /// <summary>
         /// Configures the application and HTTP request pipeline. Configure is called after ConfigureServices is
         /// called by the ASP.NET runtime.
         /// </summary>
-        public void Configure(IApplicationBuilder application) =>
+        public void Configure(IApplicationBuilder application)
+        {
             application
                 // Pass a GUID in a X-Correlation-ID HTTP header to set the HttpContext.TraceIdentifier.
                 // UpdateTraceIdentifier must be false due to a bug. See https://github.com/aspnet/AspNetCore/issues/5144
-                .UseCorrelationId(new CorrelationIdOptions() {UpdateTraceIdentifier = false})
+                .UseCorrelationId(new CorrelationIdOptions() { UpdateTraceIdentifier = false })
                 .UseForwardedHeaders()
                 .UseResponseCaching()
                 .UseResponseCompression()
@@ -108,12 +115,17 @@ namespace Evoflare.API
                     this.hostingEnvironment.IsDevelopment(),
                     x => x.UseDeveloperErrorPages())
                 .UseHealthChecks("/status")
-                .UseHealthChecks("/status/self", new HealthCheckOptions() {Predicate = _ => false})
+                .UseHealthChecks("/status/self", new HealthCheckOptions() { Predicate = _ => false })
                 .UseStaticFilesWithCacheControl()
                 .UseAuthentication()
                 .UseMvc()
                 .UseSwagger()
                 .UseCustomSwaggerUI(GetType().GetTypeInfo().Assembly)
-                .UseDbSeed(this.configuration);
+                .UseDbSeed(this.configuration)
+                .UseSignalR(route =>
+                {
+                    route.MapHub<NotificationHub>("/hubs/notification-hub");
+                });
+        }
     }
 }

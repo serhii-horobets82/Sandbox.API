@@ -26,9 +26,11 @@ namespace Evoflare.API
                     options.AddPolicy(
                         CorsPolicyName.AllowAny,
                         x => x
-                            .AllowAnyOrigin()
+                            .WithOrigins("http://localhost:8080")
+                            //.AllowAnyOrigin()
                             .AllowAnyMethod()
-                            .AllowAnyHeader());
+                            .AllowAnyHeader()
+                            .AllowCredentials());
                 });
 
         /// <summary>
