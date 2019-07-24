@@ -343,6 +343,8 @@ namespace Evoflare.API.Data
             SeedIdeaComment(applicationContext);
             SeedIdeaTag(applicationContext);
             SeedIdeaTagRef(applicationContext);
+            SeedIdeaLike(applicationContext);
+            SeedIdeaView(applicationContext);
 
             SeedOrganizationStructureType(applicationContext);
 
