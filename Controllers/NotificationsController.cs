@@ -84,31 +84,39 @@ namespace Evoflare.API.Controllers
 
         public class M
         {
-            public string Message { get; set; }
+            public int NotificationTypeId { get; set; }
+            public NotificationData Data { get; set; }
+            public class NotificationData
+            {
+                public string Name { get; set; }
+                public string Project { get; set; }
+            }
         }
         // POST: api/Notifications/send
         [HttpPost("send")]
-        public async Task<IActionResult> SendNotification(M message)
+        public async Task<IActionResult> SendNotification(M notification)
         {
+            var type = await _context.NotificationType.FirstOrDefaultAsync(x => x.Id == notification.NotificationTypeId);
+
             await _hubContext
               .Clients
               .All
-              .SendNotification(message.Message);
+              .SendTestNotification(new { Template = type.Template, Data = notification.Data, Type = notification.NotificationTypeId });
             return new JsonResult(new { r = 2 });
         }
 
         // POST: api/Notifications
-        [HttpPost]
-        public async Task<ActionResult<Notification>> PostNotification(Notification notification)
-        {
-            _context.Notification.Add(notification);
-            await _context.SaveChangesAsync();
-            await _hubContext
-              .Clients
-              .All
-              .SendNotification("Message...");
-            return CreatedAtAction("GetNotification", new { id = notification.Id }, notification);
-        }
+        //[HttpPost]
+        //public async Task<ActionResult<Notification>> PostNotification(Notification notification)
+        //{
+        //    _context.Notification.Add(notification);
+        //    await _context.SaveChangesAsync();
+        //    await _hubContext
+        //      .Clients
+        //      .All
+        //      .SendNotification("Message...");
+        //    return CreatedAtAction("GetNotification", new { id = notification.Id }, notification);
+        //}
 
         // DELETE: api/Notifications/5
         [HttpDelete("{id}")]

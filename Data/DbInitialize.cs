@@ -348,6 +348,9 @@ namespace Evoflare.API.Data
 
             SeedOrganizationStructureType(applicationContext);
 
+            SeedNotificationType(applicationContext);
+            SeedNotification(applicationContext);
+
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)
                 using (var connection = applicationContext.Database.GetDbConnection())

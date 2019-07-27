@@ -8,5 +8,6 @@ namespace Evoflare.API.Hubs
     public interface INotificationHub
     {
         Task SendNotification(string message);
+        Task SendTestNotification(object message);
     }
 }
