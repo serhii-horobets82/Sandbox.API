@@ -45,12 +45,19 @@ namespace Evoflare.API.Controllers
                 .Include(i => i.IdeaLike)
                 .Include(i => i.IdeaView)
                 .FirstOrDefaultAsync(i => i.Id == id);
-            idea.IdeaComment = idea.IdeaComment.Where(c => !c.ParentCommentId.HasValue).ToList();
             if (idea == null)
             {
                 return NotFound();
             }
 
+            idea.IdeaComment = idea.IdeaComment.Where(c => !c.ParentCommentId.HasValue).ToList();
+            var employeeId = 1;
+            if (!idea.IdeaView.Any(v => v.EmployeeId == employeeId))
+            {
+                var view = new IdeaView { EmployeeId = employeeId, IdeaId = id };
+                _context.IdeaView.Add(view);
+                await _context.SaveChangesAsync();
+            }
             return idea;
         }
 
@@ -98,6 +105,31 @@ namespace Evoflare.API.Controllers
             return CreatedAtAction("GetIdea", new { id = idea.Id }, idea);
         }
 
+        // POST: api/Ideas/{ideaId}/like
+        [HttpPost("{ideaId}/like")]
+        public async Task<ActionResult<IdeaLike>> LikeIdea(int ideaId)
+        {
+            var newLike = new IdeaLike
+            {
+                EmployeeId = 1,
+                IdeaId = ideaId,
+            };
+            _context.IdeaLike.Add(newLike);
+            await _context.SaveChangesAsync();
+
+            return newLike;
+        }
+        // DELETE: api/Ideas/{ideaId}/like
+        [HttpDelete("{ideaId}/like")]
+        public async Task<ActionResult<IdeaLike>> UnLikeIdea(int ideaId)
+        {
+            var like = await _context.IdeaLike.FirstOrDefaultAsync(l => l.IdeaId == ideaId && l.EmployeeId == 1);
+            
+            _context.IdeaLike.Remove(like);
+            await _context.SaveChangesAsync();
+
+            return like;
+        }
         //// DELETE: api/Ideas/5
         //[HttpDelete("{id}")]
         //public async Task<ActionResult<Idea>> DeleteIdea(int id)

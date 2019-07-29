@@ -450,8 +450,13 @@ namespace Evoflare.API.Data
             SeedIdeaComment(applicationContext);
             SeedIdeaTag(applicationContext);
             SeedIdeaTagRef(applicationContext);
+            SeedIdeaLike(applicationContext);
+            SeedIdeaView(applicationContext);
 
             SeedOrganizationStructureType(applicationContext);
+
+            SeedNotificationType(applicationContext);
+            SeedNotification(applicationContext);
 
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)
