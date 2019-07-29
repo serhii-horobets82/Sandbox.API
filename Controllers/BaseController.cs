@@ -16,12 +16,10 @@ namespace Evoflare.API.Controllers
             return new EmptyResult();
         }
 
-        protected virtual int? GetEmployeeId()
+        protected virtual int GetEmployeeId()
         {
-            var employeeId = User.Claims.FirstOrDefault(x => x.Type == Constants.JwtClaimIdentifiers.EmployeeId)?.Value;
-            if (!string.IsNullOrEmpty(employeeId))
-                return Convert.ToInt32(employeeId);
-            return null;
+            var employeeId = User.Claims.First(x => x.Type == Constants.JwtClaimIdentifiers.EmployeeId);
+            return Convert.ToInt32(employeeId.Value);
         }
     }
 }

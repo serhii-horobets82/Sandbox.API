@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PositionsController : ControllerBase
+    public class PositionsController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -142,7 +142,7 @@ namespace Evoflare.API.Controllers
                 return BadRequest();
             }
 
-            position.UpdatedBy = 1;
+            position.UpdatedBy = GetEmployeeId();
             position.UpdatedDate = DateTime.UtcNow;
             _context.Entry(position).State = EntityState.Modified;
 
@@ -175,7 +175,7 @@ namespace Evoflare.API.Controllers
             }
 
             //position.CreatedDate = DateTime.UtcNow;
-            position.CreatedBy = 1;
+            position.CreatedBy = GetEmployeeId();
             foreach(var positionRole in position.PositionRole)
             {
                 //positionRole.DateTime = DateTime.UtcNow;

@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeEvaluationsController : ControllerBase
+    public class EmployeeEvaluationsController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -34,7 +34,7 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<IEnumerable<EmployeeEvaluation>>> GetWhomEvaluate(int employeeId, [FromQuery] bool? history)
         {
             var employeeEvaluation = _context.EmployeeEvaluation
-                .Where(e => e.EcfEmployeeEvaluation.Any(t => t.OrganizationId == employeeId));
+                .Where(e => e.EcfEmployeeEvaluation.Any(t => t.EvaluationId == employeeId));
 
             if (!history.HasValue || (history.HasValue && !history.Value))
             {
@@ -164,7 +164,7 @@ namespace Evoflare.API.Controllers
             employeeEvaluation.Archived = false;
             employeeEvaluation.OrganizationId = 1;
             employeeEvaluation.StartDate = DateTime.UtcNow;
-            employeeEvaluation.StartedById = 11;
+            employeeEvaluation.StartedById = GetEmployeeId();
 
             var lastEvaluation = await _context.EmployeeEvaluation
                 .Include(e => e.EcfEmployeeEvaluation)
@@ -246,12 +246,11 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/EmployeeEvaluations/i-evaluate-360
-        // TODO: remove from header, should come from user
         [HttpGet("i-evaluate-360")]
-        public async Task<ActionResult<List<_360employeeEvaluation>>> GetIEvaluate360([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<ActionResult<List<_360employeeEvaluation>>> GetIEvaluate360()
         {
             var employeesToEvaluate = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == id /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
+                .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
                 .Include(e => e.Evaluation.Employee)
                 .ToListAsync();
 

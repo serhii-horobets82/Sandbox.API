@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CertificatesController : ControllerBase
+    public class CertificatesController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -21,9 +21,8 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/Certificates/profile
-        // TODO: remove from header, should come from user
         [HttpGet("profile")]
-        public async Task<ActionResult<IEnumerable<Certificate>>> GetProfileCertificates([FromHeader(Name = "_EmployeeId")] int employeeId, [FromQuery] bool all = false)
+        public async Task<ActionResult<IEnumerable<Certificate>>> GetProfileCertificates([FromQuery] bool all = false)
         {
             // TODO:
             // get user

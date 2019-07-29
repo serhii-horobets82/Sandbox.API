@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class IdeaCommentsController : ControllerBase
+    public class IdeaCommentsController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -78,7 +78,7 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<IdeaComment>> PostIdeaComment(IdeaComment ideaComment)
         {
             ideaComment.CreatedDate = DateTime.UtcNow;
-            ideaComment.CreatedById = 1;
+            ideaComment.CreatedById = GetEmployeeId();
             ideaComment.OrganizationId = 1;
 
             _context.IdeaComment.Add(ideaComment);

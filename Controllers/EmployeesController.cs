@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -154,15 +154,14 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/Employees/profile
-        // TODO: remove this from header, it should go from user 
         [HttpGet("profile")]
-        public async Task<IActionResult> GetEmployeeProfile([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<IActionResult> GetEmployeeProfile()
         {
             var employee = await _context.Employee
                 .Include(e => e.EmployeeType)
                 .Include(e => e.EmployeeRelationsEmployee)
                     .ThenInclude(e => e.Team.Project)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == GetEmployeeId());
 
             if (employee == null)
             {
@@ -173,11 +172,10 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/Employees/suggestions-to-improve
-        // TODO: remove this from header, it should go from user 
         [HttpGet("suggestions-to-improve")]
-        public async Task<List<_360employeeEvaluation>> GetSuggestionsToImprove([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<List<_360employeeEvaluation>> GetSuggestionsToImprove()
         {
-            var evaluation = await _context.EmployeeEvaluation.FirstOrDefaultAsync(e => e.EmployeeId == id && !e.Archived);
+            var evaluation = await _context.EmployeeEvaluation.FirstOrDefaultAsync(e => e.EmployeeId == GetEmployeeId() && !e.Archived);
             if (evaluation != null)
             {
                 var _360Feedbacks = await _context._360employeeEvaluation.Where(e => e.EvaluationId == evaluation.Id).ToListAsync();
@@ -197,19 +195,18 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/Employees/profile/ecf-evaluation
-        // TODO: remove from header, should come from user
         [HttpGet("profile/ecf-evaluation")]
-        public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf()
         {
             // getting all the competences from DB
             var competences = await _context.EcfCompetence
                 .Include(c => c.EcfCompetenceLevel)
                 .ToListAsync();
             var competencesById = competences.ToDictionary(c => c.Id);
-
+            var employeeId = GetEmployeeId();
             // getting only Competences from roles
             var competencesFromRoles = await _context.EmployeeRelations
-                .Where(p => p.EmployeeId == id)
+                .Where(p => p.EmployeeId == employeeId)
                 .Select(p => p.Position)
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
                 .SelectMany(r => r.EcfRoleCompetence.Select(c => new { RoleCompetenceLevel = c.CompetenceLevel, c.CompetenceId }))
@@ -218,7 +215,7 @@ namespace Evoflare.API.Controllers
             var lastEvaluation = await _context.EmployeeEvaluation
                 .Include(e => e.EcfEmployeeEvaluation)
                     .ThenInclude(e => e.EcfEvaluationResult)
-                .FirstOrDefaultAsync(e => e.EmployeeId == id && !e.Archived);
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId && !e.Archived);
 
             var pastEvaluationsByCompetence = 
                 new Dictionary<string, (string competenceId, int competenceLevel, int roleCompetenceLevel)>();

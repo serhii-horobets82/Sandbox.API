@@ -57,7 +57,7 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet("rows")]
-        public async Task<List<CompetenceRow>> GetCompetences([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<List<CompetenceRow>> GetCompetences()
         {
             // getting all the competences from DB
             var competences = await _context.EcfCompetence

@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class _360evaluationController : ControllerBase
+    public class _360evaluationController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -42,15 +42,14 @@ namespace Evoflare.API.Controllers
         }
 
         // GET: api/_360evaluation/employee/5/evaluator
-        // TODO: remove from header, should come from user
         /// <summary>
         /// Gets a questionary for a specific employee. Used when 360 in progress, evaluator needs to give feedback.
         /// </summary>
         [HttpGet("employee/{id}/evaluator")]
-        public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id, [FromHeader(Name = "_EmployeeId")] int employeeId)
+        public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id)
         {
             var questionarie = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == employeeId && e.Evaluation.EmployeeId == id)
+                .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() && e.Evaluation.EmployeeId == id)
                 .Include(e => e._360feedbackGroup)
                     .ThenInclude(f => f._360questionarie)
                         .ThenInclude(q => q._360questionToMark)
