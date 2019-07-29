@@ -26,7 +26,7 @@ namespace Evoflare.API
                     options.AddPolicy(
                         CorsPolicyName.AllowAny,
                         x => x
-                            .WithOrigins("http://localhost:8080", "https://evoflare.azurewebsites.net")
+                            .WithOrigins("http://localhost:8080", "https://evoflare.azurewebsites.net", "http://evoflare.azurewebsites.net", "https://evoflare-web.herokuapp.com")
                             //.AllowAnyOrigin()
                             .AllowAnyMethod()
                             .AllowAnyHeader()
