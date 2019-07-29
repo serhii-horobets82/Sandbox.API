@@ -1,11 +1,9 @@
 namespace Evoflare.API
 {
     using Evoflare.API.Commands;
-    using Evoflare.API.Mappers;
+    using Evoflare.API.Models;
     using Evoflare.API.Repositories;
     using Evoflare.API.Services;
-    using Evoflare.API.ViewModels;
-    using Boxed.Mapping;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -28,17 +26,15 @@ namespace Evoflare.API
                 .AddSingleton<IPutCarCommand, PutCarCommand>();
 
         public static IServiceCollection AddProjectMappers(this IServiceCollection services) =>
-            services
-                .AddSingleton<IMapper<Models.Car, Car>, CarToCarMapper>()
-                .AddSingleton<IMapper<Models.Car, SaveCar>, CarToSaveCarMapper>()
-                .AddSingleton<IMapper<SaveCar, Models.Car>, CarToSaveCarMapper>();
+            services;
 
         public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
             services
-                .AddSingleton<ICarRepository, CarRepository>();
+                .AddSingleton<ICarRepository, CarRepository>()
+                .AddSingleton<IRepository<Employee>, Repository<Employee>>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
-            services
-                .AddSingleton<IClockService, ClockService>();
+            services;
+        //.AddSingleton<IEmployeeService, EmployeeService>();
     }
 }

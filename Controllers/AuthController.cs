@@ -2,10 +2,12 @@
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Helpers;
+using Evoflare.API.Models;
 using Evoflare.API.Services;
 using Evoflare.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Controllers
 {
@@ -13,11 +15,13 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+
         private readonly IActivityLogService activityLogService;
         private readonly IJwtFactory jwtFactory;
         private readonly UserManager<ApplicationUser> userManager;
 
         public AuthController(
+            EvoflareDbContext dbContext,
             UserManager<ApplicationUser> userManager,
             IJwtFactory jwtFactory,
             IActivityLogService activityLogService)
@@ -37,6 +41,7 @@ namespace Evoflare.API.Controllers
 
             // try get user by name
             var user = await userManager.FindByNameAsync(credentials.UserName);
+
             // check the credentials
             if (user != null && await userManager.CheckPasswordAsync(user, credentials.Password))
             {

@@ -71,6 +71,18 @@
       "problemMatcher": []
     },
     {
+      "label": "app: Generate empty db",
+      "command": "dotnet",
+      "type": "process",
+      "group": "build",
+      "args": [
+        "run",
+        "${workspaceFolder}/Evoflare.API.csproj",
+        "only-migrate=true"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "app: Publish",
       "command": "dotnet",
       "type": "process",
@@ -83,7 +95,6 @@
       "type": "process",
       "args": [
         "watch",
-        "--urls http://*:5000",
         "run",
         "${workspaceFolder}/Evoflare.API.csproj"
       ],
@@ -97,7 +108,8 @@
       "dependsOrder": "sequence",
       "dependsOn": [
         "child-task: Scaffold database(dbo schema)",
-        "child-task: Patch EvofalreDbContext file"
+        "child-task: Patch EvofalreDbContext file",
+        "child-task: Patch Employee file"
       ],
       "problemMatcher": []
     },
@@ -128,9 +140,18 @@
     {
       "label": "child-task: Patch EvofalreDbContext file",
       "type": "shell",
-      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace '}\\);.\n          ','});\n\r            base.OnModelCreating(modelBuilder);\n' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs",
+      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace '}\\);.\n          ','});\n\r            base.OnModelCreating(modelBuilder);\n' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs -Encoding UTF8",
       "options": {
         "cwd": "${workspaceRoot}/Data"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Patch Employee file",
+      "type": "shell",
+      "command": "(Get-Content -path Employee.cs -Raw) -replace '}.\n}','public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }\n }\n}' | Out-File Employee.cs -Encoding UTF8",
+      "options": {
+        "cwd": "${workspaceRoot}/Models"
       },
       "problemMatcher": []
     },

@@ -1,7 +1,7 @@
 { 
     "mssql.connections": [
         {
-            "connectionString": "Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7"
+            "connectionString": "Server=localhost,14330;Database=EvoflareDB01;User Id=sa;Password=DatgE66VbHy7"
         },
         {
             "connectionString": "Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7"

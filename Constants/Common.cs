@@ -1,5 +1,8 @@
 ﻿namespace Evoflare.API.Constants
 {
+
+
+
     /// <summary>
     ///     Codes for the representation of human sexes is an international standard
     ///     ISO/IEC 5218
@@ -28,6 +31,7 @@
     public static class JwtClaimIdentifiers
     {
         public const string Roles = "roles";
+        public const string EmployeeId = "empId";
         public const string Rol = "rol";
         public const string Id = "id";
     }

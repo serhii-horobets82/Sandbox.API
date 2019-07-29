@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Evoflare.API.Constants;
+using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 namespace Evoflare.API.Auth.Models
 {
@@ -24,5 +26,7 @@ namespace Evoflare.API.Auth.Models
 
         [Display(Name = "User gender code")]
         public Gender Gender { get; set; }
+
+        public virtual Employee IdNavigation { get; set; }
     }
 }

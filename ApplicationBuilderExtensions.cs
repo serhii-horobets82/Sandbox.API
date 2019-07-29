@@ -57,7 +57,7 @@ namespace Evoflare.API
         }
 
         /// <summary>
-        /// Creating new Database 
+        /// Creating new and\or seed database 
         /// </summary>
         /// <param name="application"></param>
         /// <param name="configuration"></param>

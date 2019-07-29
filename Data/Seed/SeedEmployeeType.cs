@@ -31,6 +31,9 @@ namespace Evoflare.API.Data
 				new EmployeeType {Id = 6, Type = @"OPERATIONS", OrganizationId = 1 },
 				new EmployeeType {Id = 8, Type = @"Performance Engineer", OrganizationId = 1 },
 				new EmployeeType {Id = 9, Type = @"Another role", OrganizationId = 1 },
+				new EmployeeType {Id = 10, Type = @"SysAdmin", OrganizationId = 1 },
+				new EmployeeType {Id = 11, Type = @"Admin", OrganizationId = 1 },
+				new EmployeeType {Id = 12, Type = @"HR", OrganizationId = 1 },
 
             };
             context.EmployeeType.AddRange(items);

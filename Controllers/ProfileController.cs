@@ -13,7 +13,7 @@ namespace Evoflare.API.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class ProfileController : ControllerBase
+    public class ProfileController : BaseController
     {
         private readonly EvoflareDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
@@ -48,7 +48,8 @@ namespace Evoflare.API.Controllers
                 profile.PictureUrl,
                 profile.Location,
                 profile.Locale,
-                roles
+                roles,
+                employeeId = GetEmployeeId()
             });
         }
     }

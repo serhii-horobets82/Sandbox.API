@@ -6,16 +6,20 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using Evoflare.API.Auth.Models;
 using Microsoft.AspNetCore.Identity;
+using Evoflare.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Auth
 {
     public class JwtFactory : IJwtFactory
     {
+        private readonly EvoflareDbContext dbContext;
         private readonly JwtIssuerOptions jwtOptions;
         private readonly RoleManager<ApplicationRole> roleManager;
 
-        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions, RoleManager<ApplicationRole> roleManager)
+        public JwtFactory(EvoflareDbContext dbContext, IOptions<JwtIssuerOptions> jwtOptions, RoleManager<ApplicationRole> roleManager)
         {
+            this.dbContext = dbContext;
             this.jwtOptions = jwtOptions.Value;
             ThrowIfInvalidOptions(this.jwtOptions);
             this.roleManager = roleManager;
@@ -23,10 +27,12 @@ namespace Evoflare.API.Auth
 
         public async Task<Token> GenerateAuthToken(ApplicationUser user, IList<string> userRoles, IList<Claim> userClaims)
         {
+            var employee = await dbContext.Employee.Include(c => c.Users).SingleAsync(e => e.UserId == user.Id);
             var claims = new List<Claim>(userClaims);
             // common claims 
             claims.AddRange(new[] {
                 new Claim(Constants.JwtClaimIdentifiers.Id, user.Id),
+                new Claim(Constants.JwtClaimIdentifiers.EmployeeId, employee.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess),
                 new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),

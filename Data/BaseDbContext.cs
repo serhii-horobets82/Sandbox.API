@@ -50,6 +50,13 @@ namespace Evoflare.API.Models
                 }
             }
 
+            // Workaroound 
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.Metadata.RemoveIndex(new[] { entity.Property(r => r.UserId).Metadata });
+            });
+            //
+
             const string CoreSchemaName = "core";
             const string SecuritySchemaName = "security";
 
@@ -84,31 +91,38 @@ namespace Evoflare.API.Models
             // == security =======
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                entity.ToTable(name: "AspNetUser", schema: SecuritySchemaName);
+                entity.ToTable(name: "Users", schema: SecuritySchemaName);
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.Users)
+                    .HasPrincipalKey<Employee>(p => p.UserId)
+                    .HasForeignKey<ApplicationUser>(d => d.Id)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Users_Employee");
             });
             modelBuilder.Entity<ApplicationRole>(entity =>
             {
-                entity.ToTable(name: "AspNetRole", schema: SecuritySchemaName);
+                entity.ToTable(name: "Roles", schema: SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityUserClaim<string>>(entity =>
             {
-                entity.ToTable("AspNetUserClaim", SecuritySchemaName);
+                entity.ToTable("UserClaims", SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
             {
-                entity.ToTable("AspNetUserLogin", SecuritySchemaName);
+                entity.ToTable("UserLogins", SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityRoleClaim<string>>(entity =>
             {
-                entity.ToTable("AspNetRoleClaim", SecuritySchemaName);
+                entity.ToTable("RoleClaims", SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityUserRole<string>>(entity =>
             {
-                entity.ToTable("AspNetUserRole", SecuritySchemaName);
+                entity.ToTable("UserRoles", SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityUserToken<string>>(entity =>
             {
-                entity.ToTable("AspNetUserToken", SecuritySchemaName);
+                entity.ToTable("UserTokens", SecuritySchemaName);
             });
         }
     }

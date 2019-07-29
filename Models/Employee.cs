@@ -29,7 +29,7 @@ namespace Evoflare.API.Models
         }
 
         public int Id { get; set; }
-        [StringLength(10)]
+        [Required]
         public string UserId { get; set; }
         public bool IsManager { get; set; }
         public int EmployeeTypeId { get; set; }
@@ -84,5 +84,7 @@ namespace Evoflare.API.Models
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         [InverseProperty("Evaluator")]
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
-    }
+    public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
+ }
 }
+
