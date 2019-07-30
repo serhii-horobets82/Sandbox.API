@@ -258,7 +258,7 @@ namespace Evoflare.API.Data
             }
         }
 
-        private static void RecreateDatabase(DbContext context, int timeout)
+        public static void RecreateDatabase(DbContext context, int timeout)
         {
             // drop database
             Log.Information("Deleting database - start");

@@ -11,7 +11,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : BaseController
     {
         private readonly EvoflareDbContext _context;
 
@@ -156,13 +156,13 @@ namespace Evoflare.API.Controllers
         // GET: api/Employees/profile
         // TODO: remove this from header, it should go from user 
         [HttpGet("profile")]
-        public async Task<IActionResult> GetEmployeeProfile([FromHeader(Name = "_EmployeeId")] int id)
+        public async Task<IActionResult> GetEmployeeProfile()
         {
             var employee = await _context.Employee
                 .Include(e => e.EmployeeType)
                 .Include(e => e.EmployeeRelationsEmployee)
                     .ThenInclude(e => e.Team.Project)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == GetEmployeeId());
 
             if (employee == null)
             {
