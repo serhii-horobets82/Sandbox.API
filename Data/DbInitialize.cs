@@ -26,7 +26,7 @@ namespace Evoflare.API.Data
 {
     public static partial class DbInitializer
     {
-        private const string DefaultPassword = "qwerty";
+        public const string DefaultPassword = "qwerty";
         private const string DefaultLocation = "Ukraine";
         private const string DefaultLocale = "en";
         private const string DefaultPictureUrl = "https://picsum.photos/300/300/?random";
@@ -258,7 +258,7 @@ namespace Evoflare.API.Data
             }
         }
 
-        private static void RecreateDatabase(DbContext context, int timeout)
+        public static void RecreateDatabase(DbContext context, int timeout)
         {
             // drop database
             Log.Information("Deleting database - start");

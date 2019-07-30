@@ -35,19 +35,64 @@ namespace Evoflare.API.Controllers
 
         [HttpGet]
         [Authorize(Policy = PolicyTypes.AdminPolicy.View)]
-        public async Task<IEnumerable<JObject>> GetAsync()
+        public async Task<IActionResult> GetAsync()
         {
-            return await context.Users.Select(c => new JObject
+            var users = await context.Users.Include(e => e.IdNavigation).Where(e => e.LockoutEnabled).Select(c => new
             {
-                { "id",  c.Id },
-                { "email",  c.Email },
-                { "firstName",  c.FirstName },
-                { "lastName",  c.LastName },
-                { "accessFailedCount",  c.AccessFailedCount },
-                { "gender",  c.Gender.ToString() },
-                { "age",  c.Age }
+                id = c.Id,
+                email = c.Email,
+                firstName = c.FirstName,
+                lastName = c.LastName,
+                accessFailedCount = c.AccessFailedCount,
+                gender = (int)c.Gender,
+                age = c.Age,
+                emloyeeId = c.IdNavigation.Id,
+                emloyeeType = c.IdNavigation.EmployeeType.Type,
+                hiringDate = c.IdNavigation.HiringDate
             }).ToListAsync();
+            return new OkObjectResult(users);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Policy = PolicyTypes.AdminPolicy.Crud)]
+        public async Task<ActionResult> Delete(string id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.LockoutEnabled = false;
+            var result = await userManager.UpdateAsync(user);
+
+            //var profile = await context.Profile.Include(e => e.Identity).FirstOrDefaultAsync(e => e.IdentityId == user.Id);
+            //context.Profile.Remove(profile);
+            //var employee = await context.Employee.Include(e => e.Users).FirstOrDefaultAsync(e => e.UserId == user.Id);
+            //context.Employee.Remove(employee);
+            //var result = await userManager.DeleteAsync(user);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, ApplicationUser userDto)
+        {
+            if (id != userDto.Id)
+            {
+                return BadRequest();
+            }
+            var user = await context.Users.FindAsync(id);
+            context.Entry(user).State = EntityState.Modified;
+
+            user.Gender = userDto.Gender;
+            user.Age = userDto.Age;
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+
+            await context.SaveChangesAsync();
+
+            return Ok(user);
+        }
+
 
         private async Task<bool> UserHasRole(string role)
         {
