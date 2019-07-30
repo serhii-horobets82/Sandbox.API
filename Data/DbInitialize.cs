@@ -26,7 +26,7 @@ namespace Evoflare.API.Data
 {
     public static partial class DbInitializer
     {
-        private const string DefaultPassword = "qwerty";
+        public const string DefaultPassword = "qwerty";
         private const string DefaultLocation = "Ukraine";
         private const string DefaultLocale = "en";
         private const string DefaultPictureUrl = "https://picsum.photos/300/300/?random";
