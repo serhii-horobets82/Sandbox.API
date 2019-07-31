@@ -1,6 +1,8 @@
+using System.Threading.Tasks;
 using Evoflare.API.Constants;
 using Evoflare.API.Core.Permissions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,10 +11,26 @@ namespace Evoflare.API
     public static class PoliciesExtensions
     {
 
+        public class AdminRequirement : AuthorizationHandler<AdminRequirement>, IAuthorizationRequirement
+        {
+            protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminRequirement requirement)
+            {
+                if (!context.User.IsAdminOrSysAdmin())
+                {
+                    return Task.CompletedTask;
+                }
+
+                context.Succeed(requirement);
+                return Task.CompletedTask;
+            }
+        }
+
         public static IServiceCollection AddCustomPolicies(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthorization(options =>
                 {
+                    options.AddPolicy(nameof(AdminRequirement), policy => policy.AddRequirements(new AdminRequirement()));
+
                     options.AddPolicy("ApiUser",
                         policy => policy.RequireClaim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess));
 

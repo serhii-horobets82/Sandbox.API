@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Boxed.AspNetCore;
@@ -12,11 +13,13 @@ using Boxed.AspNetCore.Swagger.OperationFilters;
 using Boxed.AspNetCore.Swagger.SchemaFilters;
 using CorrelationId;
 using Evoflare.API.Auth;
+using Evoflare.API.Auth.Identity;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
+using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -97,14 +100,18 @@ namespace Evoflare.API
             var appSettings = configuration.GetSection<AppSettings>();
             var secretKey = Encoding.ASCII.GetBytes(appSettings.Secret);
 
+
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
             var signingKey = new SymmetricSecurityKey(secretKey);
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IEmailSender, EmailSender>();
+            //services.AddTransient<IUserAccessor, HttpUserAccessor>();
 
             // Register the ConfigurationBuilder instance of FacebookAuthSettings
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
             services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
+            services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -186,6 +193,7 @@ namespace Evoflare.API
                     options.SignIn.RequireConfirmedEmail = true;
                     // Set for correct userManager.GetUserAsync execution
                     options.ClaimsIdentity.UserIdClaimType = Constants.JwtClaimIdentifiers.Id;
+                    options.ClaimsIdentity.RoleClaimType = ClaimsIdentity.DefaultRoleClaimType;
                 })
                 .AddEntityFrameworkStores<EvoflareDbContext>()
                 .AddDefaultTokenProviders();

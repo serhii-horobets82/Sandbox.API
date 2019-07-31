@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Models;
+using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Evoflare.API.Controllers
 {
@@ -17,11 +20,41 @@ namespace Evoflare.API.Controllers
     {
         private readonly EvoflareDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IMemoryCache memoryCache;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext)
+        private readonly IEmailSender emailSender;
+
+        public ProfileController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext,
+        IMemoryCache memoryCache, IEmailSender emailSender)
         {
             this.userManager = userManager;
             this.appDbContext = appDbContext;
+            this.memoryCache = memoryCache;
+            this.emailSender = emailSender;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Confirm()
+        {
+            await emailSender.SendEmailAsync("goroserg@gmail.com", "e-mail confirmation", "Hello world");
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Claims()
+        {
+            var claims = await memoryCache.GetOrCreateAsync($"Claims:{User.GetUserId()}", (entry) =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return Task.FromResult(User.GetUserClaims());
+            });
+            return new OkObjectResult(claims);
+        }
+
+        [HttpGet]
+        public IActionResult Permissions()
+        {
+            return new OkObjectResult(User.GetUserPermissions());
         }
 
         // GET api/profile/me

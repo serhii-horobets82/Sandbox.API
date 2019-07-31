@@ -2,13 +2,21 @@
 {
     public static class PolicyTypes
     {
+            
+        public static class SysAdminPolicy
+        {
+            public const string Crud = "admin.crud";
+            public const string Cru = "admin.cru";
+            public const string View = "admin.view";
+        }
+
         public static class AdminPolicy
         {
             public const string Crud = "admin.crud";
             public const string Cru = "admin.cru";
             public const string View = "admin.view";
         }
-        
+
         public static class SalaryPolicy
         {
             public const string Cru = "salary.cru";

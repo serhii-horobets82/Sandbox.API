@@ -55,7 +55,7 @@ namespace Evoflare.API.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var roles = new List<ApplicationRole>
             {
-                new ApplicationRole { Name = Constants.Roles.SysAdmin, DefaultPermission = AccessFlag.GodMode,  PolicyName="SysPolicy" },
+                new ApplicationRole { Name = Constants.Roles.SysAdmin, DefaultPermission = AccessFlag.GodMode,  PolicyName=nameof(PolicyTypes.SysAdminPolicy)},
                 new ApplicationRole { Name = Constants.Roles.Admin, DefaultPermission = AccessFlag.Manage,  PolicyName="AdminPolicy" },
                 new ApplicationRole { Name = Constants.Roles.ChiefManager, DefaultPermission = AccessFlag.Manage, PolicyName="ManagerPolicy" },
                 new ApplicationRole { Name = Constants.Roles.Manager, DefaultPermission = AccessFlag.Read | AccessFlag.Create  | AccessFlag.Edit | AccessFlag.Details, PolicyName="ManagerPolicy" },
@@ -283,7 +283,13 @@ namespace Evoflare.API.Data
             }
         }
 
-        public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration)
+        public static bool SeedDatabase()
+        {
+
+            return true;
+        }
+
+        public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             // version of assembly, format x.y.z.w  
@@ -302,7 +308,6 @@ namespace Evoflare.API.Data
             var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
             var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
 
-
             if (exportData)
             {
                 Log.Information("Start generate seed classes");
@@ -314,7 +319,7 @@ namespace Evoflare.API.Data
                 return;
             }
 
-            if (recreateDatabase)
+            if (recreateDatabase || forceRecreate)
                 RecreateDatabase(applicationContext, retryTimeout);
             else
                 applicationContext.Database.EnsureCreated();
@@ -383,11 +388,11 @@ namespace Evoflare.API.Data
                     var defRole = Constants.Roles.User;
                     switch (employee.EmployeeTypeId)
                     {
-                        case 10 : defRole =  Constants.Roles.SysAdmin; break;
-                        case 11 : defRole =  Constants.Roles.Admin; break;
-                        case 1 : defRole =  Constants.Roles.Manager; break;
-                        case 12 : defRole =  Constants.Roles.HR; break;
-                    }     
+                        case 10: defRole = Constants.Roles.SysAdmin; break;
+                        case 11: defRole = Constants.Roles.Admin; break;
+                        case 1: defRole = Constants.Roles.Manager; break;
+                        case 12: defRole = Constants.Roles.HR; break;
+                    }
                     CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", defRole, employee).Wait();
                 }
 
