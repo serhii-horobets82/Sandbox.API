@@ -21,6 +21,7 @@
     {
         public const string SysAdmin = "SysAdmin";
         public const string Admin = "Admin";
+
         public const string Manager = "Manager";
         public const string ChiefManager = "ChiefManager";
         public const string HR = "HR";
@@ -30,8 +31,8 @@
 
     public static class JwtClaimIdentifiers
     {
-        public const string Roles = "roles";
         public const string EmployeeId = "empId";
+        public const string Email = "email";
         public const string Rol = "rol";
         public const string Id = "id";
     }
