@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Evoflare.API.Auth.Identity;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Models;
 using Evoflare.API.Services;
@@ -18,14 +19,16 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]/[action]")]
     public class ProfileController : BaseController
     {
+        private readonly IUserManager userManager;
         private readonly EvoflareDbContext appDbContext;
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly IMemoryCache memoryCache;
-
         private readonly IEmailSender emailSender;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, EvoflareDbContext appDbContext,
-        IMemoryCache memoryCache, IEmailSender emailSender)
+        public ProfileController(
+            IUserManager userManager,
+            EvoflareDbContext appDbContext,
+            IMemoryCache memoryCache,
+            IEmailSender emailSender)
         {
             this.userManager = userManager;
             this.appDbContext = appDbContext;
@@ -33,11 +36,19 @@ namespace Evoflare.API.Controllers
             this.emailSender = emailSender;
         }
 
+       
+
         [HttpPost]
-        public async Task<IActionResult> Confirm()
+        public async Task<IActionResult> ResendEmailConfirmation()
         {
-            await emailSender.SendEmailAsync("goroserg@gmail.com", "e-mail confirmation", "Hello world");
-            return Ok();
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var result = await userManager.SendEmailConfirmationMessage(user);
+            return Ok(result);
         }
 
         [HttpGet]

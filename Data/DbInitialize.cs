@@ -217,7 +217,6 @@ namespace Evoflare.API.Data
                 {
                     user = new ApplicationUser
                     {
-                        Id = empl.UserId,
                         UserName = userEmail,
                         Email = userEmail,
                         FirstName = empl.Name,
@@ -226,6 +225,8 @@ namespace Evoflare.API.Data
                         LockoutEnabled = false,
                         Gender = Gender.Unknown
                     };
+                    if (empl.UserId != null)
+                        user.Id = empl.UserId;
 
                     empl.UserId = user.Id;
                     empl.NameTemp = $"{user.LastName} {user.FirstName}";
@@ -248,6 +249,10 @@ namespace Evoflare.API.Data
                     });
 
                     await userManager.AddToRoleAsync(user, roleName);
+                    
+                    dbContext.Entry(empl).Reload();
+                    dbContext.Entry(user).Reload();
+
                     trans.Commit();
                 }
                 catch
@@ -283,20 +288,8 @@ namespace Evoflare.API.Data
             }
         }
 
-        public static bool SeedDatabase()
-        {
-
-            return true;
-        }
-
         public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false)
         {
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
-            // version of assembly, format x.y.z.w  
-            var currentVersion = assemblyInfo.Version.ToString();
-            // version in database table AppVersion
-            var previousVersion = string.Empty;
-
             // main context, user\roles\auth
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
@@ -330,6 +323,12 @@ namespace Evoflare.API.Data
                 return;
             }
 
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            // version of assembly, format x.y.z.w  
+            var currentVersion = assemblyInfo.Version.ToString();
+            // version in database table AppVersion
+            var previousVersion = string.Empty;
+
             try
             {
                 // check core table AppVersion for records
@@ -353,13 +352,18 @@ namespace Evoflare.API.Data
                 CreateRoles(serviceProvider).Wait();
             }
 
-            SeedOrganization(applicationContext);
-            SeedEmployeeType(applicationContext);
-            //SeedEmployee(applicationContext);
-            if (!applicationContext.Users.Any())
+            if(previousVersion != null) return; // DB alredy has data
+
+            try
             {
-                var employees = new[]
+
+                SeedOrganization(applicationContext);
+                SeedEmployeeType(applicationContext);
+                //SeedEmployee(applicationContext);
+                if (!applicationContext.Users.Any())
                 {
+                    var employees = new[]
+                    {
                     new Employee {Id = 1, UserId = @"d91a5edf-31d4-471c-91e0-a1426e33fe73", IsManager = true, EmployeeTypeId = 1, OrganizationId = 1, NameTemp = @"Manager John", HiringDate = DateTime.ParseExact("2010-02-01T00:00:00.0000000", "O", CultureInfo.InvariantCulture), Name = @"John", Surname = @"Manager" },
                     new Employee {Id = 2, UserId = @"a156a0b8-62f1-443e-a341-be1ff040d7ed", IsManager = true, EmployeeTypeId = 1, OrganizationId = 1, NameTemp = @"Manager Bob", HiringDate = DateTime.ParseExact("2011-12-01T00:00:00.0000000", "O", CultureInfo.InvariantCulture), Name = @"Bob", Surname = @"Manager" },
                     new Employee {Id = 3, UserId = @"a6c25630-171b-4c43-891c-29ec301ebcf9", IsManager = false, EmployeeTypeId = 3, OrganizationId = 1, NameTemp = @"QA Karl", HiringDate = DateTime.ParseExact("2017-11-21T00:00:00.0000000", "O", CultureInfo.InvariantCulture), Name = @"Karl", Surname = @"QA" },
@@ -383,85 +387,91 @@ namespace Evoflare.API.Data
                     new Employee {Id = 27, UserId = @"afdd760d-d2aa-412f-a368-57ad67f88c47", IsManager = false, EmployeeTypeId = 12, OrganizationId = 1, NameTemp = @"HR Regular", HiringDate = DateTime.ParseExact("2010-01-01T00:00:00.0000000", "O", CultureInfo.InvariantCulture), Name = @"Regular", Surname = @"HR" },
                 };
 
-                foreach (var employee in employees)
-                {
-                    var defRole = Constants.Roles.User;
-                    switch (employee.EmployeeTypeId)
+                    foreach (var employee in employees)
                     {
-                        case 10: defRole = Constants.Roles.SysAdmin; break;
-                        case 11: defRole = Constants.Roles.Admin; break;
-                        case 1: defRole = Constants.Roles.Manager; break;
-                        case 12: defRole = Constants.Roles.HR; break;
+                        var defRole = Constants.Roles.User;
+                        switch (employee.EmployeeTypeId)
+                        {
+                            case 10: defRole = Constants.Roles.SysAdmin; break;
+                            case 11: defRole = Constants.Roles.Admin; break;
+                            case 1: defRole = Constants.Roles.Manager; break;
+                            case 12: defRole = Constants.Roles.HR; break;
+                        }
+                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", defRole, employee).Wait();
                     }
-                    CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", defRole, employee).Wait();
+
+                    // sysdadmin
+                    // var empl = new Employee { Name = "System", Surname = "Admin", EmployeeTypeId = 10, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "sysadmin@evoflare.com", Constants.Roles.SysAdmin, empl).Wait();
+                    // // admin
+                    // empl = new Employee { Name = "Regular", Surname = "Admin", EmployeeTypeId = 11, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "admin@evoflare.com", Constants.Roles.Admin, empl).Wait();
+                    // // chief.manager
+                    // empl = new Employee { Name = "Chief", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "chief.manager@evoflare.com", Constants.Roles.ChiefManager, empl).Wait();
+                    // // manager
+                    // empl = new Employee { Name = "Regular", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "manager@evoflare.com", Constants.Roles.Manager, empl).Wait();
+                    // // chief.hr
+                    // empl = new Employee { Name = "Chief", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "chief.hr@evoflare.com", Constants.Roles.ChiefHR, empl).Wait();
+                    // // hr
+                    // empl = new Employee { Name = "Regular", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
+                    // CreateOrUpdateEmployee(serviceProvider, "hr@evoflare.com", Constants.Roles.HR, empl).Wait();
                 }
+                SeedEmployeeEvaluation(applicationContext);
+                SeedCertificationExam(applicationContext);
 
-                // sysdadmin
-                // var empl = new Employee { Name = "System", Surname = "Admin", EmployeeTypeId = 10, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "sysadmin@evoflare.com", Constants.Roles.SysAdmin, empl).Wait();
-                // // admin
-                // empl = new Employee { Name = "Regular", Surname = "Admin", EmployeeTypeId = 11, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "admin@evoflare.com", Constants.Roles.Admin, empl).Wait();
-                // // chief.manager
-                // empl = new Employee { Name = "Chief", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "chief.manager@evoflare.com", Constants.Roles.ChiefManager, empl).Wait();
-                // // manager
-                // empl = new Employee { Name = "Regular", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "manager@evoflare.com", Constants.Roles.Manager, empl).Wait();
-                // // chief.hr
-                // empl = new Employee { Name = "Chief", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "chief.hr@evoflare.com", Constants.Roles.ChiefHR, empl).Wait();
-                // // hr
-                // empl = new Employee { Name = "Regular", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                // CreateOrUpdateEmployee(serviceProvider, "hr@evoflare.com", Constants.Roles.HR, empl).Wait();
+                SeedEcfCompetence(applicationContext);
+                SeedEcfCompetenceLevel(applicationContext);
+                SeedEcfEmployeeEvaluation(applicationContext);
+                SeedEcfEvaluationResult(applicationContext);
+                SeedEcfRole(applicationContext);
+                SeedEcfRoleCompetence(applicationContext);
+
+                SeedProject(applicationContext);
+                SeedPosition(applicationContext);
+                SeedPositionRole(applicationContext);
+                SeedProjectCareerPath(applicationContext);
+
+                SeedRoleGrade(applicationContext);
+                SeedRoleGradeCompetence(applicationContext);
+                SeedTeam(applicationContext);
+                SeedProjectPosition(applicationContext);
+                SeedProjectPositionCompetence(applicationContext);
+
+                Seed_360feedbackGroup(applicationContext);
+                Seed_360feedbackMark(applicationContext);
+                Seed_360questionarie(applicationContext);
+                Seed_360questionToMark(applicationContext);
+                Seed_360question(applicationContext);
+
+                Seed_360employeeEvaluation(applicationContext);
+                Seed_360evaluation(applicationContext);
+
+                SeedCustomerContact(applicationContext);
+                SeedCertificate(applicationContext);
+                SeedCompetenceCertificate(applicationContext);
+
+                SeedEmployeeRelations(applicationContext);
+
+                SeedIdea(applicationContext);
+                SeedIdeaComment(applicationContext);
+                SeedIdeaTag(applicationContext);
+                SeedIdeaTagRef(applicationContext);
+                SeedIdeaLike(applicationContext);
+                SeedIdeaView(applicationContext);
+
+                SeedOrganizationStructureType(applicationContext);
+
+                SeedNotificationType(applicationContext);
+                SeedNotification(applicationContext);
             }
-            SeedEmployeeEvaluation(applicationContext);
-            SeedCertificationExam(applicationContext);
-
-            SeedEcfCompetence(applicationContext);
-            SeedEcfCompetenceLevel(applicationContext);
-            SeedEcfEmployeeEvaluation(applicationContext);
-            SeedEcfEvaluationResult(applicationContext);
-            SeedEcfRole(applicationContext);
-            SeedEcfRoleCompetence(applicationContext);
-
-            SeedProject(applicationContext);
-            SeedPosition(applicationContext);
-            SeedPositionRole(applicationContext);
-            SeedProjectCareerPath(applicationContext);
-
-            SeedRoleGrade(applicationContext);
-            SeedRoleGradeCompetence(applicationContext);
-            SeedTeam(applicationContext);
-            SeedProjectPosition(applicationContext);
-            SeedProjectPositionCompetence(applicationContext);
-
-            Seed_360feedbackGroup(applicationContext);
-            Seed_360feedbackMark(applicationContext);
-            Seed_360questionarie(applicationContext);
-            Seed_360questionToMark(applicationContext);
-            Seed_360question(applicationContext);
-
-            Seed_360employeeEvaluation(applicationContext);
-            Seed_360evaluation(applicationContext);
-
-            SeedCustomerContact(applicationContext);
-            SeedCertificate(applicationContext);
-            SeedCompetenceCertificate(applicationContext);
-
-            SeedEmployeeRelations(applicationContext);
-
-            SeedIdea(applicationContext);
-            SeedIdeaComment(applicationContext);
-            SeedIdeaTag(applicationContext);
-            SeedIdeaTagRef(applicationContext);
-            SeedIdeaLike(applicationContext);
-            SeedIdeaView(applicationContext);
-
-            SeedOrganizationStructureType(applicationContext);
-
-            SeedNotificationType(applicationContext);
-            SeedNotification(applicationContext);
+            catch (Exception ex)
+            {
+                // Continue startup 
+                Log.Error(ex.Message);
+            }
 
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)

@@ -106,7 +106,7 @@ namespace Evoflare.API
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IEmailSender, EmailSender>();
-            //services.AddTransient<IUserAccessor, HttpUserAccessor>();
+            services.AddTransient<IUserManager, UserManager>();
 
             // Register the ConfigurationBuilder instance of FacebookAuthSettings
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));

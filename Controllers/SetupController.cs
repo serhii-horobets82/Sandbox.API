@@ -10,6 +10,7 @@ using static Evoflare.API.PoliciesExtensions;
 
 namespace Evoflare.API.Controllers
 {
+
     [Authorize(Policy = nameof(AdminRequirement), AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
@@ -18,6 +19,7 @@ namespace Evoflare.API.Controllers
         private readonly EvoflareDbContext context;
         private readonly IServiceProvider serviceProvider;
         private readonly IConfiguration configuration;
+
 
         public SetupController(
             EvoflareDbContext context,
@@ -32,21 +34,17 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var configurations = new[] {
-                 new {Id = "config01", Schema = "Typical functional organization", Users = 10 },
-                 new {Id = "config02", Schema = "Typical divisional organization", Users = 25 },
-                 new {Id = "config03", Schema = "Typical matrix organization", Users = 15 }
-            };
-            return new OkObjectResult(configurations);
+            return new OkObjectResult(SetupManager.Configurations);
         }
 
 
         [HttpPost]
         [Authorize(Policy = PolicyTypes.AdminPolicy.Crud)]
-        public IActionResult RecreateDb()
+        public IActionResult ResetDB(SetupParams setupParams)
         {
-            DbInitializer.Initialize(serviceProvider, configuration, true);
-            return Ok();
+            //DbInitializer.Initialize(serviceProvider, configuration, true);
+            DbInitializer.Seed(setupParams, context, serviceProvider, configuration);
+            return Ok(setupParams);
         }
     }
 }
