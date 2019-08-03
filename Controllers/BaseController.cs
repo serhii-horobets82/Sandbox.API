@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Evoflare.API.Controllers
 {
@@ -10,6 +11,7 @@ namespace Evoflare.API.Controllers
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
+
         protected virtual IActionResult InvokeHttp404()
         {
             Response.StatusCode = 404;

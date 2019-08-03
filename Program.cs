@@ -16,22 +16,40 @@ namespace Evoflare.API
     public sealed class Program
     {
         private static CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-
+        private static bool restartFlag = false;
         public static void Shutdown()
         {
             cancelTokenSource.Cancel();
         }
 
-        public static int Main(string[] args) => LogAndRun(CreateWebHostBuilder(args).Build());
+        public static void Restart()
+        {
+            Log.Information("Restarting application");
+            restartFlag = true;
+            cancelTokenSource.Cancel();
+        }
 
-        public static int LogAndRun(IWebHost webHost)
+        public static int Main(string[] args) => LogAndRun(args, CreateWebHostBuilder(args).Build());
+
+        public static int LogAndRun(string[] args, IWebHost webHost)
         {
             Log.Logger = BuildLogger(webHost);
 
             try
             {
                 Log.Information("Starting application");
-                webHost.RunAsync(cancelTokenSource.Token).GetAwaiter().GetResult();
+
+
+            ApplicationStart:
+                webHost.RunAsync(cancelTokenSource.Token). GetAwaiter().GetResult();
+
+                if(restartFlag) {
+                    Log.Information("Restart application");
+                    cancelTokenSource = new CancellationTokenSource();
+                    webHost = CreateWebHostBuilder(args).Build();
+                    restartFlag = false;
+                    goto ApplicationStart;
+                }
                 Log.Information("Stopped application");
                 return 0;
             }

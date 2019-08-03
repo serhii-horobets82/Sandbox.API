@@ -30,6 +30,7 @@ namespace Evoflare.API.Controllers
         [HttpGet("demousers")]
         public IActionResult GetDemoUser()
         {
+            appContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             var employees = appContext.Employee.Include(c => c.Users).ToArray();
             var result = employees.Select(e => new { Title = e.NameTemp, UserName = e.Users.Email });
             return new OkObjectResult(result);

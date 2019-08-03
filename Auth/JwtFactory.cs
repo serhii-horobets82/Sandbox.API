@@ -41,7 +41,7 @@ namespace Evoflare.API.Auth
 
             foreach (var userRole in userRoles)
             {
-                claims.Add(new Claim(Constants.JwtClaimIdentifiers.Roles, userRole));
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, userRole));
                 var role = await roleManager.FindByNameAsync(userRole);
                 if (role != null)
                 {
