@@ -314,6 +314,7 @@ namespace Evoflare.API.Data
                 return;
             }
 
+            Seed_360EvaluationForAnalytics(applicationContext);
             if (recreateDatabase)
                 RecreateDatabase(applicationContext, retryTimeout);
             else
@@ -415,8 +416,10 @@ namespace Evoflare.API.Data
 
             SeedEcfCompetence(applicationContext);
             SeedEcfCompetenceLevel(applicationContext);
-            SeedEcfEmployeeEvaluation(applicationContext);
-            SeedEcfEvaluationResult(applicationContext);
+            // disable for now to make 360 work.
+            // TODO: This should be unlinked from 360 evaluation process. The initial implementation is incorrect.
+            //SeedEcfEmployeeEvaluation(applicationContext);
+            //SeedEcfEvaluationResult(applicationContext);
             SeedEcfRole(applicationContext);
             SeedEcfRoleCompetence(applicationContext);
 
