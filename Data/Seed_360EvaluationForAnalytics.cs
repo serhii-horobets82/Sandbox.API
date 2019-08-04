@@ -11,7 +11,13 @@ namespace Evoflare.API.Data
 {
     public class SeedTestData
     {
-    
+        public static void RemoveExisting360EvaluationData(EvoflareDbContext context)
+        {
+            context.Database.ExecuteSqlCommand(@"delete from [360Evaluation]");
+            context.Database.ExecuteSqlCommand(@"delete from [360EmployeeEvaluation]");
+            context.Database.ExecuteSqlCommand(@"delete from [EmployeeEvaluation]");
+        }
+
 		public static bool Seed_360EvaluationForAnalytics(EvoflareDbContext context)
         {
             var hrId = 27;

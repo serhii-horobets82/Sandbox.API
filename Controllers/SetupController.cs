@@ -46,5 +46,14 @@ namespace Evoflare.API.Controllers
             DbInitializer.Seed(setupParams, context, serviceProvider, configuration);
             return Ok(setupParams);
         }
+
+        [HttpPost("seed-360-feedback")]
+        [Authorize(Policy = PolicyTypes.AdminPolicy.Crud)]
+        public IActionResult Seed360FeedbackData()
+        {
+            SeedTestData.RemoveExisting360EvaluationData(context);
+            SeedTestData.Seed_360EvaluationForAnalytics(context);
+            return Ok();
+        }
     }
 }
