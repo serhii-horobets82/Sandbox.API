@@ -179,6 +179,112 @@ namespace Evoflare.API.Controllers
             return employees;
         }
 
+
+        // GET: api/_360evaluation/profile
+        [HttpGet("profile")]
+        public async Task<ActionResult<dynamic>> Get_360evaluationForProfile()
+        {
+            var id = GetEmployeeId();
+            var allEvaluations = await _context.EmployeeEvaluation
+                .OrderByDescending(e => e.StartDate)
+                .ToListAsync();
+            var allTheData = await _context._360employeeEvaluation
+                .Select(e => new
+                {
+                    e.EvaluationId,
+                    e.EvaluatorEmployeeId,
+                    EvaluationResults = e._360evaluation.Select(ev => new
+                    {
+                        ev.QuestionId,
+                        ev.FeedbackMarkId
+                    }).ToList()
+                }).ToListAsync();
+            var myMeanByQuestion = allTheData
+                .Where(d => d.EvaluatorEmployeeId == id)
+                .SelectMany(d => d.EvaluationResults)
+                .GroupBy(r => r.QuestionId, r => r.FeedbackMarkId)
+                .ToDictionary(r => r.Key, r => r.Average());// (r.Sum() * 1.0) / r.Count());
+            var companyMeanByQuestion = allTheData
+                .SelectMany(d => d.EvaluationResults)
+                .GroupBy(r => r.QuestionId, r => r.FeedbackMarkId)
+                .ToDictionary(r => r.Key, r => r.Average());// (r.Sum() * 1.0) / r.Count());
+
+            var questions = await _context._360questionarie
+                .Where(q => q._360feedbackGroupId == 2) // for peers
+                .OrderBy(q => q.Id)
+                .ToListAsync();
+                //.ToDictionaryAsync(q => q.Id, q => q.Text);
+            var barData = new
+            {
+                My = questions
+                    .Select(q => 
+                        new { Question = q.Text, Value = Math.Round(myMeanByQuestion[q.Id], 1) })
+                    .ToList(),
+                Company = questions
+                    .Select(q => 
+                        new { Question = q.Text, Value = Math.Round(companyMeanByQuestion[q.Id], 1) })
+                    .ToList(),
+            };
+            var quarter = new Dictionary<int, string>
+            {
+                { 1, "I" },
+                { 2, "II" },
+                { 3, "III" },
+                { 4, "IV" },
+            };
+            var lineDataCategories = allEvaluations
+                .Where(e => e.EmployeeId == id)
+                .Take(4)
+                .OrderBy(e => e.StartDate)
+                .Select(e => $"{quarter[(int)Math.Ceiling((e.StartDate.Month + 1) / 3.0)]} {e.StartDate.Year}")
+                .ToList();
+
+            var myEvaluation = allEvaluations
+                .Where(e => e.EmployeeId == id)
+                .Take(4)
+                .OrderBy(e => e.StartDate)
+                .SelectMany(e => allTheData
+                    .Where(d => d.EvaluationId == e.Id)
+                    .SelectMany(d => d.EvaluationResults)
+                    .Select(f => new
+                    {
+                        Question = f.QuestionId,
+                        Value = f.FeedbackMarkId,
+                        Evaluation = e
+                    })
+                )
+                .GroupBy(e => e.Question)
+                .Select(e => new
+                {
+                    Question = questions.First(q => q.Id == e.Key).Text,
+                    Values = e
+                        .GroupBy(q => q.Evaluation.StartDate, q => q.Value)
+                        .Select(q => new { Date = q.Key, Value = Math.Round(q.Average(), 1) })
+                        .OrderBy(q => q.Date)
+                        .Select(q => q.Value)
+                        .ToList()
+                });
+
+            var lineData = new
+            {
+                Categories = lineDataCategories,
+                Data = myEvaluation
+            };
+            // Evaluation (date)
+            //      question
+            //      mark
+            // ===>
+            // Question
+            //      evaluation
+            //      Average(mark)
+
+            return new
+            {
+                BarData = barData,
+                LineData = lineData
+            };
+        }
+
         private bool _360evaluationExists(int id)
         {
             return _context._360evaluation.Any(e => e.Id == id);
