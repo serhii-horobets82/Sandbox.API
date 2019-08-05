@@ -21,6 +21,8 @@ namespace Evoflare.API.Models
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime CreatedDate { get; set; }
         public int OrganizationId { get; set; }
 
         [InverseProperty("Project")]
