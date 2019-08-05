@@ -44,6 +44,19 @@ namespace Evoflare.API.Data
 				new EmployeeRelations {Id = 19, EmployeeId = 13, ManagerId = null, TeamId = 8, ProjectId = 1, PositionId = null, OrganizationId = 1, Archived = false },
 				new EmployeeRelations {Id = 20, EmployeeId = 17, ManagerId = null, TeamId = 8, ProjectId = 1, PositionId = 3, OrganizationId = 1, Archived = false },
 				new EmployeeRelations {Id = 21, EmployeeId = 21, ManagerId = null, TeamId = 8, ProjectId = 1, PositionId = 2, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 22, EmployeeId = null, ManagerId = 1, TeamId = null, ProjectId = 1, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 23, EmployeeId = null, ManagerId = 10, TeamId = null, ProjectId = 2, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 25, EmployeeId = null, ManagerId = 2, TeamId = null, ProjectId = 3, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 26, EmployeeId = null, ManagerId = 1, TeamId = null, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 27, EmployeeId = null, ManagerId = 10, TeamId = null, ProjectId = 5, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 28, EmployeeId = null, ManagerId = 1, TeamId = null, ProjectId = 6, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 29, EmployeeId = null, ManagerId = 10, TeamId = null, ProjectId = 8, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 31, EmployeeId = 3, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 32, EmployeeId = 4, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 33, EmployeeId = 6, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 34, EmployeeId = 7, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 35, EmployeeId = 16, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 36, EmployeeId = 17, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
 
             };
             context.EmployeeRelations.AddRange(items);

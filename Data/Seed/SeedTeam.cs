@@ -31,6 +31,7 @@ namespace Evoflare.API.Data
 				new Team {Id = 6, Name = @"Another cool team", ProjectId = 1, OrganizationId = 1 },
 				new Team {Id = 7, Name = @"Another cool team 2", ProjectId = 1, OrganizationId = 1 },
 				new Team {Id = 8, Name = @"Mainenance team", ProjectId = 1, OrganizationId = 1 },
+				new Team {Id = 10, Name = @"Team 1", ProjectId = 4, OrganizationId = 1 },
 
             };
             context.Team.AddRange(items);
