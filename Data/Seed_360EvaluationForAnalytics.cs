@@ -37,6 +37,85 @@ namespace Evoflare.API.Data
             var _360employeeEvaluations = new List<_360employeeEvaluation>();
             var amountAll = 0;
             var amountSkipped = 0;
+
+            //var chanceToEvaluatePeerPercent = 80;
+            //var markChanceDistribution = new Dictionary<int, int>
+            //        {
+            //            { 1, 2 },
+            //            { 2, 5 },
+            //            { 3, 25 },
+            //            { 4, 45 },
+            //            { 5, 23 },
+            //        };
+            var kind = new
+            {
+                EvaluationChance = 75,
+                FeedbackMarkChances = new Dictionary<int, int>
+                        {
+                            { 1, 0 },
+                            { 2, 0 },
+                            { 3, 20 },
+                            { 4, 50 },
+                            { 5, 30 },
+                        },
+                MarkDistribution = new int[] { 0, 0, 0, 0, 0, 0 }
+            };
+            var righteous = new
+            {
+                EvaluationChance = 75,
+                FeedbackMarkChances = new Dictionary<int, int>
+                        {
+                            { 1, 25 },
+                            { 2, 45 },
+                            { 3, 30 },
+                            { 4, 0 },
+                            { 5, 0 },
+                        },
+                MarkDistribution = new int[] { 0, 0, 0, 0, 0, 0 }
+            };
+            var hardworker = new
+            {
+                EvaluationChance = 95,
+                FeedbackMarkChances = new Dictionary<int, int>
+                        {
+                            { 1, 0 },
+                            { 2, 0 },
+                            { 3, 100 },
+                            { 4, 0 },
+                            { 5, 0 },
+                        },
+                MarkDistribution = new int[] { 0, 0, 0, 0, 0, 0 }
+            };
+            var kindIds = new List<int>
+                    {
+                        3,  // Karl QA
+                        4,  // Marta AutoQA
+                        6,  // Linus Developer
+                        7,  // Mark Developer
+                    };
+            var righteousIds = new List<int>
+                    {
+                        12, // Tapak QA
+                        13, // Mikki QA
+                        18, // Mila Developer
+                    };
+            var hardworkerIds = new List<int>
+                    {
+                        15,  // Billy AutoQA
+                        16,  // Todd Developer
+                        17,  // Riana Developer
+                        21,  // Alex Took
+                    };
+            var inverseMarkChanceDistribution = new int[] { 0, 0, 0, 0, 0, 0 }; // length 6
+            foreach (var i in Enumerable.Range(1, 5))
+            {
+                //inverseMarkChanceDistribution[i] =
+                //    markChanceDistribution.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
+                kind.MarkDistribution[i] = kind.FeedbackMarkChances.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
+                righteous.MarkDistribution[i] = righteous.FeedbackMarkChances.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
+                hardworker.MarkDistribution[i] = hardworker.FeedbackMarkChances.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
+            }
+
             // 360 evaluation routine is starting each quarter 1st day of month
             var periodMonths = 3;
             var startDate = new DateTime(2017, 1, 1);
@@ -67,27 +146,24 @@ namespace Evoflare.API.Data
                     // TODO: debugging
                     evaluations.Add(evaluation);
 
-                    var chanceToEvaluatePeerPercent = 80;
-                    var markChanceDistribution = new Dictionary<int, int>
+                    var config =
+                        kindIds.Contains(employee.Id)
+                            ? kind
+                            : righteousIds.Contains(employee.Id)
+                                ? righteous
+                                : hardworkerIds.Contains(employee.Id)
+                                    ? hardworker
+                                    : null;
+                    if (config == null)
                     {
-                        { 1, 5 },
-                        { 2, 10 },
-                        { 3, 30 },
-                        { 4, 40 },
-                        { 5, 15 },
-                    };
-                    var inverseMarkChanceDistribution = new int[] { 0, 0, 0, 0, 0, 0 }; // length 6
-                    foreach(var i in Enumerable.Range(1, 5))
-                    {
-                        inverseMarkChanceDistribution[i] =
-                            markChanceDistribution.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
+                        continue;
                     }
                     // get all the peers to current employee
                     // let the employee to create feedback for everyone (or mostly everyone)
                     foreach (var peer in relations[employee])
                     {
                         amountAll++;
-                        if (random.Next(100) < chanceToEvaluatePeerPercent)
+                        if (random.Next(100) < config.EvaluationChance)
                         {
 
                             var _360EmployeeEvaluation = new _360employeeEvaluation
@@ -111,7 +187,7 @@ namespace Evoflare.API.Data
                             _360employeeEvaluations.Add(_360EmployeeEvaluation);
                             var feedbacks = peersQuestions.Select(q =>
                             {
-                                var mark = GetMarkUsingDistribution(inverseMarkChanceDistribution, random);
+                                var mark = GetMarkUsingDistribution(config.MarkDistribution, random);
                                 return new _360evaluation
                                 {
                                     Evaluation = _360EmployeeEvaluation,

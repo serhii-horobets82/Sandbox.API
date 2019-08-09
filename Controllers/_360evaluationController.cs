@@ -185,6 +185,9 @@ namespace Evoflare.API.Controllers
         public async Task<ActionResult<dynamic>> Get_360evaluationForProfile()
         {
             var id = GetEmployeeId();
+            var employee = await _context.Employee.FirstOrDefaultAsync(e => e.Id == id);
+            if (employee.IsManager) return Ok(new { });
+
             var allEvaluations = await _context.EmployeeEvaluation
                 .OrderByDescending(e => e.StartDate)
                 .ToListAsync();
@@ -424,7 +427,20 @@ namespace Evoflare.API.Controllers
         //    }
         //    return checklist.All(c => c);
         //}
-
+        private dynamic GetStatistics(
+            ICollection<_360employeeEvaluation> employeeEvaluations,
+            ICollection<_360employeeEvaluation> allEmployeeEvaluations)
+        {
+            var feedbacks = employeeEvaluations.Count;
+            var averageCount = allEmployeeEvaluations
+                .GroupBy(e => e.EvaluatorEmployeeId)
+                .Select(e => e.Count()).Average();
+            var feedbackMarks  = employeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).OrderBy(x => x).ToList();
+            var averageFeedback = feedbackMarks.Average();
+            var allFeedbacksAverage = allEmployeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).Average();
+            var variance = Math.Abs(Variance(feedbackMarks));
+            return feedbackMarks;
+        }
         private bool ValidateForKind(
             ICollection<_360employeeEvaluation> employeeEvaluations, 
             ICollection<_360employeeEvaluation> allEmployeeEvaluations)
@@ -555,7 +571,7 @@ namespace Evoflare.API.Controllers
                 .ToListAsync();
 
             var rep = new Dictionary<DateTime, Dictionary<int, List<bool>>>();
-            var ids = new HashSet<int>() { 7, 12, 13, 16, 17, 18, 21 };
+            var ids = new HashSet<int>() { 3, 4, 6, 7, 12, 13, 15, 16, 17, 18, 21 };
             foreach (var p in lastEvaluations.ToLookup(e => e.StartDate))
             {
                 var dict = new Dictionary<int, List<bool>>();
@@ -574,6 +590,7 @@ namespace Evoflare.API.Controllers
                     if (evaluations.Any())
                     {
                         var c = evaluations.Count;
+                        var stat = GetStatistics(evaluations, allEvaluations);
                         var isGood = ValidateForKind(evaluations, allEvaluations);
                         var isBad = ValidateForRighteous(evaluations, allEvaluations);
                         var isUgly = ValidateForHardworker(evaluations, allEvaluations);
