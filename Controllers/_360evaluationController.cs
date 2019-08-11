@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Evoflare.API.Models;
+using Evoflare.API.Helpers;
 
 namespace Evoflare.API.Controllers
 {
@@ -146,37 +147,72 @@ namespace Evoflare.API.Controllers
             return _360evaluation;
         }
 
+        // GET: api/_360evaluation/periods
+        [HttpGet("periods")]
+        public async Task<IEnumerable<dynamic>> GetEvaluationPeriods()
+        {
+            var periods = await _context.EmployeeEvaluation
+                .Select(e => e.StartDate)
+                .Distinct()
+                .OrderByDescending(d => d)
+                .ToListAsync();
+            return periods
+                .Select(d => new
+                {
+                    Text = DateTimeUtils.ToQuarterYearString(d) + 
+                        (d < DateTime.UtcNow.AddMonths(-1) ? " (Closed)" : ""),
+                    Value = DateTimeUtils.GetQuarterStartDate(d),
+                    IsClosed = d < DateTime.UtcNow.AddMonths(-1)
+                });
+        }
+
         // GET: api/_360evaluation/by-project/5
         [HttpGet("by-project/{id}")]
-        public async Task<ActionResult<List<EmployeeRelations>>> Get_360evaluationByProject(int id)
+        public async Task<ActionResult<Dictionary<int, List<dynamic>>>> Get_360evaluationByProject(int id, [FromQuery] DateTime periodStart)
         {
-            var employees = await _context.EmployeeRelations
+            var employeeId = GetEmployeeId();
+            if (!await _context.EmployeeRelations.AnyAsync(r => r.ProjectId == id && r.ManagerId == employeeId))
+            {
+                return NotFound();
+            }
+
+            var employeeRelations = await _context.EmployeeRelations
                 .Where(r => r.ProjectId == id)
                 .Include(r => r.Team)
                 .Include(r => r.Employee)
-                .Include(r => r.Employee)
-                    .ThenInclude(e => e.EmployeeEvaluationEmployee)
-                        .ThenInclude(e => e._360employeeEvaluation)
-                .Include(r => r.Manager)
-                .Include(r => r.Manager)
-                    .ThenInclude(e => e.EmployeeEvaluationEmployee)
-                        .ThenInclude(e => e._360employeeEvaluation)
                 .ToListAsync();
-            foreach (var item in employees)
+            var periodEnd = periodStart.AddMonths(3);
+            var evaluations = await _context.EmployeeEvaluation
+                .Where(e => e.StartDate >= periodStart && e.StartDate < periodEnd)
+                .Include(e => e._360employeeEvaluation)
+                .ToListAsync();
+
+            var evaluationsByWhomEvaluating = evaluations.ToLookup(e => e.EmployeeId, e => e._360employeeEvaluation);
+            var employeeRelationsByTeam = employeeRelations
+                .Where(e => e.TeamId.HasValue && e.EmployeeId.HasValue)
+                .ToLookup(e => e.TeamId);
+
+            var results = new Dictionary<int, List<dynamic>>();
+            foreach(var kv in employeeRelationsByTeam)
             {
-                item.Team.EmployeeRelations = null;
-                //if (item.Employee != null)
-                //{
-                //item.Employee.EcfEmployeeEvaluationEndBy = null;
-                //    item.Employee.EcfEmployeeEvaluationStartBy = null;
-                //    item.Employee.EcfEmployeeEvaluationEvaluator = null;
-                //    item.Employee.EmployeeEvaluationEndedBy = null;
-                //    item.Employee.EmployeeEvaluationStartedBy = null;
-                //    item.Employee.EmployeeRelationsEmployee = null;
-                //    item.Employee.EmployeeRelationsManager = null;
-                //}
+                var teamId = kv.Key.Value;
+                var relationIds = employeeRelationsByTeam[teamId].Select(r => r.EmployeeId.Value).ToHashSet();
+                var rows = new List<dynamic>();
+                foreach (var rel in relationIds)
+                {
+                    var ev = evaluationsByWhomEvaluating[rel].SelectMany(r => r.Select(x => x)).Select(t => t.EvaluatorEmployeeId).ToList();
+
+                    var data = new
+                    {
+                        EmployeeId = rel,
+                        EvaluatedIds = relationIds.Intersect(ev).Where(i => i != rel),
+                        NotEvaluatedIds = relationIds.Except(ev).Where(i => i != rel)
+                    };
+                    rows.Add(data);
+                }
+                results.Add(teamId, rows);
             }
-            return employees;
+            return results;
         }
 
 
@@ -228,18 +264,12 @@ namespace Evoflare.API.Controllers
                         new { Question = q.Text, Value = Math.Round(companyMeanByQuestion[q.Id], 1) })
                     .ToList(),
             };
-            var quarter = new Dictionary<int, string>
-            {
-                { 1, "I" },
-                { 2, "II" },
-                { 3, "III" },
-                { 4, "IV" },
-            };
+
             var lineDataCategories = allEvaluations
                 .Where(e => e.EmployeeId == id)
                 .Take(4)
                 .OrderBy(e => e.StartDate)
-                .Select(e => $"{quarter[(int)Math.Ceiling((e.StartDate.Month + 1) / 3.0)]} {e.StartDate.Year}")
+                .Select(e => DateTimeUtils.ToQuarterYearString(e.StartDate))
                 .ToList();
 
             var myEvaluation = allEvaluations
@@ -581,7 +611,7 @@ namespace Evoflare.API.Controllers
                 var allEvaluations = period
                     .SelectMany(c => c._360employeeEvaluation)
                     .ToList();
-                foreach (var employee in employees.Where(e => ids.Contains(e.Id)))
+                foreach (var employee in employees)//.Where(e => ids.Contains(e.Id)))
                 {
                     var evaluations = period
                         .SelectMany(c => c._360employeeEvaluation)

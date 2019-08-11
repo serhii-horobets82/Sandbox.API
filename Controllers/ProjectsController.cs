@@ -46,6 +46,36 @@ namespace Evoflare.API.Controllers
             });
         }
 
+        // GET: api/Projects/my-basic
+        [HttpGet("my-basic")] // manager
+        public async Task<IEnumerable<dynamic>> GetProjectsMyBasic()
+        {
+            var projects = await _context.Project
+                .Include(p => p.Team)
+                .Include(p => p.EmployeeRelations)
+                    .ThenInclude(r => r.Manager)
+                .ToListAsync();
+            var rel = await _context.EmployeeRelations
+                .Where(r => r.ManagerId.HasValue && !r.TeamId.HasValue && r.ProjectId.HasValue)
+                .Include(r => r.Manager)
+                .ToDictionaryAsync(r => r.ProjectId.Value, r => r.Manager);
+            var employeeId = GetEmployeeId();
+            return projects
+                .Where(p => p.EmployeeRelations.Any(r => r.ManagerId == employeeId))
+                .Select(p =>
+                {
+                    var hasManager = rel.TryGetValue(p.Id, out var manager);
+                    return new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.CreatedDate,
+                        ManagerId = hasManager ? manager.Id : 0,
+                        ManagerFullName = hasManager ? manager.Name + " " + manager.Surname : string.Empty,
+                        Teams = p.Team.Select(t => new Team { Id = t.Id, Name = t.Name })
+                    };
+                });
+        }
 
         // GET: api/Projects
         [HttpGet] // manager

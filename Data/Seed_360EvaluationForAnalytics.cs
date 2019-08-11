@@ -54,9 +54,9 @@ namespace Evoflare.API.Data
                         {
                             { 1, 0 },
                             { 2, 0 },
-                            { 3, 20 },
-                            { 4, 50 },
-                            { 5, 30 },
+                            { 3, 10 },
+                            { 4, 65 },
+                            { 5, 25 },
                         },
                 MarkDistribution = new int[] { 0, 0, 0, 0, 0, 0 }
             };
@@ -146,22 +146,22 @@ namespace Evoflare.API.Data
                     // TODO: debugging
                     evaluations.Add(evaluation);
 
-                    var config =
-                        kindIds.Contains(employee.Id)
-                            ? kind
-                            : righteousIds.Contains(employee.Id)
-                                ? righteous
-                                : hardworkerIds.Contains(employee.Id)
-                                    ? hardworker
-                                    : null;
-                    if (config == null)
-                    {
-                        continue;
-                    }
                     // get all the peers to current employee
                     // let the employee to create feedback for everyone (or mostly everyone)
                     foreach (var peer in relations[employee])
                     {
+                        var config =
+                            kindIds.Contains(peer.Id)
+                                ? kind
+                                : righteousIds.Contains(peer.Id)
+                                    ? righteous
+                                    : hardworkerIds.Contains(peer.Id)
+                                        ? hardworker
+                                        : null;
+                        if (config == null)
+                        {
+                            continue;
+                        }
                         amountAll++;
                         if (random.Next(100) < config.EvaluationChance)
                         {
@@ -169,7 +169,7 @@ namespace Evoflare.API.Data
                             var _360EmployeeEvaluation = new _360employeeEvaluation
                             {
                                 Evaluation = evaluation,
-                                EvaluatorEmployeeId = employee.Id,
+                                EvaluatorEmployeeId = peer.Id,
                                 _360feedbackGroupId = peerFeedbackGroupId,
                                 StartDoing = "",
                                 StopDoing = "",
