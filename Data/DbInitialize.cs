@@ -327,7 +327,7 @@ namespace Evoflare.API.Data
             // version of assembly, format x.y.z.w  
             var currentVersion = assemblyInfo.Version.ToString();
             // version in database table AppVersion
-            var previousVersion = string.Empty;
+            string previousVersion = null;
 
             try
             {
