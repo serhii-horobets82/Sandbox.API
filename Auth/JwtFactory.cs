@@ -28,11 +28,14 @@ namespace Evoflare.API.Auth
         public async Task<Token> GenerateAuthToken(ApplicationUser user, IList<string> userRoles, IList<Claim> userClaims)
         {
             var employee = await dbContext.Employee.Include(c => c.Users).SingleAsync(e => e.UserId == user.Id);
+            var organization = await dbContext.Organization.SingleAsync(e => e.Id == employee.OrganizationId);
             var claims = new List<Claim>(userClaims);
             // common claims 
             claims.AddRange(new[] {
                 new Claim(Constants.JwtClaimIdentifiers.Id, user.Id),
                 new Claim(Constants.JwtClaimIdentifiers.EmployeeId, employee.Id.ToString()),
+                new Claim(Constants.JwtClaimIdentifiers.OrganizationId, organization.Id.ToString()),
+                new Claim(Constants.JwtClaimIdentifiers.OrganizationName, organization.Name),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(Constants.JwtClaimIdentifiers.Rol, Constants.JwtClaims.ApiAccess),
                 new Claim(JwtRegisteredClaimNames.Jti, await jwtOptions.JtiGenerator()),

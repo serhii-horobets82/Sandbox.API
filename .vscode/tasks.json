@@ -214,21 +214,6 @@
       "problemMatcher": []
     },
     {
-      "label": "heroku(API): Build and push",
-      "type": "process",
-      "command": "push-to-heroku.cmd",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "options": {
-        "cwd": "${workspaceRoot}"
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "docker(API): Build and run container",
       "type": "process",
       "command": "start-docker-api.cmd",
@@ -292,10 +277,25 @@
       "group": "build",
       "dependsOrder": "sequence",
       "dependsOn": [
+        "child-task: Build image",
         "child-task: Push to heroku",
         "child-task: Release to heroku",
         "heroku(API): Logs",
       ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "child-task: Build image",
+      "type": "shell",
+      "command": "docker build --pull -t evoflare-api -f Dockerfile ..\\",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
       "presentation": {
         "reveal": "always",
         "panel": "shared",

@@ -32,6 +32,8 @@
     public static class JwtClaimIdentifiers
     {
         public const string EmployeeId = "empId";
+        public const string OrganizationId = "orgId";
+        public const string OrganizationName = "orgName";
         public const string Email = "email";
         public const string Rol = "rol";
         public const string Id = "id";

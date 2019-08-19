@@ -36,7 +36,7 @@ namespace Evoflare.API.Controllers
             this.emailSender = emailSender;
         }
 
-       
+
 
         [HttpPost]
         public async Task<IActionResult> ResendEmailConfirmation()
@@ -93,7 +93,13 @@ namespace Evoflare.API.Controllers
                 profile.Location,
                 profile.Locale,
                 roles,
-                employeeId = GetEmployeeId()
+                employeeId = GetEmployeeId(),
+                organizationId = GetOrganizationId(),
+                organizationName = GetOrganizationName(),
+                isSysAdmin = User.IsSysAdmin(),
+                isAdmin = User.IsAdmin(),
+                isManager = User.IsManager(),
+                isHR = User.IsHr()
             });
         }
     }

@@ -211,7 +211,7 @@ namespace Evoflare.API.Data
             if (user == null)
             {
                 var trans = dbContext.Database.BeginTransaction();
-                if (empl.Id != 0)
+                if (empl.Id != 0 &&  dbContext.Database.IsSqlServer())
                     dbContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] ON");
                 try
                 {

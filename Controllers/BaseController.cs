@@ -1,9 +1,6 @@
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Evoflare.API.Controllers
 {
@@ -20,8 +17,15 @@ namespace Evoflare.API.Controllers
 
         protected virtual int GetEmployeeId()
         {
-            var employeeId = User.Claims.First(x => x.Type == Constants.JwtClaimIdentifiers.EmployeeId);
-            return Convert.ToInt32(employeeId.Value);
+            return User.GetEmployeeId();
+        }
+        protected virtual int GetOrganizationId()
+        {
+            return User.GetOrganizationId();
+        }
+        protected virtual string GetOrganizationName()
+        {
+            return User.GetOrganizationName();
         }
     }
 }

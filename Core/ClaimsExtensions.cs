@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -7,22 +8,55 @@ namespace Evoflare.API
 {
     public static class ClaimsExtensions
     {
-        public static string GetUserId(
-            this ClaimsPrincipal claimsPrincipal)
+        public static string GetUserId(this ClaimsPrincipal claimsPrincipal)
         {
             return claimsPrincipal.Claims.Where(c => c.Type == JwtClaimIdentifiers.Id).Select(c => c.Value).FirstOrDefault();
         }
 
-        public static string GetEmployeeId(
-            this ClaimsPrincipal claimsPrincipal)
+        public static int GetEmployeeId(this ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.Claims.Where(c => c.Type == JwtClaimIdentifiers.EmployeeId).Select(c => c.Value).FirstOrDefault();
+            var employeeId = claimsPrincipal.Claims.First(x => x.Type == Constants.JwtClaimIdentifiers.EmployeeId);
+            return Convert.ToInt32(employeeId.Value);
         }
 
-        public static string GetUserEmail(
-            this ClaimsPrincipal claimsPrincipal)
+        public static int GetOrganizationId(this ClaimsPrincipal claimsPrincipal)
+        {
+            var organizationId = claimsPrincipal.Claims.First(x => x.Type == Constants.JwtClaimIdentifiers.OrganizationId);
+            return Convert.ToInt32(organizationId.Value);
+        }
+
+        public static string GetOrganizationName(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal.Claims.Where(c => c.Type == JwtClaimIdentifiers.OrganizationName).Select(c => c.Value).FirstOrDefault();
+        }
+
+        public static string GetUserEmail(this ClaimsPrincipal claimsPrincipal)
         {
             return claimsPrincipal.Claims.Where(c => c.Type == ClaimTypes.Email).Select(c => c.Value).FirstOrDefault();
+        }
+
+        public static bool IsSysAdmin(this ClaimsPrincipal claimsPrincipal)
+        {
+            var roles = claimsPrincipal.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType);
+            return roles.All(rm => rm.Value == Roles.SysAdmin);
+        }
+
+        public static bool IsAdmin(this ClaimsPrincipal claimsPrincipal)
+        {
+            var roles = claimsPrincipal.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType);
+            return roles.All(rm => rm.Value == Roles.Admin);
+        }
+
+        public static bool IsManager(this ClaimsPrincipal claimsPrincipal)
+        {
+            var roles = claimsPrincipal.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType);
+            return roles.All(rm => rm.Value == Roles.Manager);
+        }
+
+        public static bool IsHr(this ClaimsPrincipal claimsPrincipal)
+        {
+            var roles = claimsPrincipal.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType);
+            return roles.All(rm => rm.Value == Roles.HR);
         }
 
         public static void AddPermission(this ClaimsIdentity claimsIdentity, PermissionClaimValue claimValue) =>
