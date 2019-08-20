@@ -17,6 +17,7 @@ namespace Evoflare.API
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using Evoflare.API.Hubs;
+    using Evoflare.API.Data;
 
     /// <summary>
     /// The main start-up class for the application.
@@ -65,6 +66,10 @@ namespace Evoflare.API
                 // Add useful interface for accessing the ActionContext outside a controller.
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
                 .AddScoped<IActivityLogService, ActivityLogService>()
+                .AddSingleton<IConnectionStringBuilder, ConnectionStringBuilder>()
+                .AddSingleton<IDbContextFactory, DbContextFactory>()
+                .AddSingleton<INotificationSender, NotificationSender>()
+                .AddSingleton<INotificationLogic, NotificationLogic>()
                 // Add useful interface for accessing the IUrlHelper outside a controller.
                 .AddScoped(x => x
                     .GetRequiredService<IUrlHelperFactory>()
