@@ -24,12 +24,12 @@ namespace Evoflare.API.Controllers
             _hubContext = hubContext;
         }
 
-        // GET: api/Notifications/types
-        [HttpGet("types")]
-        public async Task<ActionResult<IEnumerable<NotificationType>>> GetNotificationTypes()
-        {
-            return await _context.NotificationType.ToListAsync();
-        }
+        //// GET: api/Notifications/types
+        //[HttpGet("types")]
+        //public async Task<ActionResult<IEnumerable<NotificationType>>> GetNotificationTypes()
+        //{
+        //    return await _context.NotificationType.ToListAsync();
+        //}
 
         // GET: api/Notifications
         [HttpGet]
@@ -92,18 +92,19 @@ namespace Evoflare.API.Controllers
                 public string Project { get; set; }
             }
         }
-        // POST: api/Notifications/send
-        [HttpPost("send")]
-        public async Task<IActionResult> SendNotification(M notification)
-        {
-            var type = await _context.NotificationType.FirstOrDefaultAsync(x => x.Id == notification.NotificationTypeId);
+        // TODO: remove this method from front-end
+        //// POST: api/Notifications/send
+        //[HttpPost("send")]
+        //public async Task<IActionResult> SendNotification(M notification)
+        //{
+        //    var type = await _context.NotificationType.FirstOrDefaultAsync(x => x.Id == notification.NotificationTypeId);
 
-            await _hubContext
-              .Clients
-              .All
-              .SendTestNotification(new { Template = type.Template, Data = notification.Data, Type = notification.NotificationTypeId });
-            return new JsonResult(new { r = 2 });
-        }
+        //    await _hubContext
+        //      .Clients
+        //      .All
+        //      .SendTestNotification(new { Template = type.Template, Data = notification.Data, Type = notification.NotificationTypeId });
+        //    return new JsonResult(new { r = 2 });
+        //}
 
         // POST: api/Notifications
         //[HttpPost]

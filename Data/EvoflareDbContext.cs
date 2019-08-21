@@ -37,7 +37,6 @@ namespace Evoflare.API.Models
         public virtual DbSet<IdeaTagRef> IdeaTagRef { get; set; }
         public virtual DbSet<IdeaView> IdeaView { get; set; }
         public virtual DbSet<Notification> Notification { get; set; }
-        public virtual DbSet<NotificationType> NotificationType { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
         public virtual DbSet<OrganizationStructureType> OrganizationStructureType { get; set; }
         public virtual DbSet<Pdp> Pdp { get; set; }
@@ -64,8 +63,7 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-
-                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB01;User Id=sa;Password=DatgE66VbHy7");
+                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB02;User ID=sa;Password=DatgE66VbHy7");
             }
         }
 
@@ -899,8 +897,6 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Question_360FeedbackGroup");
             });
- base.OnModelCreating(modelBuilder);
-       }
+        }
     }
 }
-

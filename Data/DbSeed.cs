@@ -134,8 +134,8 @@ namespace Evoflare.API.Data
 
                 SeedOrganizationStructureType(applicationContext);
 
-                SeedNotificationType(applicationContext);
-                SeedNotification(applicationContext);
+                //SeedNotificationType(applicationContext);
+                //SeedNotification(applicationContext);
             }
             else
             {

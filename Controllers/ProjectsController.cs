@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Evoflare.API.Models;
+using Evoflare.API.Services;
 
 namespace Evoflare.API.Controllers
 {
@@ -14,10 +15,12 @@ namespace Evoflare.API.Controllers
     public class ProjectsController : BaseController
     {
         private readonly EvoflareDbContext _context;
+        private readonly INotificationLogic notificationLogic;
 
-        public ProjectsController(EvoflareDbContext context)
+        public ProjectsController(EvoflareDbContext context, INotificationLogic notificationLogic)
         {
             _context = context;
+            this.notificationLogic = notificationLogic;
         }
 
         // GET: api/Projects/basic
@@ -261,6 +264,8 @@ namespace Evoflare.API.Controllers
             };
             _context.EmployeeRelations.Add(d);
             await _context.SaveChangesAsync();
+
+            await notificationLogic.ManagerAssignedToProject(relation.ManagerId.Value, id);
 
             return Ok(new { id = d.Id });
         }

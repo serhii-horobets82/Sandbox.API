@@ -8,9 +8,9 @@ namespace Evoflare.API.Models
     public partial class Notification
     {
         public int Id { get; set; }
-        public int Type { get; set; }
         public int EmployeeId { get; set; }
-        public string Data { get; set; }
+        [Required]
+        public string Message { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedDate { get; set; }
         public int CreatedBy { get; set; }

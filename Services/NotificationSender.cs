@@ -53,11 +53,10 @@ namespace Evoflare.API.Services
 
         private async Task<ICollection<Notification>> SaveToDb(ICollection<int> ids, int initiatorId, string message)
         {
-            // TODO: set message
             var notifications = ids.Select(id =>
                 new Notification
                 {
-                    Data = message,
+                    Message = message,
                     CreatedBy = initiatorId,
                     CreatedDate = DateTime.UtcNow,
                     EmployeeId = id,
@@ -73,9 +72,9 @@ namespace Evoflare.API.Services
             var connectionId = NotificationHub.EmployeeToConnection[notification.EmployeeId];
             var data = new NotificationData
             {
-                Message = notification.Data,
-                NotificationId = notification.Id,
-                Date = notification.CreatedDate
+                Message = notification.Message,
+                Id = notification.Id,
+                CreatedDate = notification.CreatedDate
             };
             hubContext.Clients.Client(connectionId).SendNotification(data);
         }
