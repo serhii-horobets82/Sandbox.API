@@ -13,7 +13,7 @@ namespace Evoflare.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NotificationsController : ControllerBase
+    public class NotificationsController : BaseController
     {
         private readonly EvoflareDbContext _context;
         private readonly IHubContext<NotificationHub, INotificationHub> _hubContext;
@@ -35,21 +35,25 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Notification>>> GetNotification()
         {
-            return await _context.Notification.ToListAsync();
+            var employeeId = User.GetEmployeeId();
+            return await _context.Notification.Where(n => n.EmployeeId == employeeId).ToListAsync();
         }
 
-        // GET: api/Notifications/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Notification>> GetNotification(int id)
+        // POST: api/Notifications/1/read
+        [HttpPost("{id}/read")]
+        public async Task<IActionResult> MarkNotificationRead([FromRoute] int id)
         {
-            var notification = await _context.Notification.FindAsync(id);
-
-            if (notification == null)
+            var employeeId = User.GetEmployeeId();
+            var notification = await _context.Notification.FirstOrDefaultAsync(n => n.Id == id && n.EmployeeId == employeeId);
+            if (notification != null)
             {
-                return NotFound();
+                notification.Active = false;
+                notification.ViewDate = DateTime.UtcNow;
+                _context.Notification.Update(notification);
+                await _context.SaveChangesAsync();
             }
 
-            return notification;
+            return Ok(notification);
         }
 
         //// PUT: api/Notifications/5

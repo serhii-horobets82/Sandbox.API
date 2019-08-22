@@ -69,14 +69,16 @@ namespace Evoflare.API.Services
 
         private void SendHubNotification(Notification notification)
         {
-            var connectionId = NotificationHub.EmployeeToConnection[notification.EmployeeId];
-            var data = new NotificationData
+            if (NotificationHub.EmployeeToConnection.TryGetValue(notification.EmployeeId, out var connectionId))
             {
-                Message = notification.Message,
-                Id = notification.Id,
-                CreatedDate = notification.CreatedDate
-            };
-            hubContext.Clients.Client(connectionId).SendNotification(data);
+                var data = new NotificationData
+                {
+                    Message = notification.Message,
+                    Id = notification.Id,
+                    CreatedDate = notification.CreatedDate
+                };
+                hubContext.Clients.Client(connectionId).SendNotification(data);
+            }
         }
 
         //private void SendHubNotifications(ICollection<int> ids, int initiatorId)
