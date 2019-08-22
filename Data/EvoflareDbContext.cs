@@ -897,6 +897,8 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Question_360FeedbackGroup");
             });
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
