@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
@@ -257,7 +256,9 @@ namespace Evoflare.API
                 .ConfigureAndValidateSingleton<CacheProfileOptions>(
                     configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
                 .ConfigureAndValidateSingleton<AppSettings>(
-                    configuration.GetSection(nameof(AppSettings)));
+                    configuration.GetSection(nameof(AppSettings)))
+                .ConfigureAndValidateSingleton<ClientSetting>(
+                    configuration.GetSection(nameof(ClientSetting)));
         }
 
         /// <summary>
