@@ -10,7 +10,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Label="Package">
-    <Version>0.0.1.8</Version>
+    <Version>0.0.1.9</Version>
     <Authors>EvoFlare teams</Authors>
     <Company>EvoFlare teams</Company>
     <Product>EvoFlare</Product>
@@ -22,8 +22,8 @@ https://evoflare-secondary.z19.web.core.windows.net</Description>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Evoflare.API.Program</StartupObject>
-    <AssemblyVersion>0.0.1.8</AssemblyVersion>
-    <FileVersion>0.0.1.8</FileVersion>
+    <AssemblyVersion>0.0.1.9</AssemblyVersion>
+    <FileVersion>0.0.1.9</FileVersion>
     <PackageTags/>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

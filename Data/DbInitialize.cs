@@ -211,7 +211,7 @@ namespace Evoflare.API.Data
             if (user == null)
             {
                 var trans = dbContext.Database.BeginTransaction();
-                if (empl.Id != 0 &&  dbContext.Database.IsSqlServer())
+                if (empl.Id != 0 && dbContext.Database.IsSqlServer())
                     dbContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] ON");
                 try
                 {
@@ -249,7 +249,7 @@ namespace Evoflare.API.Data
                     });
 
                     await userManager.AddToRoleAsync(user, roleName);
-                    
+
                     dbContext.Entry(empl).Reload();
                     dbContext.Entry(user).Reload();
 
@@ -346,17 +346,27 @@ namespace Evoflare.API.Data
                 recreateDatabase = true;
             }
 
+            if (previousVersion != null)
+            {
+                // For new assembly version - recreate database    
+                if (previousVersion != currentVersion)
+                {
+                    RecreateDatabase(applicationContext, retryTimeout);
+                    recreateDatabase = true;
+                }
+                else return; // DB alredy has data    
+            }
+
             // check for roles
             if (!applicationContext.Roles.Any())
             {
                 CreateRoles(serviceProvider).Wait();
             }
 
-            if(previousVersion != null) return; // DB alredy has data
+
 
             try
             {
-
                 SeedOrganization(applicationContext);
                 SeedEmployeeType(applicationContext);
                 //SeedEmployee(applicationContext);
@@ -422,14 +432,14 @@ namespace Evoflare.API.Data
                 SeedEmployeeEvaluation(applicationContext);
                 SeedCertificationExam(applicationContext);
 
-            SeedEcfCompetence(applicationContext);
-            SeedEcfCompetenceLevel(applicationContext);
-            // disable for now to make 360 work.
-            // TODO: This should be unlinked from 360 evaluation process. The initial implementation is incorrect.
-            //SeedEcfEmployeeEvaluation(applicationContext);
-            //SeedEcfEvaluationResult(applicationContext);
-            SeedEcfRole(applicationContext);
-            SeedEcfRoleCompetence(applicationContext);
+                SeedEcfCompetence(applicationContext);
+                SeedEcfCompetenceLevel(applicationContext);
+                // disable for now to make 360 work.
+                // TODO: This should be unlinked from 360 evaluation process. The initial implementation is incorrect.
+                //SeedEcfEmployeeEvaluation(applicationContext);
+                //SeedEcfEvaluationResult(applicationContext);
+                SeedEcfRole(applicationContext);
+                SeedEcfRoleCompetence(applicationContext);
 
                 SeedProject(applicationContext);
                 SeedPosition(applicationContext);
