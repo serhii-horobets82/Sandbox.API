@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace Evoflare.API.Controllers
 {
@@ -37,18 +36,18 @@ namespace Evoflare.API.Controllers
         [Authorize(Policy = PolicyTypes.AdminPolicy.View)]
         public async Task<IActionResult> GetAsync()
         {
-            var users = await context.Users.Include(e => e.IdNavigation).Where(e => e.LockoutEnabled).Select(c => new
+            var users = await context.Employee.Include(e => e.Users).Where(e => e.Users.LockoutEnabled).Select(c => new
             {
-                id = c.Id,
-                email = c.Email,
-                firstName = c.FirstName,
-                lastName = c.LastName,
-                accessFailedCount = c.AccessFailedCount,
-                gender = (int)c.Gender,
-                age = c.Age,
-                emloyeeId = c.IdNavigation.Id,
-                emloyeeType = c.IdNavigation.EmployeeType.Type,
-                hiringDate = c.IdNavigation.HiringDate
+                id = c.Users.Id,
+                email = c.Users.Email,
+                firstName = c.Users.FirstName,
+                lastName = c.Users.LastName,
+                accessFailedCount = c.Users.AccessFailedCount,
+                gender = (int)c.Users.Gender,
+                age = c.Users.Age,
+                emloyeeId = c.Id,
+                emloyeeType = c.EmployeeType.Type,
+                hiringDate = c.HiringDate
             }).ToListAsync();
             return new OkObjectResult(users);
         }
