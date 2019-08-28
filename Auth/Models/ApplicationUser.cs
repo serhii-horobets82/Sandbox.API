@@ -27,6 +27,7 @@ namespace Evoflare.API.Auth.Models
         [Display(Name = "User gender code")]
         public Gender Gender { get; set; }
 
-        public virtual Employee IdNavigation { get; set; }
+        [InverseProperty("Users")]
+        public virtual ICollection<Employee> Employee { get; set; }
     }
 }

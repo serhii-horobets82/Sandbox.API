@@ -92,13 +92,6 @@ namespace Evoflare.API.Models
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
                 entity.ToTable(name: "Users", schema: SecuritySchemaName);
-
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.Users)
-                    .HasPrincipalKey<Employee>(p => p.UserId)
-                    .HasForeignKey<ApplicationUser>(d => d.Id)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Users_Employee");
             });
             modelBuilder.Entity<ApplicationRole>(entity =>
             {

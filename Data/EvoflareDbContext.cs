@@ -63,7 +63,8 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB02;User ID=sa;Password=DatgE66VbHy7");
+
+                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
             }
         }
 
@@ -249,9 +250,7 @@ namespace Evoflare.API.Models
 
                 entity.HasIndex(e => e.OrganizationId);
 
-                entity.HasIndex(e => e.UserId)
-                    .HasName("AK_Employee_UserId")
-                    .IsUnique();
+                entity.HasIndex(e => e.UserId);
 
                 entity.HasOne(d => d.EmployeeType)
                     .WithMany(p => p.Employee)
@@ -897,8 +896,8 @@ namespace Evoflare.API.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360Question_360FeedbackGroup");
             });
-
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
+

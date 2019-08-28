@@ -108,8 +108,7 @@
       "dependsOrder": "sequence",
       "dependsOn": [
         "child-task: Scaffold database(dbo schema)",
-        "child-task: Patch EvofalreDbContext file",
-        "child-task: Patch Employee file"
+        "child-task: Patch files"
       ],
       "problemMatcher": []
     },
@@ -138,21 +137,16 @@
       "problemMatcher": []
     },
     {
-      "label": "child-task: Patch EvofalreDbContext file",
+      "label": "child-task: Patch files",
       "type": "shell",
-      "command": "(Get-Content -path EvoflareDbContext.cs -Raw) -replace '}\\);.\n          ','});\n\r            base.OnModelCreating(modelBuilder);\n' -replace ': DbContext',': BaseDbContext' -replace '#warning.*','' -replace '#warning.*',''  | Out-File EvoflareDbContext.cs -Encoding UTF8",
-      "options": {
-        "cwd": "${workspaceRoot}/Data"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "child-task: Patch Employee file",
-      "type": "shell",
-      "command": "(Get-Content -path Employee.cs -Raw) -replace '}.\n}','public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }\n }\n}' | Out-File Employee.cs -Encoding UTF8",
-      "options": {
-        "cwd": "${workspaceRoot}/Models"
-      },
+      "command": "powershell",
+      "args": [   
+          "-ExecutionPolicy",
+          "Unrestricted",
+          "-NoProfile",
+          "-File",
+          "${cwd}/Scripts/patch.ps1"       
+      ],
       "problemMatcher": []
     },
     {
@@ -344,6 +338,7 @@
         "group": "heroku"
       },
       "problemMatcher": []
-    }
+    },
+    
   ]
 }

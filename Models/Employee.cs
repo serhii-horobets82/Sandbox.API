@@ -84,7 +84,9 @@ namespace Evoflare.API.Models
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         [InverseProperty("Evaluator")]
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
-    public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
+        [ForeignKey("UserId")]
+        [InverseProperty("Employee")]
+        public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
  }
 }
 
