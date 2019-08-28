@@ -50,11 +50,6 @@ namespace Evoflare.API.Models
         [ForeignKey("OrganizationId")]
         [InverseProperty("Employee")]
         public virtual Organization Organization { get; set; }
-        [ForeignKey("UserId")]
-        [InverseProperty("Employee")]
-        public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
-
-
         [InverseProperty("EndBy")]
         public virtual ICollection<EcfEmployeeEvaluation> EcfEmployeeEvaluationEndBy { get; set; }
         [InverseProperty("Evaluator")]
@@ -89,5 +84,9 @@ namespace Evoflare.API.Models
         public virtual ICollection<_360employeeEvaluation> _360employeeEvaluation { get; set; }
         [InverseProperty("Evaluator")]
         public virtual ICollection<_360pendingEvaluator> _360pendingEvaluator { get; set; }
-    }
+        [ForeignKey("UserId")]
+        [InverseProperty("Employee")]
+        public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
+ }
 }
+
