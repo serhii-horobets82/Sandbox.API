@@ -48,5 +48,18 @@ namespace Evoflare.API.Services
             return callbackUrl;
         }
 
+        ///
+        public string MapTypeToRole(int type)
+        {
+            var role = Constants.Roles.User;
+            switch (type)
+            {
+                case 10: role = Constants.Roles.SysAdmin; break;
+                case 11: role = Constants.Roles.Admin; break;
+                case 1: role = Constants.Roles.Manager; break;
+                case 12: role = Constants.Roles.HR; break;
+            }
+            return role;
+        }
     }
 }

@@ -21,6 +21,7 @@ using System.Security.Claims;
 using Evoflare.API.Auth;
 using System.Globalization;
 using System.Data.SqlClient;
+using Evoflare.API.Auth.Identity;
 
 namespace Evoflare.API.Data
 {
@@ -28,8 +29,7 @@ namespace Evoflare.API.Data
     {
         public static void Seed(SetupParams setupParams, EvoflareDbContext applicationContext, IServiceProvider serviceProvider, IConfiguration configuration)
         {
-            //applicationContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
+            var userManager = serviceProvider.GetRequiredService<IUserManager>();
             var appSettings = configuration.GetSection<AppSettings>();
             var dbType = appSettings.DataBaseType;
             var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
@@ -78,15 +78,8 @@ namespace Evoflare.API.Data
 
                 foreach (var employee in employees)
                 {
-                    var defRole = Constants.Roles.User;
-                    switch (employee.EmployeeTypeId)
-                    {
-                        case 10: defRole = Constants.Roles.SysAdmin; break;
-                        case 11: defRole = Constants.Roles.Admin; break;
-                        case 1: defRole = Constants.Roles.Manager; break;
-                        case 12: defRole = Constants.Roles.HR; break;
-                    }
-                    CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", defRole, employee).Wait();
+                    var userRole = userManager.MapTypeToRole(employee.EmployeeTypeId);
+                    CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee).Wait();
                 }
 
                 SeedEmployeeEvaluation(applicationContext);

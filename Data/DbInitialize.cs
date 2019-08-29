@@ -23,6 +23,7 @@ using System.Globalization;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text;
+using Evoflare.API.Auth.Identity;
 
 namespace Evoflare.API.Data
 {
@@ -202,7 +203,6 @@ namespace Evoflare.API.Data
             await userManager.AddToRoleAsync(user, roleName);
         }
 
-
         private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, string userEmail, string roleName, Employee empl)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -310,6 +310,7 @@ namespace Evoflare.API.Data
         public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false)
         {
             // main context, user\roles\auth
+            var userManager = serviceProvider.GetRequiredService<IUserManager>();
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
             var appSettings = configuration.GetSection<AppSettings>();
@@ -416,15 +417,8 @@ namespace Evoflare.API.Data
 
                     foreach (var employee in employees)
                     {
-                        var defRole = Constants.Roles.User;
-                        switch (employee.EmployeeTypeId)
-                        {
-                            case 10: defRole = Constants.Roles.SysAdmin; break;
-                            case 11: defRole = Constants.Roles.Admin; break;
-                            case 1: defRole = Constants.Roles.Manager; break;
-                            case 12: defRole = Constants.Roles.HR; break;
-                        }
-                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", defRole, employee).Wait();
+                        var userRole = userManager.MapTypeToRole(employee.EmployeeTypeId);
+                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee).Wait();
                     }
 
                     // sysdadmin
