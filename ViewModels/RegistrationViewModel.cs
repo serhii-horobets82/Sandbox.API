@@ -20,4 +20,18 @@ namespace Evoflare.API.ViewModels
         public int Age { get; set; }
         public Gender Gender { get; set; }
     }
+
+    public class ActivationViewModel
+    {
+        [Required]
+        public string Code { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Locale { get; set; }
+        public int Age { get; set; }
+        public Gender Gender { get; set; }
+    }
+
 }

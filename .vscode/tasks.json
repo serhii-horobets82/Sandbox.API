@@ -93,11 +93,7 @@
       "label": "app: Watch",
       "command": "dotnet",
       "type": "process",
-      "args": [
-        "watch",
-        "run",
-        "${workspaceFolder}/Evoflare.API.csproj"
-      ],
+      "args": ["watch", "run", "${workspaceFolder}/Evoflare.API.csproj"],
       "problemMatcher": []
     },
     {
@@ -140,12 +136,12 @@
       "label": "child-task: Patch files",
       "type": "shell",
       "command": "powershell",
-      "args": [   
-          "-ExecutionPolicy",
-          "Unrestricted",
-          "-NoProfile",
-          "-File",
-          "${cwd}/Scripts/patch.ps1"       
+      "args": [
+        "-ExecutionPolicy",
+        "Unrestricted",
+        "-NoProfile",
+        "-File",
+        "${cwd}/Scripts/patch.ps1"
       ],
       "problemMatcher": []
     },
@@ -274,7 +270,7 @@
         "child-task: Build image",
         "child-task: Push to heroku",
         "child-task: Release to heroku",
-        "heroku(API): Logs",
+        "heroku(API): Logs"
       ],
       "presentation": {
         "reveal": "always",
@@ -339,6 +335,17 @@
       },
       "problemMatcher": []
     },
-    
+    {
+      "label": "heroku(DB): DB info",
+      "type": "shell",
+      "command": "heroku pg:info -a evoflare-api",
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(DB): Reset DB",
+      "type": "shell",
+      "command": "heroku pg:reset DATABASE_URL",
+      "problemMatcher": []
+    }
   ]
 }

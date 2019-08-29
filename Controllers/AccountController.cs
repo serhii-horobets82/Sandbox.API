@@ -72,6 +72,30 @@ namespace Evoflare.API.Controllers
             }
 
             var result = await userManager.ConfirmEmailAsync(user, code);
+
+            return Ok(result);
+        }
+
+
+        [HttpPost("activate/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(string id, [FromBody] ActivationViewModel model)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                throw new InvalidOperationException();
+            }
+            var result = await userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                user.EmailConfirmed = true;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Gender = model.Gender;
+                await userManager.UpdateAsync(user);
+                await userManager.SetLockoutEnabledAsync(user, true);
+            }
             return Ok(result);
         }
     }

@@ -36,13 +36,14 @@ namespace Evoflare.API.Controllers
         [Authorize(Policy = PolicyTypes.AdminPolicy.View)]
         public async Task<IActionResult> GetAsync()
         {
-            var users = await context.Employee.Include(e => e.Users).Where(e => e.Users.LockoutEnabled).Select(c => new
+            var users = await context.Employee.Include(e => e.Users).Select(c => new
             {
                 id = c.Users.Id,
                 email = c.Users.Email,
                 firstName = c.Users.FirstName,
                 lastName = c.Users.LastName,
                 accessFailedCount = c.Users.AccessFailedCount,
+                isActive = c.Users.LockoutEnabled,
                 gender = (int)c.Users.Gender,
                 age = c.Users.Age,
                 emloyeeId = c.Id,

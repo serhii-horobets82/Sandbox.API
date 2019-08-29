@@ -21,6 +21,8 @@ using System.Security.Claims;
 using Evoflare.API.Auth;
 using System.Globalization;
 using System.Data.SqlClient;
+using System.IO;
+using System.Text;
 
 namespace Evoflare.API.Data
 {
@@ -177,7 +179,6 @@ namespace Evoflare.API.Data
                     FirstName = firstName,
                     LastName = lastName,
                     EmailConfirmed = true,
-                    LockoutEnabled = false,
                     Gender = gender,
                     Age = age
                 };
@@ -222,7 +223,6 @@ namespace Evoflare.API.Data
                         FirstName = empl.Name,
                         LastName = empl.Surname,
                         EmailConfirmed = true,
-                        LockoutEnabled = false,
                         Gender = Gender.Unknown
                     };
                     if (empl.UserId != null)
@@ -267,7 +267,26 @@ namespace Evoflare.API.Data
         {
             // drop database
             Log.Information("Deleting database - start");
-            if (context.Database.EnsureDeleted()) Log.Logger.Information("Deleting database - finish");
+            // For heroku POSTGRES it always exception 
+            try
+            {
+                // For SQL Server use custom script for drop all tables
+                if (context.Database.IsSqlServer())
+                {
+                    var dropScriptfile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database\\dropTables.sql");
+                    var sql = File.ReadAllText(dropScriptfile, Encoding.UTF8);
+                    context.Database.ExecuteSqlCommand(sql);
+                }
+                else
+                    context.Database.EnsureDeleted();
+                Log.Logger.Information("Deleting database - finish");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error deleting database");
+                return;
+            }
+
             try
             {
                 // and create again
@@ -362,8 +381,6 @@ namespace Evoflare.API.Data
             {
                 CreateRoles(serviceProvider).Wait();
             }
-
-
 
             try
             {

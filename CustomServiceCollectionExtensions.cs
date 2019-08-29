@@ -34,6 +34,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -84,8 +85,33 @@ namespace Evoflare.API
                 //    configuration.GetConnectionString("DefaultConnectionPostgres"),
                 //    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
                 //).BuildServiceProvider().GetRequiredService<IRelationalTypeMappingSource>();
+                var connectionString = configuration.GetConnectionString("DefaultConnectionPostgres");
+
+                // Check enviroment for DATABASE_URL (heroku postgres)
+                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? configuration.GetValue<string>("DATABASE_URL"); 
+                if (databaseUrl != null)
+                {
+                    var databaseUri = new Uri(databaseUrl);
+                    var userInfo = databaseUri.UserInfo.Split(':');
+
+                    var builder = new NpgsqlConnectionStringBuilder
+                    {
+                        Host = databaseUri.Host,
+                        Port = databaseUri.Port,
+                        Username = userInfo[0],
+                        Password = userInfo[1],
+                        Database = databaseUri.LocalPath.TrimStart('/'),
+                        Pooling = true,
+                        UseSslStream = true,
+                        SslMode = SslMode.Require,
+                        TrustServerCertificate = true
+                    };
+                    //Pooling=true;Use SSL Stream=True;SSL Mode=Require;TrustServerCertificate=True;
+                    connectionString = builder.ToString();
+                }
+
                 services.AddDbContext<EvoflareDbContext>(options => options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnectionPostgres"),
+                    connectionString,
                     npgsqlOptions => npgsqlOptions.CommandTimeout(300))
                 );
             }

@@ -83,6 +83,9 @@ https://evoflare-secondary.z19.web.core.windows.net</Description>
     <None Update="Database\init.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Database\dropTables.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\Seed\"/>

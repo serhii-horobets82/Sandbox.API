@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
 
 namespace Evoflare.API.Controllers
 {
@@ -25,15 +24,6 @@ namespace Evoflare.API.Controllers
         public async Task<AppVersion> GetAppVersion()
         {
             return await appContext.AppVersion.FirstOrDefaultAsync();
-        }
-
-        [HttpGet("demousers")]
-        public IActionResult GetDemoUser()
-        {
-            appContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            var employees = appContext.Employee.Include(c => c.Users).ToArray();
-            var result = employees.Select(e => new { Title = e.NameTemp, UserName = e.Users.Email });
-            return new OkObjectResult(result);
         }
     }
 }

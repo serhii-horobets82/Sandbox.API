@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Evoflare.API.Auth.Identity;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
@@ -68,12 +69,18 @@ namespace Evoflare.API.Services
             var user = new ApplicationUser
             {
                 Email = invite.Email,
-                EmailConfirmed = true,
+                EmailConfirmed = false,
                 UserName = invite.Email,
-                PasswordHash = Guid.NewGuid().ToString()
             };
+            var randomPassword = Guid.NewGuid().ToString();
+            var r = await _userManager.CreateAsync(user, randomPassword);
+            // lock user
+            await _userManager.SetLockoutEnabledAsync(user, false);
 
-            var r = await _userManager.CreateAsync(user);
+            _context.Profile.Add(new UserProfile
+            {
+                IdentityId = user.Id,
+            });
 
             if (!r.Succeeded)
             {
@@ -113,7 +120,7 @@ namespace Evoflare.API.Services
 
             _logger.LogDebug($"{nameof(InviteManager.GenerateWelcomeLink)} ends");
 
-            return $"{_clientConfig.Host}/{_clientConfig.NewUserPage}/{token}";
+            return $"{_clientConfig.Host}/{_clientConfig.NewUserPage}/{user.Id}?code={HttpUtility.UrlEncode(token)}";
         }
 
         private async Task SendWelcomeLink(string email, string restorePasswordLink)

@@ -29,7 +29,7 @@ namespace Evoflare.API.Controllers
         public async Task<IActionResult> GetGemoUsers()
         {
             var users = await _employeeRepository.GetListAsync(e => e.EmployeeType, e => e.Users);
-            var result = users.Select(e => new { Id = e.Id, Name = e.Name, Surname = e.Surname, Email = e.Users.Email, Type = e.EmployeeType.Id, TypeName = e.EmployeeType.Type, Password = DbInitializer.DefaultPassword });
+            var result = users.Where(e => e.Users.LockoutEnabled).Select(e => new { Id = e.Id, Name = e.Name, Surname = e.Surname, Email = e.Users.Email, Type = e.EmployeeType.Id, TypeName = e.EmployeeType.Type, Password = DbInitializer.DefaultPassword });
             return new OkObjectResult(result);
         }
     }
