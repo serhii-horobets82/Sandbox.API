@@ -45,6 +45,10 @@ https://evoflare-secondary.z19.web.core.windows.net</Description>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\swagger\index.html"/>
+    <EmbeddedResource Include="Database\drop.sql"/>
+    <EmbeddedResource Include="Database\dropTablesPg.sql"/>
+    <EmbeddedResource Include="Database\patchPg.sql"/>
+    <EmbeddedResource Include="Database\dropTables.sql"/>
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Boxed.AspNetCore" Version="3.2.0"/>
@@ -75,17 +79,6 @@ https://evoflare-secondary.z19.web.core.windows.net</Description>
     <Content Update="wwwroot\swagger\favico-32x32.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Database\drop.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Database\init.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Database\dropTables.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\Seed\"/>

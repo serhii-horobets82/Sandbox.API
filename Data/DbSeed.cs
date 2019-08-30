@@ -36,7 +36,6 @@ namespace Evoflare.API.Data
 
             RecreateDatabase(applicationContext, retryTimeout);
 
-            //applicationContext = new EvoflareDbContext();
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             // version of assembly, format x.y.z.w  
             var currentVersion = assemblyInfo.Version.ToString();
@@ -150,6 +149,8 @@ namespace Evoflare.API.Data
                 empl = new Employee { Name = "Regular", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
                 CreateOrUpdateEmployee(serviceProvider, "hr@evoflare.com", Constants.Roles.HR, empl).Wait();
             }
+
+            PatchDatabase(applicationContext);
 
             var trans = applicationContext.Database.BeginTransaction();
             var connection = applicationContext.Database.GetDbConnection();

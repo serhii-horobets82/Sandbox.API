@@ -336,6 +336,12 @@
       "problemMatcher": []
     },
     {
+      "label": "heroku(API): Config",
+      "type": "shell",
+      "command": "heroku config -a evoflare-api",
+      "problemMatcher": []
+    },
+    {
       "label": "heroku(DB): DB info",
       "type": "shell",
       "command": "heroku pg:info -a evoflare-api",

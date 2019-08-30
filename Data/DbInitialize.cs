@@ -263,27 +263,45 @@ namespace Evoflare.API.Data
             }
         }
 
+        /// Additional changes in DB after re-creation
+        public static void PatchDatabase(DbContext context)
+        {
+            if (context.Database.IsNpgsql())
+            {
+                context.Database.ExecuteSqlCommand(ReadEmbeddedResource("Evoflare.API.Database.patchPg.sql"));
+            }
+        }
+
+        public static string ReadEmbeddedResource(string key)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = "";
+            using (var stream = assembly.GetManifestResourceStream(key))
+            {
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    content = reader.ReadToEnd();
+                }
+            }
+            return content;
+        }
+
         public static void RecreateDatabase(DbContext context, int timeout)
         {
             // drop database
-            Log.Information("Deleting database - start");
-            // For heroku POSTGRES it always exception 
+            Log.Information("Truncate database - start");
             try
             {
-                // For SQL Server use custom script for drop all tables
-                if (context.Database.IsSqlServer())
-                {
-                    var dropScriptfile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database\\dropTables.sql");
-                    var sql = File.ReadAllText(dropScriptfile, Encoding.UTF8);
-                    context.Database.ExecuteSqlCommand(sql);
-                }
-                else
-                    context.Database.EnsureDeleted();
-                Log.Logger.Information("Deleting database - finish");
+                var resourceKey = "Evoflare.API.Database.dropTables.sql";
+                if (context.Database.IsNpgsql())
+                    resourceKey = "Evoflare.API.Database.dropTablesPg.sql";
+                context.Database.ExecuteSqlCommand(ReadEmbeddedResource(resourceKey));
+
+                Log.Logger.Information("Truncate database - finish");
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error deleting database");
+                Log.Error(ex, "Error truncated database");
                 return;
             }
 
@@ -495,6 +513,8 @@ namespace Evoflare.API.Data
                 // Continue startup 
                 Log.Error(ex.Message);
             }
+
+            PatchDatabase(applicationContext);
 
             // if version different - recreate business data with sql 
             if (previousVersion != currentVersion)
