@@ -284,7 +284,7 @@ namespace Evoflare.API
                 .ConfigureAndValidateSingleton<AppSettings>(
                     configuration.GetSection(nameof(AppSettings)))
                 .ConfigureAndValidateSingleton<ClientSetting>(configuration.GetSection(nameof(ClientSetting)))
-                .ConfigureAndValidateSingleton<ThirdPartySetting>(configuration.GetSection(nameof(ThirdPartySetting)));
+                .ConfigureAndValidateSingleton<ThirdParty>(configuration.GetSection(nameof(ThirdParty)));
         }
 
         /// <summary>

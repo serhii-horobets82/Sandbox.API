@@ -12,18 +12,18 @@ namespace Evoflare.API.Controllers
     [Route("api/[controller]")]
     public class EnvironmentController : BaseController
     {
-        private readonly ThirdPartySetting _config;
+        private readonly ThirdParty _config;
         private readonly IEnvironmentManager _environment;
         private readonly ILogger<EnvironmentController> _logger;
 
-        public EnvironmentController(IEnvironmentManager environment, IOptions<ThirdPartySetting> config, ILogger<EnvironmentController> logger)
+        public EnvironmentController(IEnvironmentManager environment, IOptions<ThirdParty> config, ILogger<EnvironmentController> logger)
         {
             _config = config.Value;
             _environment = environment;
             _logger = logger;
         }
 
-        [HttpPost("/")]
+        [HttpPost()]
         [AllowAnonymous]
         public async Task<ActionResult> Create([FromHeader] string clientId, [FromBody] EnvironmentDefinition payload)
         {

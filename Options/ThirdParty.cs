@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Evoflare.API.Options
 {
-    public class ThirdPartySetting
+    public class ThirdParty
     {
         public Landing Landing { get; set; }
     }
