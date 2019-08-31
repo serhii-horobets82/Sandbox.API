@@ -33,7 +33,7 @@ namespace Evoflare.API.Controllers
                 return BadRequest();
             }
 
-            var isUserExists = await _context.Users.AnyAsync(x => string.Equals(x.Email, invite.Email, System.StringComparison.CurrentCultureIgnoreCase));
+            var isUserExists = await _context.Users.AnyAsync(x => string.Equals(x.Email, invite.Email, StringComparison.CurrentCultureIgnoreCase));
 
             if (isUserExists)
             {
@@ -62,5 +62,7 @@ namespace Evoflare.API.Controllers
 
         [Required]
         public int Role { get; set; }
+
+        public string UserName { get; set; }
     }
 }

@@ -70,7 +70,7 @@ namespace Evoflare.API.Services
             {
                 Email = invite.Email,
                 EmailConfirmed = false,
-                UserName = invite.Email,
+                UserName = invite.UserName ?? invite.Email,
             };
             var randomPassword = Guid.NewGuid().ToString();
             var r = await _userManager.CreateAsync(user, randomPassword);
