@@ -71,6 +71,7 @@ namespace Evoflare.API
                 .AddSingleton<INotificationSender, NotificationSender>()
                 .AddSingleton<INotificationLogic, NotificationLogic>()
                 .AddScoped<IInviteManager, InviteManager>()
+                .AddScoped<IEnvironmentManager, EnvironmentManager>()
                 // Add useful interface for accessing the IUrlHelper outside a controller.
                 .AddScoped(x => x
                     .GetRequiredService<IUrlHelperFactory>()

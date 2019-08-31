@@ -88,7 +88,7 @@ namespace Evoflare.API
                 var connectionString = configuration.GetConnectionString("DefaultConnectionPostgres");
 
                 // Check enviroment for DATABASE_URL (heroku postgres)
-                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? configuration.GetValue<string>("DATABASE_URL"); 
+                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? configuration.GetValue<string>("DATABASE_URL");
                 if (databaseUrl != null)
                 {
                     var databaseUri = new Uri(databaseUrl);
@@ -283,8 +283,8 @@ namespace Evoflare.API
                     configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
                 .ConfigureAndValidateSingleton<AppSettings>(
                     configuration.GetSection(nameof(AppSettings)))
-                .ConfigureAndValidateSingleton<ClientSetting>(
-                    configuration.GetSection(nameof(ClientSetting)));
+                .ConfigureAndValidateSingleton<ClientSetting>(configuration.GetSection(nameof(ClientSetting)))
+                .ConfigureAndValidateSingleton<ThirdPartySetting>(configuration.GetSection(nameof(ThirdPartySetting)));
         }
 
         /// <summary>
