@@ -24,7 +24,7 @@ namespace Evoflare.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IdeaTag>>> GetIdeaTag()
         {
-            return await _context.IdeaTag.ToListAsync();
+            return await _context.IdeaTag.AsNoTracking().ToListAsync();
         }
 
         //// GET: api/IdeaTags/5

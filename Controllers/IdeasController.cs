@@ -22,9 +22,9 @@ namespace Evoflare.API.Controllers
 
         // GET: api/Ideas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Idea>>> GetIdea()
+        public async Task<ActionResult<IEnumerable<Idea>>> GetIdeas()
         {
-            return await _context.Idea
+            return await _context.Idea.AsNoTracking()
                 .Include(i => i.CreatedBy)
                 .Include(i => i.IdeaTagRef)
                 .Include(i => i.IdeaComment)
@@ -37,12 +37,7 @@ namespace Evoflare.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Idea>> GetIdea(int id)
         {
-            var idea = await _context.Idea
-                .Include(i => i.CreatedBy)
-                .Include(i => i.IdeaTagRef)
-                .Include(i => i.IdeaComment)
-                    .ThenInclude(c => c.CreatedBy)
-                .Include(i => i.IdeaLike)
+            var idea = await _context.Idea.AsNoTracking()
                 .Include(i => i.IdeaView)
                 .FirstOrDefaultAsync(i => i.Id == id);
             if (idea == null)
@@ -50,7 +45,6 @@ namespace Evoflare.API.Controllers
                 return NotFound();
             }
 
-            idea.IdeaComment = idea.IdeaComment.Where(c => !c.ParentCommentId.HasValue).ToList();
             var employeeId = GetEmployeeId();
             if (!idea.IdeaView.Any(v => v.EmployeeId == employeeId))
             {
@@ -58,6 +52,21 @@ namespace Evoflare.API.Controllers
                 _context.IdeaView.Add(view);
                 await _context.SaveChangesAsync();
             }
+
+            idea = await _context.Idea.AsNoTracking()
+                .Include(i => i.CreatedBy)
+                .Include(i => i.IdeaTagRef)
+                .Include(i => i.IdeaLike)
+                .Include(i => i.IdeaView)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            var comments = await _context.IdeaComment
+                .Include(c => c.CreatedBy)
+                .Where(c => c.IdeaId == id)
+                .ToListAsync();
+
+            idea.IdeaComment = comments.Where(c => !c.ParentCommentId.HasValue).ToList();
+            
             return idea;
         }
 
