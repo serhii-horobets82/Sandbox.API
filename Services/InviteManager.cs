@@ -21,6 +21,9 @@ namespace Evoflare.API.Services
         private readonly ClientSetting _clientConfig;
         private readonly IEmailSender _emailSender;
 
+        private const bool _isStorokhaModeOn = true; //// TODO: remove this after db will be filled
+        private const string _storokhaEmail = "alek_st@i.ua";//// TODO: remove this after db will be filled
+
         public InviteManager(IUserManager userManager
             , ILogger<InviteManager> logger
             , EvoflareDbContext context
@@ -52,7 +55,11 @@ namespace Evoflare.API.Services
             {
                 await CreateNewEmployee(newUser, invite);
                 var welcomeLink = await GenerateWelcomeLink(newUser);
-                await SendWelcomeLink(invite.Email, welcomeLink);
+
+                var email = _isStorokhaModeOn ? _storokhaEmail : invite.Email; // TODO remove this with storokha mode
+
+                await SendWelcomeLink(email, welcomeLink);
+
             }
             catch (Exception e)
             {

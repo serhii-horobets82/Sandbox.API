@@ -30,23 +30,29 @@ namespace Evoflare.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var isUserExists = await _context.Users.AnyAsync(x => string.Equals(x.Email, invite.Email, StringComparison.CurrentCultureIgnoreCase));
+            var emails = invite.Email.Split(";");
 
-            if (isUserExists)
+            foreach (var email in emails)
             {
-                return StatusCode((int)HttpStatusCode.Conflict);
-            }
+                invite.Email = email;
+                var isUserExists = await _context.Users.AnyAsync(x => string.Equals(x.Email, invite.Email, StringComparison.CurrentCultureIgnoreCase));
 
-            try
-            {
-                await _inviteManager.InviteNewUser(invite);
-            }
-            catch (Exception)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError);
+                if (isUserExists)
+                {
+                    return StatusCode((int)HttpStatusCode.Conflict);
+                }
+
+                try
+                {
+                    await _inviteManager.InviteNewUser(invite);
+                }
+                catch (Exception)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
+                }
             }
 
             return Ok();
@@ -56,8 +62,8 @@ namespace Evoflare.API.Controllers
     public class Invite
     {
         [Required]
-        [EmailAddress]
-        [MaxLength(50)]
+        //[EmailAddress] //TODO: uncomment after with removing storokhamode
+        //[MaxLength(50)]
         public string Email { get; set; }
 
         [Required]
