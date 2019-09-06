@@ -13,7 +13,7 @@ namespace Evoflare.API.Data
     {
         public static void RemoveExisting360EvaluationData(EvoflareDbContext context)
         {
-            context.Database.ExecuteSqlCommand("delete from \"360Evaluation\"");
+            context.Database.ExecuteSqlCommand("delete from \"360EvaluationResult\"");
             context.Database.ExecuteSqlCommand("delete from \"360EmployeeEvaluation\"");
             context.Database.ExecuteSqlCommand("delete from \"EmployeeEvaluation\"");
         }
@@ -65,9 +65,9 @@ namespace Evoflare.API.Data
                 EvaluationChance = 75,
                 FeedbackMarkChances = new Dictionary<int, int>
                         {
-                            { 1, 25 },
+                            { 1, 35 },
                             { 2, 45 },
-                            { 3, 30 },
+                            { 3, 20 },
                             { 4, 0 },
                             { 5, 0 },
                         },
@@ -116,15 +116,16 @@ namespace Evoflare.API.Data
                 hardworker.MarkDistribution[i] = hardworker.FeedbackMarkChances.Where(kv => kv.Key <= i).Select(kv => kv.Value).Sum();
             }
 
+            var settings = context._360evaluationSchedule.First();
             // 360 evaluation routine is starting each quarter 1st day of month
-            var periodMonths = 3;
+            var periodMonths = settings.PeriodMonths;
             var startDate = new DateTime(2017, 1, 1);
             // 360 evaluation period lasts for 1 month
-            var evaluationPeriodMonth = 1;
+            var evaluationPeriodMonth = settings.EvaluationWindowMonths;
             for (var date = startDate; date < DateTime.Now; date = date.AddMonths(periodMonths))
             {
                 // evaluation is Archived/Closed after 1 month
-                var isArchived = date < DateTime.Now.AddMonths(-evaluationPeriodMonth);
+                var isArchived = date.AddMonths(evaluationPeriodMonth) < DateTime.UtcNow;
                 // for each employee
                 foreach (var employee in relations.Keys)
                 {
@@ -178,24 +179,23 @@ namespace Evoflare.API.Data
                             };
                             if (isArchived)
                             {
-                                _360EmployeeEvaluation.EndDate = date.AddMonths(1);
+                                _360EmployeeEvaluation.EndDate = date.AddMonths(evaluationPeriodMonth);
                             }
                             evaluation._360employeeEvaluation.Add(_360EmployeeEvaluation);
 
                             // TODO: debugging
                             _360employeeEvaluations.Add(_360EmployeeEvaluation);
-                            // TODO: fix
-                            //var feedbacks = peersQuestions.Select(q =>
-                            //{
-                            //    var mark = GetMarkUsingDistribution(config.MarkDistribution, random);
-                            //    return new _360evaluationResult
-                            //    {
-                            //        Evaluation = _360EmployeeEvaluation,
-                            //        QuestionId = q.Id,
-                            //        FeedbackMarkId = mark
-                            //    };
-                            //}).ToList();
-                            //_360EmployeeEvaluation._360evaluationResult = feedbacks;
+                            var feedbacks = peersQuestions.Select(q =>
+                            {
+                                var mark = GetMarkUsingDistribution(config.MarkDistribution, random);
+                                return new _360evaluationResult
+                                {
+                                    Evaluation = _360EmployeeEvaluation,
+                                    _360questionnarieStatementId = q._360questionnarieStatement
+                                        .First(s => s.Mark == mark).Id,
+                                };
+                            }).ToList();
+                            _360EmployeeEvaluation._360evaluationResult = feedbacks;
                         }
                         else
                         {

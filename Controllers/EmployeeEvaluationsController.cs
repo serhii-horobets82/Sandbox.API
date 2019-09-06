@@ -247,11 +247,14 @@ namespace Evoflare.API.Controllers
 
         // GET: api/EmployeeEvaluations/i-evaluate-360
         [HttpGet("i-evaluate-360")]
-        public async Task<ActionResult<List<_360employeeEvaluation>>> GetIEvaluate360()
+        public async Task<ActionResult<IEnumerable<dynamic>>> GetIEvaluate360()
         {
             var employeesToEvaluate = await _context._360employeeEvaluation
                 .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
                 .Include(e => e.Evaluation.Employee)
+                .OrderByDescending(e => e.StartDate)
+                //.GroupBy(e => e.StartDate)
+                //.Select(e => new { Date = e.Key, Employees = e })
                 .ToListAsync();
 
             return employeesToEvaluate;
