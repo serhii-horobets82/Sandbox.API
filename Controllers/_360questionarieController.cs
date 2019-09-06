@@ -133,7 +133,7 @@ namespace Evoflare.API.Controllers
             //};
             _360questionarie._360questionnarieStatement = 
                 Enumerable.Range(1, 5)
-                    .Select(i => new _360questionnarieStatement { Mark = i })
+                    .Select(i => new _360questionnarieStatement { Mark = i, Text = " " })
                     .ToList();
             
             _context._360questionnarie.Add(_360questionarie);
