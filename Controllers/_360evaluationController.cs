@@ -156,14 +156,26 @@ namespace Evoflare.API.Controllers
                 .Distinct()
                 .OrderByDescending(d => d)
                 .ToListAsync();
+            var settings = await _context._360evaluationSchedule.FirstAsync();
             return periods
                 .Select(d => new
                 {
-                    Text = DateTimeUtils.ToQuarterYearString(d) + 
-                        (d < DateTime.UtcNow.AddMonths(-1) ? " (Closed)" : ""),
+                    Text = DateTimeUtils.ToQuarterYearString(d) + (IsPeriodClosed(d, settings) ? " (Closed)" : ""),
                     Value = DateTimeUtils.GetQuarterStartDate(d),
-                    IsClosed = d < DateTime.UtcNow.AddMonths(-1)
+                    IsClosed = IsPeriodClosed(d, settings)
                 });
+        }
+
+        private bool IsPeriodClosed(DateTime date, _360evaluationSchedule settings)
+        {
+            return date.AddMonths(settings.EvaluationWindowMonths) < DateTime.UtcNow;
+        }
+
+        // GET: api/_360evaluation/schedule-settings
+        [HttpGet("schedule-settings")]
+        public async Task<_360evaluationSchedule> GetEvaluationScheduleSettings()
+        {
+            return await _context._360evaluationSchedule.FirstAsync();
         }
 
         // GET: api/_360evaluation/by-project/5
