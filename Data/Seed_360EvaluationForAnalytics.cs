@@ -22,13 +22,13 @@ namespace Evoflare.API.Data
         {
             var hrId = 27;
             var relations = BuildRelations(context);
-            var questions = context._360questionarie
-                .Include(g => g._360questionToMark)
+            var questions = context._360questionnarie
+                .Include(g => g._360questionnarieStatement)
                 .ToList();
 
-            var peerFeedbackGroupId = 2;  // peer
+            //var peerFeedbackGroupId = 2;  // peer
             var peersQuestions = questions
-                .Where(g => g._360feedbackGroupId == peerFeedbackGroupId)
+                //.Where(g => g._360feedbackGroupId == peerFeedbackGroupId)
                 .ToList();
 
             var random = new Random(Guid.NewGuid().GetHashCode());
@@ -170,7 +170,6 @@ namespace Evoflare.API.Data
                             {
                                 Evaluation = evaluation,
                                 EvaluatorEmployeeId = peer.Id,
-                                _360feedbackGroupId = peerFeedbackGroupId,
                                 StartDoing = "",
                                 StopDoing = "",
                                 OtherComments = "",
@@ -185,18 +184,18 @@ namespace Evoflare.API.Data
 
                             // TODO: debugging
                             _360employeeEvaluations.Add(_360EmployeeEvaluation);
-                            var feedbacks = peersQuestions.Select(q =>
-                            {
-                                var mark = GetMarkUsingDistribution(config.MarkDistribution, random);
-                                return new _360evaluation
-                                {
-                                    Evaluation = _360EmployeeEvaluation,
-                                    QuestionId = q.Id,
-                                    FeedbackMarkId = mark,
-                                    OrganizationId = 1
-                                };
-                            }).ToList();
-                            _360EmployeeEvaluation._360evaluation = feedbacks;
+                            // TODO: fix
+                            //var feedbacks = peersQuestions.Select(q =>
+                            //{
+                            //    var mark = GetMarkUsingDistribution(config.MarkDistribution, random);
+                            //    return new _360evaluationResult
+                            //    {
+                            //        Evaluation = _360EmployeeEvaluation,
+                            //        QuestionId = q.Id,
+                            //        FeedbackMarkId = mark
+                            //    };
+                            //}).ToList();
+                            //_360EmployeeEvaluation._360evaluationResult = feedbacks;
                         }
                         else
                         {

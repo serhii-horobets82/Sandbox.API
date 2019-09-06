@@ -21,53 +21,53 @@ namespace Evoflare.API.Controllers
             _context = context;
         }
 
-        // GET: api/_360evaluation
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<_360evaluation>>> Get_360evaluation()
-        {
-            return await _context._360evaluation.ToListAsync();
-        }
+        //// GET: api/_360evaluation
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<_360evaluation>>> Get_360evaluation()
+        //{
+        //    return await _context._360evaluation.ToListAsync();
+        //}
         
-        // GET: api/_360evaluation/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<_360evaluation>> Get_360evaluation(int id)
-        {
-            var _360evaluation = await _context._360evaluation.FindAsync(id);
+        //// GET: api/_360evaluation/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<_360evaluation>> Get_360evaluation(int id)
+        //{
+        //    var _360evaluation = await _context._360evaluation.FindAsync(id);
 
-            if (_360evaluation == null)
-            {
-                return NotFound();
-            }
+        //    if (_360evaluation == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return _360evaluation;
-        }
+        //    return _360evaluation;
+        //}
 
-        // GET: api/_360evaluation/employee/5/evaluator
-        /// <summary>
-        /// Gets a questionary for a specific employee. Used when 360 in progress, evaluator needs to give feedback.
-        /// </summary>
-        [HttpGet("employee/{id}/evaluator")]
-        public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id)
-        {
-            var questionarie = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() && e.Evaluation.EmployeeId == id)
-                .Include(e => e._360feedbackGroup)
-                    .ThenInclude(f => f._360questionarie)
-                        .ThenInclude(q => q._360questionToMark)
-                            .ThenInclude(q => q._360question)
-                .ToListAsync();
+        //// GET: api/_360evaluation/employee/5/evaluator
+        ///// <summary>
+        ///// Gets a questionary for a specific employee. Used when 360 in progress, evaluator needs to give feedback.
+        ///// </summary>
+        //[HttpGet("employee/{id}/evaluator")]
+        //public async Task<ActionResult<List<_360questionarie>>> Get_360evaluationQuestionary(int id)
+        //{
+        //    var questionarie = await _context._360employeeEvaluation
+        //        .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() && e.Evaluation.EmployeeId == id)
+        //        .Include(e => e._360feedbackGroup)
+        //            .ThenInclude(f => f._360questionarie)
+        //                .ThenInclude(q => q._360questionToMark)
+        //                    .ThenInclude(q => q._360question)
+        //        .ToListAsync();
 
-            return questionarie
-                .SelectMany(e => e._360feedbackGroup._360questionarie)
-                .ToList();
-        }
+        //    return questionarie
+        //        .SelectMany(e => e._360feedbackGroup._360questionarie)
+        //        .ToList();
+        //}
 
         public class _360FeedbackSubmit
         {
             public string StartDoing { get; set; }
             public string StopDoing { get; set; }
             public string OtherComments { get; set; }
-            public List<_360evaluation> Feedbacks { get; set; }
+            public List<_360evaluationResult> Feedbacks { get; set; }
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace Evoflare.API.Controllers
         [HttpPost("feedback/{id}")]
         public async Task<IActionResult> Save360Feedback(int id, _360FeedbackSubmit feedback)
         {
-            feedback.Feedbacks.ForEach(f => f.OrganizationId = 1);
-            _context._360evaluation.AddRange(feedback.Feedbacks);
+            // TODO: fix front-end
+            _context._360evaluationResult.AddRange(feedback.Feedbacks);
 
             var evaluation = await _context._360employeeEvaluation.FirstOrDefaultAsync(e => e.Id == id);
             evaluation.EndDate = DateTime.UtcNow;
@@ -91,61 +91,61 @@ namespace Evoflare.API.Controllers
             return Ok();
         }
 
-        // PUT: api/_360evaluation/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put_360evaluation(int id, _360evaluation _360evaluation)
-        {
-            if (id != _360evaluation.Id)
-            {
-                return BadRequest();
-            }
+        //// PUT: api/_360evaluation/5
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Put_360evaluation(int id, _360evaluation _360evaluation)
+        //{
+        //    if (id != _360evaluation.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(_360evaluation).State = EntityState.Modified;
+        //    _context.Entry(_360evaluation).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_360evaluationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!_360evaluationExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        // POST: api/_360evaluation
-        [HttpPost]
-        public async Task<ActionResult<_360evaluation>> Post_360evaluation(_360evaluation _360evaluation)
-        {
-            _context._360evaluation.Add(_360evaluation);
-            await _context.SaveChangesAsync();
+        //// POST: api/_360evaluation
+        //[HttpPost]
+        //public async Task<ActionResult<_360evaluation>> Post_360evaluation(_360evaluation _360evaluation)
+        //{
+        //    _context._360evaluation.Add(_360evaluation);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("Get_360evaluation", new { id = _360evaluation.Id }, _360evaluation);
-        }
+        //    return CreatedAtAction("Get_360evaluation", new { id = _360evaluation.Id }, _360evaluation);
+        //}
 
-        // DELETE: api/_360evaluation/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<_360evaluation>> Delete_360evaluation(int id)
-        {
-            var _360evaluation = await _context._360evaluation.FindAsync(id);
-            if (_360evaluation == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/_360evaluation/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<_360evaluation>> Delete_360evaluation(int id)
+        //{
+        //    var _360evaluation = await _context._360evaluation.FindAsync(id);
+        //    if (_360evaluation == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context._360evaluation.Remove(_360evaluation);
-            await _context.SaveChangesAsync();
+        //    _context._360evaluation.Remove(_360evaluation);
+        //    await _context.SaveChangesAsync();
 
-            return _360evaluation;
-        }
+        //    return _360evaluation;
+        //}
 
         // GET: api/_360evaluation/periods
         [HttpGet("periods")]
@@ -232,10 +232,10 @@ namespace Evoflare.API.Controllers
                 {
                     e.EvaluationId,
                     e.EvaluatorEmployeeId,
-                    EvaluationResults = e._360evaluation.Select(ev => new
+                    EvaluationResults = e._360evaluationResult.Select(ev => new
                     {
-                        ev.QuestionId,
-                        ev.FeedbackMarkId
+                        QuestionId = ev._360questionnarieStatementId,
+                        FeedbackMarkId = ev._360questionnarieStatement.Mark
                     }).ToList()
                 }).ToListAsync();
             var myMeanByQuestion = allTheData
@@ -248,8 +248,9 @@ namespace Evoflare.API.Controllers
                 .GroupBy(r => r.QuestionId, r => r.FeedbackMarkId)
                 .ToDictionary(r => r.Key, r => r.Average());// (r.Sum() * 1.0) / r.Count());
 
-            var questions = await _context._360questionarie
-                .Where(q => q._360feedbackGroupId == 2) // for peers
+            var isManager = User.IsManager();
+            var questions = await _context._360questionnarie
+                .Where(q => q.IsForManager == isManager)
                 .OrderBy(q => q.Id)
                 .ToListAsync();
                 //.ToDictionaryAsync(q => q.Id, q => q.Text);
@@ -257,11 +258,11 @@ namespace Evoflare.API.Controllers
             {
                 My = questions
                     .Select(q => 
-                        new { Question = q.Text, Value = Math.Round(myMeanByQuestion[q.Id], 1) })
+                        new { Question = q.Name, Value = Math.Round(myMeanByQuestion[q.Id], 1) })
                     .ToList(),
                 Company = questions
                     .Select(q => 
-                        new { Question = q.Text, Value = Math.Round(companyMeanByQuestion[q.Id], 1) })
+                        new { Question = q.Name, Value = Math.Round(companyMeanByQuestion[q.Id], 1) })
                     .ToList(),
             };
 
@@ -289,7 +290,7 @@ namespace Evoflare.API.Controllers
                 .GroupBy(e => e.Question)
                 .Select(e => new
                 {
-                    Question = questions.First(q => q.Id == e.Key).Text,
+                    Question = questions.First(q => q.Id == e.Key).Name,
                     Values = e
                         .GroupBy(q => q.Evaluation.StartDate, q => q.Value)
                         .Select(q => new { Date = q.Key, Value = Math.Round(q.Average(), 1) })
@@ -464,10 +465,15 @@ namespace Evoflare.API.Controllers
             var feedbacks = employeeEvaluations.Count;
             var averageCount = allEmployeeEvaluations
                 .GroupBy(e => e.EvaluatorEmployeeId)
-                .Select(e => e.Count()).Average();
-            var feedbackMarks  = employeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).OrderBy(x => x).ToList();
+                .Select(e => e.Count())
+                .Average();
+            var feedbackMarks  = employeeEvaluations
+                .SelectMany(e => e._360evaluationResult.Select(ev => ev._360questionnarieStatement.Mark))
+                .OrderBy(x => x).ToList();
             var averageFeedback = feedbackMarks.Average();
-            var allFeedbacksAverage = allEmployeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).Average();
+            var allFeedbacksAverage = allEmployeeEvaluations
+                .SelectMany(e => e._360evaluationResult.Select(ev => ev._360questionnarieStatement.Mark))
+                .Average();
             var variance = Math.Abs(Variance(feedbackMarks));
             return feedbackMarks;
         }
@@ -481,7 +487,9 @@ namespace Evoflare.API.Controllers
             checks.Add(employeeEvaluations.Count > criteria.FeedbacksGiven);
 
             // средний балл выше 4,1
-            var feedbacks = employeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).ToList();
+            var feedbacks = employeeEvaluations
+                .SelectMany(e => e._360evaluationResult.Select(ev => ev._360questionnarieStatement.Mark))
+                .ToList();
             checks.Add(feedbacks.Average() > criteria.MeanValue);
 
             // среди оценок отсутствуют единицы и двойки
@@ -501,11 +509,15 @@ namespace Evoflare.API.Controllers
             checks.Add(employeeEvaluations.Count > criteria.FeedbacksGiven);
 
             // поставивших меньше 2,7
-            var feedbacks = employeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).ToList();
+            var feedbacks = employeeEvaluations
+                .SelectMany(e => e._360evaluationResult.Select(ev => ev._360questionnarieStatement.Mark))
+                .ToList();
             checks.Add(feedbacks.Average() < criteria.MeanValue);
 
             // не ставивших оценки выше средней
-            var allFeedbacksMean = allEmployeeEvaluations.SelectMany(e => e._360evaluation.Select(ev => ev.FeedbackMarkId)).Average();
+            var allFeedbacksMean = allEmployeeEvaluations
+                .SelectMany(e => e._360evaluationResult.Select(ev => ev._360questionnarieStatement.Mark))
+                .Average();
             checks.Add(feedbacks.All(f => f <= allFeedbacksMean));
             
             return checks.All(c => c);
@@ -525,8 +537,8 @@ namespace Evoflare.API.Controllers
 
             // средняя оценка — три,
             var marks = employeeEvaluations
-                .SelectMany(e => e._360evaluation)
-                .Select(e => e.FeedbackMarkId)
+                .SelectMany(e => e._360evaluationResult)
+                .Select(e => e._360questionnarieStatement.Mark)
                 .ToList();
             var average = marks.Average();
             checks.Add(average == criteria.MeanValue);
@@ -552,8 +564,8 @@ namespace Evoflare.API.Controllers
             // !! с небольшим отклонением
             // !! дисперсию не учитываем
             var marks = employeeEvaluations
-                .SelectMany(e => e._360evaluation)
-                .Select(e => e.FeedbackMarkId)
+                .SelectMany(e => e._360evaluationResult)
+                .Select(e => e._360questionnarieStatement.Mark)
                 .ToList();
             var average = marks.Average();
             checks.Add(Math.Abs(average - criteria.MeanValue) < 0.1);
@@ -594,7 +606,7 @@ namespace Evoflare.API.Controllers
             var lastEvaluations = await _context.EmployeeEvaluation
                 .Where(r => r.StartDate > DateTime.Now.AddYears(-1))
                 .Include(e => e._360employeeEvaluation)
-                    .ThenInclude(ev => ev._360evaluation)
+                    .ThenInclude(ev => ev._360evaluationResult)
                 .ToListAsync();
             var employees = await _context.Employee
                 .Where(e => !e.IsManager)
@@ -639,9 +651,9 @@ namespace Evoflare.API.Controllers
             return rep;
         }
 
-        private bool _360evaluationExists(int id)
-        {
-            return _context._360evaluation.Any(e => e.Id == id);
-        }
+        //private bool _360evaluationExists(int id)
+        //{
+        //    return _context._360evaluationResult.Any(e => e.Id == id);
+        //}
     }
 }

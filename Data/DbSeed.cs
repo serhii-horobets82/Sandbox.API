@@ -102,14 +102,14 @@ namespace Evoflare.API.Data
                 SeedProjectPosition(applicationContext);
                 SeedProjectPositionCompetence(applicationContext);
 
-                Seed_360feedbackGroup(applicationContext);
-                Seed_360feedbackMark(applicationContext);
-                Seed_360questionarie(applicationContext);
-                Seed_360questionToMark(applicationContext);
-                Seed_360question(applicationContext);
+                //Seed_360feedbackGroup(applicationContext);
+                //Seed_360feedbackMark(applicationContext);
+                //Seed_360questionarie(applicationContext);
+                //Seed_360questionToMark(applicationContext);
+                //Seed_360question(applicationContext);
 
-                Seed_360employeeEvaluation(applicationContext);
-                Seed_360evaluation(applicationContext);
+                //Seed_360employeeEvaluation(applicationContext);
+                //Seed_360evaluation(applicationContext);
 
                 SeedCustomerContact(applicationContext);
                 SeedCertificate(applicationContext);

@@ -50,21 +50,18 @@ namespace Evoflare.API.Models
         public virtual DbSet<RoleGradeCompetence> RoleGradeCompetence { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<_360employeeEvaluation> _360employeeEvaluation { get; set; }
-        public virtual DbSet<_360evaluation> _360evaluation { get; set; }
-        public virtual DbSet<_360evaluationComment> _360evaluationComment { get; set; }
-        public virtual DbSet<_360feedbackGroup> _360feedbackGroup { get; set; }
-        public virtual DbSet<_360feedbackMark> _360feedbackMark { get; set; }
+        public virtual DbSet<_360evaluationResult> _360evaluationResult { get; set; }
+        public virtual DbSet<_360evaluationSchedule> _360evaluationSchedule { get; set; }
         public virtual DbSet<_360pendingEvaluator> _360pendingEvaluator { get; set; }
-        public virtual DbSet<_360question> _360question { get; set; }
-        public virtual DbSet<_360questionToMark> _360questionToMark { get; set; }
-        public virtual DbSet<_360questionarie> _360questionarie { get; set; }
+        public virtual DbSet<_360questionnarie> _360questionnarie { get; set; }
+        public virtual DbSet<_360questionnarieStatement> _360questionnarieStatement { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 
-                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
+                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
             }
         }
 
@@ -732,8 +729,6 @@ namespace Evoflare.API.Models
 
                 entity.HasIndex(e => e.OrganizationId);
 
-                entity.HasIndex(e => e._360feedbackGroupId);
-
                 entity.HasOne(d => d.Evaluation)
                     .WithMany(p => p._360employeeEvaluation)
                     .HasForeignKey(d => d.EvaluationId)
@@ -751,66 +746,21 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_360EmployeeEvaluation_Organization");
-
-                entity.HasOne(d => d._360feedbackGroup)
-                    .WithMany(p => p._360employeeEvaluation)
-                    .HasForeignKey(d => d._360feedbackGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360EmployeeEvaluation_360FeedbackGroup");
             });
 
-            modelBuilder.Entity<_360evaluation>(entity =>
+            modelBuilder.Entity<_360evaluationResult>(entity =>
             {
-                entity.HasIndex(e => e.EvaluationId);
-
-                entity.HasIndex(e => e.FeedbackMarkId);
-
-                entity.HasIndex(e => e.OrganizationId);
-
-                entity.HasIndex(e => e.QuestionId);
-
                 entity.HasOne(d => d.Evaluation)
-                    .WithMany(p => p._360evaluation)
+                    .WithMany(p => p._360evaluationResult)
                     .HasForeignKey(d => d.EvaluationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Evaluation_EmployeeEvaluation");
+                    .HasConstraintName("FK_360EvaluationResult_360EmployeeEvaluation");
 
-                entity.HasOne(d => d.FeedbackMark)
-                    .WithMany(p => p._360evaluation)
-                    .HasForeignKey(d => d.FeedbackMarkId)
+                entity.HasOne(d => d._360questionnarieStatement)
+                    .WithMany(p => p._360evaluationResult)
+                    .HasForeignKey(d => d._360questionnarieStatementId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Evaluation_360FeedbackMark");
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p._360evaluation)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Evaluation_Organization");
-
-                entity.HasOne(d => d.Question)
-                    .WithMany(p => p._360evaluation)
-                    .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Evaluation_360Question");
-            });
-
-            modelBuilder.Entity<_360evaluationComment>(entity =>
-            {
-                entity.HasIndex(e => e.EvaluationId);
-
-                entity.HasIndex(e => e.OrganizationId);
-
-                entity.HasOne(d => d.Evaluation)
-                    .WithMany(p => p._360evaluationComment)
-                    .HasForeignKey(d => d.EvaluationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360EvaluationComment_360EmployeeEvaluation");
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p._360evaluationComment)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360EvaluationComment_Organization");
+                    .HasConstraintName("FK_360EvaluationResult_360QuestionnarieStatement");
             });
 
             modelBuilder.Entity<_360pendingEvaluator>(entity =>
@@ -840,61 +790,13 @@ namespace Evoflare.API.Models
                     .HasConstraintName("FK_360PendingEvaluator_360PendingEvaluator");
             });
 
-            modelBuilder.Entity<_360question>(entity =>
+            modelBuilder.Entity<_360questionnarieStatement>(entity =>
             {
-                entity.HasIndex(e => e.OrganizationId);
-
-                entity.HasIndex(e => e.QuestionToMarkId);
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p._360question)
-                    .HasForeignKey(d => d.OrganizationId)
+                entity.HasOne(d => d.Questionnarie)
+                    .WithMany(p => p._360questionnarieStatement)
+                    .HasForeignKey(d => d.QuestionnarieId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Question_Organization");
-
-                entity.HasOne(d => d.QuestionToMark)
-                    .WithMany(p => p._360question)
-                    .HasForeignKey(d => d.QuestionToMarkId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Question_360QuestionToMark");
-            });
-
-            modelBuilder.Entity<_360questionToMark>(entity =>
-            {
-                entity.HasIndex(e => e.OrganizationId);
-
-                entity.HasIndex(e => e.QuestionId);
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p._360questionToMark)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360QuestionToMark_Organization");
-
-                entity.HasOne(d => d.Question)
-                    .WithMany(p => p._360questionToMark)
-                    .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360QuestionToMark_360Questionarie");
-            });
-
-            modelBuilder.Entity<_360questionarie>(entity =>
-            {
-                entity.HasIndex(e => e.OrganizationId);
-
-                entity.HasIndex(e => e._360feedbackGroupId);
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p._360questionarie)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Questionarie_Organization");
-
-                entity.HasOne(d => d._360feedbackGroup)
-                    .WithMany(p => p._360questionarie)
-                    .HasForeignKey(d => d._360feedbackGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_360Question_360FeedbackGroup");
+                    .HasConstraintName("FK_360QuestionnarieStatement_360Questionnarie");
             });
             base.OnModelCreating(modelBuilder);
         }
