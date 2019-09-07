@@ -63,14 +63,26 @@ namespace Evoflare.API.Controllers
             public string OtherComments { get; set; }
             public List<_360evaluationResult> Feedbacks { get; set; }
         }
+        /// <summary>
+        /// Save a full feedback for all the questions in the questionarie.
+        /// </summary>
+        [HttpGet("feedback/{id}")]
+        public async Task<IActionResult> Get360Feedback(int id)
+        {
+            var result = await _context._360employeeEvaluation.AsNoTracking()
+                .Include(e => e._360evaluationResult)
+                    .ThenInclude(e => e._360questionnarieStatement)
+                        .ThenInclude(e => e.Questionnarie)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
+            return Ok(result);
+        }
         /// <summary>
         /// Save a full feedback for all the questions in the questionarie.
         /// </summary>
         [HttpPost("feedback/{id}")]
         public async Task<IActionResult> Save360Feedback(int id, _360FeedbackSubmit feedback)
         {
-            // TODO: fix front-end
             _context._360evaluationResult.AddRange(feedback.Feedbacks);
 
             var evaluation = await _context._360employeeEvaluation.FirstOrDefaultAsync(e => e.Id == id);
