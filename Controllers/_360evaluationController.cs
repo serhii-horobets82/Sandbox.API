@@ -172,6 +172,24 @@ namespace Evoflare.API.Controllers
                 });
         }
 
+        // GET: api/_360evaluation/last-period
+        [HttpGet("last-period")]
+        public async Task<dynamic> GetLastEvaluationPeriod()
+        {
+            var period = await _context.EmployeeEvaluation
+                .Select(e => e.StartDate)
+                .Distinct()
+                .OrderByDescending(d => d)
+                .FirstOrDefaultAsync();
+            var settings = await _context._360evaluationSchedule.FirstAsync();
+            return new
+            {
+                StartDate = period,
+                EndDate = period.AddMonths(settings.EvaluationWindowMonths),
+                IsClosed = IsPeriodClosed(period, settings)
+            };
+        }
+
         private bool IsPeriodClosed(DateTime date, _360evaluationSchedule settings)
         {
             return date.AddMonths(settings.EvaluationWindowMonths) < DateTime.UtcNow;
@@ -182,6 +200,95 @@ namespace Evoflare.API.Controllers
         public async Task<_360evaluationSchedule> GetEvaluationScheduleSettings()
         {
             return await _context._360evaluationSchedule.FirstAsync();
+        }
+
+        // POST: api/_360evaluation/schedule-settings
+        [HttpPost("schedule-settings")]
+        public async Task<_360evaluationSchedule> SaveEvaluationScheduleSettings(_360evaluationSchedule settings)
+        {
+            _context.Entry(settings).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+            return settings;
+        }
+
+        // POST: api/_360evaluation/start
+        // TODO: remove this after demo, evaluation should start automatically, or by HR approval
+        [HttpPost("start/{date}")]
+        public async Task<IActionResult> Start360Evaluation(DateTime date)
+        {
+            var relations = BuildRelations(_context);
+            var hrId = User.GetEmployeeId();
+            var evaluations = new List<EmployeeEvaluation>();
+
+            foreach (var employee in relations.Keys)
+            {
+                // create evaluation slot for the employee
+                var evaluation = new EmployeeEvaluation
+                {
+                    EmployeeId = employee.Id,
+                    StartDate = date,
+                    StartedById = hrId,
+                    OrganizationId = 1,
+                };
+
+                evaluations.Add(evaluation);
+
+                // get all the peers to current employee
+                // let the employee to create feedback for everyone (or mostly everyone)
+                foreach (var peer in relations[employee])
+                {                    
+                    var _360EmployeeEvaluation = new _360employeeEvaluation
+                    {
+                        Evaluation = evaluation,
+                        EvaluatorEmployeeId = peer.Id,
+                        StartDoing = null,
+                        StopDoing = null,
+                        OtherComments = null,
+                        StartDate = date,
+                        OrganizationId = 1
+                    };
+                        
+                    evaluation._360employeeEvaluation.Add(_360EmployeeEvaluation);
+                }
+            }
+            await _context.EmployeeEvaluation.AddRangeAsync(evaluations.OrderByDescending(x => x.StartDate));
+            await _context.SaveChangesAsync();
+            return Ok(date);   
+        }
+
+        private static Dictionary<Employee, List<Employee>> BuildRelations(EvoflareDbContext context)
+        {
+            var employees = context.Employee.ToList();
+            var relations = context.EmployeeRelations
+                .Include(r => r.Employee)
+                .Include(r => r.Manager)
+                .ToList();
+
+            var employeePeers = new Dictionary<Employee, List<Employee>>();
+            foreach (var employee in employees.Where(e => !e.IsManager))
+            {
+                var a = relations.Where(r => r.EmployeeId == employee.Id).ToList();
+                var teams = a.Select(r => r.TeamId).Distinct().ToHashSet();
+                var directManagerIds = a.Select(r => r.ManagerId).Where(m => m != null).Distinct().ToHashSet();
+
+                var directManagers = employees
+                    .Where(e => directManagerIds.Contains(e.Id))
+                    .ToList();
+
+                var peersAndManagers = relations
+                    .Where(r => teams.Contains(r.TeamId))
+                    .ToList();
+                var peers = peersAndManagers.Select(r => r.Employee).Where(e => e != null)
+                    //.Concat(
+                    //    peersAndManagers.Select(r => r.Manager).Where(m => m != null)
+                    //)
+                    .Where(e => e.Id != employee.Id)
+                    .Distinct().ToList();
+                employeePeers.Add(employee, peers);
+            }
+            return employeePeers;
         }
 
         // GET: api/_360evaluation/by-project/5
