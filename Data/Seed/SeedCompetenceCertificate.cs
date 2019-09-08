@@ -23,8 +23,8 @@ namespace Evoflare.API.Data
 			}
             var items = new[]
             {
-				new CompetenceCertificate {Id = 1, CompetenceId = @"B1 ", CompetenceLevelId = 23, CertificateId = 1, OrganizationId = 1 },
-				new CompetenceCertificate {Id = 2, CompetenceId = @"B2 ", CompetenceLevelId = 24, CertificateId = 2, OrganizationId = 1 },
+				new CompetenceCertificate {Id = 1, CompetenceId = 10, CompetenceLevelId = 23, CertificateId = 1, OrganizationId = 1 },
+				new CompetenceCertificate {Id = 2, CompetenceId = 11, CompetenceLevelId = 24, CertificateId = 2, OrganizationId = 1 },
 
             };
             context.CompetenceCertificate.AddRange(items);
