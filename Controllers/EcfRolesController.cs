@@ -27,9 +27,9 @@ namespace Evoflare.API.Controllers
             if (withCompetences.HasValue && withCompetences.Value)
             {
                 return _context.EcfRole
-                    .Include(r => r.EcfRoleCompetence)
+                    .Include(r => r.EmpRoleCompetence)
                         .ThenInclude(c => c.Competence)
-                            .ThenInclude(c => c.EcfCompetenceLevel);
+                            .ThenInclude(c => c.EmpCompetenceLevel);
             }
             return _context.EcfRole;
         }
@@ -47,9 +47,9 @@ namespace Evoflare.API.Controllers
             if (withCompetences.HasValue && withCompetences.Value)
             {
                 role = await _context.EcfRole
-                    .Include(r => r.EcfRoleCompetence)
+                    .Include(r => r.EmpRoleCompetence)
                         .ThenInclude(c => c.Competence)
-                            .ThenInclude(c => c.EcfCompetenceLevel)
+                            .ThenInclude(c => c.EmpCompetenceLevel)
                     .FirstOrDefaultAsync(r => r.Id == id);
             }
             else

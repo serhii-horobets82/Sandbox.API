@@ -109,7 +109,7 @@ namespace Evoflare.API.Controllers
                 .Include(e => e.EcfEmployeeEvaluation)
                     .ThenInclude(e => e.EcfEvaluationResult)
                         .ThenInclude(e => e.CompetenceNavigation)
-                            .ThenInclude(c => c.EcfCompetenceLevel)
+                            .ThenInclude(c => c.CompetenceLevel)
                 .FirstOrDefaultAsync(e => e.Id == evaluationId);
 
             return employeeEvaluation;
@@ -171,7 +171,7 @@ namespace Evoflare.API.Controllers
                     .ThenInclude(e => e.EcfEvaluationResult)
                 .FirstOrDefaultAsync(e => e.EmployeeId == employeeEvaluation.EmployeeId && !e.Archived);
 
-            var pastEvaluationsByCompetence = new Dictionary<string, EcfEvaluationResult>();
+            var pastEvaluationsByCompetence = new Dictionary<int, EcfEvaluationResult>();
             if (lastEvaluation != null)
             {
                 lastEvaluation.Archived = true;
@@ -194,7 +194,7 @@ namespace Evoflare.API.Controllers
                 .Where(p => p.EmployeeId == employeeEvaluation.EmployeeId)
                 .Select(p => p.Position)
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
-                .SelectMany(r => r.EcfRoleCompetence.Select(c => c.CompetenceId))
+                .SelectMany(r => r.EmpRoleCompetence.Select(c => c.CompetenceId))
                 .ToListAsync();
 
             foreach (var item in competencesFromRoles)

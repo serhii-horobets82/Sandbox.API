@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class EcfRoleCompetence
+    public partial class _EcfRoleCompetence
     {
         public int Id { get; set; }
         public int RoleId { get; set; }
@@ -13,10 +13,5 @@ namespace Evoflare.API.Models
         [StringLength(3)]
         public string CompetenceId { get; set; }
         public int CompetenceLevel { get; set; }
-
-        [ForeignKey("CompetenceId")]
-        [InverseProperty("EcfRoleCompetence")]
-        public virtual EcfCompetence Competence { get; set; }
-        public virtual EcfRole Role { get; set; }
     }
 }

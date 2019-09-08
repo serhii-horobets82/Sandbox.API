@@ -21,22 +21,22 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpGet("", Name = "GetCompetences")]
-        [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<EcfCompetence>))]
-        public async Task<List<EcfCompetence>> Get()
+        [SwaggerResponse(StatusCodes.Status200OK, "List of all competences.", typeof(List<EmpCompetence>))]
+        public async Task<List<EmpCompetence>> Get()
         {
-            return await _context.EcfCompetence
-                .Include(level => level.EcfCompetenceLevel)
+            return await _context.EmpCompetence
+                .Include(level => level.EmpCompetenceLevel)
                 .ToListAsync();
         }
 
         [HttpGet("{id}", Name = "GetCompetence")]
-        [SwaggerResponse(StatusCodes.Status200OK, "The Competence with the specified unique identifier.", typeof(EcfCompetence))]
+        [SwaggerResponse(StatusCodes.Status200OK, "The Competence with the specified unique identifier.", typeof(EmpCompetence))]
         [SwaggerResponse(StatusCodes.Status304NotModified, "The Competence has not changed since the date given in the If-Modified-Since HTTP header.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "A Competence with the specified unique identifier could not be found.")]
-        public async Task<EcfCompetence> Get(string id)
+        public async Task<EmpCompetence> Get(int id)
         {
-            return await _context.EcfCompetence
-                .Include(level => level.EcfCompetenceLevel)
+            return await _context.EmpCompetence
+                .Include(level => level.EmpCompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .FirstOrDefaultAsync(i => i.Id == id);
@@ -44,7 +44,7 @@ namespace Evoflare.API.Controllers
 
         public class CompetenceRow
         {
-            public string Id { get; set; }
+            public int Id { get; set; }
             public string Name { get; set; }
             public int? CompetenceLevel { get; set; }
             public int? RoleLevel { get; set; }
@@ -60,8 +60,8 @@ namespace Evoflare.API.Controllers
         public async Task<List<CompetenceRow>> GetCompetences()
         {
             // getting all the competences from DB
-            var competences = await _context.EcfCompetence
-                .Include(c => c.EcfCompetenceLevel)
+            var competences = await _context.EmpCompetence
+                .Include(c => c.EmpCompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .ToListAsync();
@@ -72,7 +72,7 @@ namespace Evoflare.API.Controllers
                 Levels = Enumerable.Range(1, 5)
                     .Select(i =>
                     {
-                        var level = c.EcfCompetenceLevel.FirstOrDefault(cl => cl.Level == i);
+                        var level = c.EmpCompetenceLevel.FirstOrDefault(cl => cl.Level == i);
                         if (level == null) return null;
                         return new CompetenceRow.LevelInfo
                         {
