@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class EmpRoleCompetence
+    public partial class RoleCompetence
     {
-        public EmpRoleCompetence()
+        public RoleCompetence()
         {
             EcfEvaluationResult = new HashSet<EcfEvaluationResult>();
         }
@@ -18,10 +18,10 @@ namespace Evoflare.API.Models
         public int CompetenceLevel { get; set; }
 
         [ForeignKey("CompetenceId")]
-        [InverseProperty("EmpRoleCompetence")]
-        public virtual EmpCompetence Competence { get; set; }
+        [InverseProperty("RoleCompetence")]
+        public virtual Competence Competence { get; set; }
         [ForeignKey("RoleId")]
-        [InverseProperty("EmpRoleCompetence")]
+        [InverseProperty("RoleCompetence")]
         public virtual EcfRole Role { get; set; }
         [InverseProperty("CompetenceNavigation")]
         public virtual ICollection<EcfEvaluationResult> EcfEvaluationResult { get; set; }

@@ -14,10 +14,10 @@ namespace Evoflare.API.Models
 
         [ForeignKey("CompetenceId")]
         [InverseProperty("RoleGradeCompetence")]
-        public virtual EmpCompetence Competence { get; set; }
+        public virtual Competence Competence { get; set; }
         [ForeignKey("CompetenceLevelId")]
         [InverseProperty("RoleGradeCompetence")]
-        public virtual EmpCompetenceLevel CompetenceLevel { get; set; }
+        public virtual CompetenceLevel CompetenceLevel { get; set; }
         [ForeignKey("RoleGradeId")]
         [InverseProperty("RoleGradeCompetence")]
         public virtual RoleGrade RoleGrade { get; set; }

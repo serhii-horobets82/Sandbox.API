@@ -194,7 +194,7 @@ namespace Evoflare.API.Controllers
                 .Where(p => p.EmployeeId == employeeEvaluation.EmployeeId)
                 .Select(p => p.Position)
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
-                .SelectMany(r => r.EmpRoleCompetence.Select(c => c.CompetenceId))
+                .SelectMany(r => r.RoleCompetence.Select(c => c.CompetenceId))
                 .ToListAsync();
 
             foreach (var item in competencesFromRoles)

@@ -16,7 +16,7 @@ namespace Evoflare.API.Models
 
         [ForeignKey("Competence")]
         [InverseProperty("EcfEvaluationResult")]
-        public virtual EmpRoleCompetence CompetenceNavigation { get; set; }
+        public virtual RoleCompetence CompetenceNavigation { get; set; }
         [ForeignKey("EvaluationId")]
         [InverseProperty("EcfEvaluationResult")]
         public virtual EcfEmployeeEvaluation Evaluation { get; set; }

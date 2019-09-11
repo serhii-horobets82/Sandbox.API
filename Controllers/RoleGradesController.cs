@@ -209,12 +209,12 @@ namespace Evoflare.API.Controllers
                 .Include(r => r.RoleGradeCompetence)
                 .Where(c => c.EmployeeTypeId == roleId)
                 .ToListAsync();
-            var skills = await _context.EmpCompetence
-                .Include(c => c.EmpCompetenceLevel)
+            var skills = await _context.Competence
+                .Include(c => c.CompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .ToListAsync();
-            var skillsById = skills.ToDictionary(s => s.Id, s => s.EmpCompetenceLevel);
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.CompetenceLevel);
             var result = grades
                 .Select(g => new
                 {
@@ -265,12 +265,12 @@ namespace Evoflare.API.Controllers
                 .Include(r => r.RoleGradeCompetence)
                 //.Where(c => c.EmployeeTypeId == roleId)
                 .ToListAsync();
-            var skills = await _context.EmpCompetence
-                .Include(c => c.EmpCompetenceLevel)
+            var skills = await _context.Competence
+                .Include(c => c.CompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .ToListAsync();
-            var skillsById = skills.ToDictionary(s => s.Id, s => s.EmpCompetenceLevel);
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.CompetenceLevel);
             var result = grades
                 .Select(g => new
                 {
@@ -345,7 +345,7 @@ namespace Evoflare.API.Controllers
         [HttpPost("{roleId}/competences")]
         public async Task<IActionResult> PostRoleGradeCompetences(int roleId, List<PostRoleGradeCompetencesModel> rows)
         {
-            var competenceLevels = await _context.EmpCompetenceLevel.ToListAsync();
+            var competenceLevels = await _context.CompetenceLevel.ToListAsync();
             var lookup = competenceLevels.ToLookup(l => l.CompetenceId);
             rows.ForEach(r =>
             {
@@ -362,12 +362,12 @@ namespace Evoflare.API.Controllers
                 }
             });
             await _context.SaveChangesAsync();
-            var skills = await _context.EmpCompetence
-                .Include(c => c.EmpCompetenceLevel)
+            var skills = await _context.Competence
+                .Include(c => c.CompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .ToListAsync();
-            var skillsById = skills.ToDictionary(s => s.Id, s => s.EmpCompetenceLevel);
+            var skillsById = skills.ToDictionary(s => s.Id, s => s.CompetenceLevel);
             var result = rows.Select(c => new CompetenceRow
             {
                 RoleGradeCompetenceId = c.Id,

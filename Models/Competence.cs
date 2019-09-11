@@ -5,14 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class EmpCompetence
+    public partial class Competence
     {
-        public EmpCompetence()
+        public Competence()
         {
             CompetenceCertificate = new HashSet<CompetenceCertificate>();
-            EmpCompetenceLevel = new HashSet<EmpCompetenceLevel>();
-            EmpRoleCompetence = new HashSet<EmpRoleCompetence>();
+            CompetenceLevel = new HashSet<CompetenceLevel>();
             ProjectPositionCompetence = new HashSet<ProjectPositionCompetence>();
+            RoleCompetence = new HashSet<RoleCompetence>();
             RoleGradeCompetence = new HashSet<RoleGradeCompetence>();
         }
 
@@ -26,16 +26,16 @@ namespace Evoflare.API.Models
         public string Summary { get; set; }
 
         [ForeignKey("CompetenceAreaId")]
-        [InverseProperty("EmpCompetence")]
-        public virtual EmpCompetenceArea CompetenceArea { get; set; }
+        [InverseProperty("Competence")]
+        public virtual CompetenceArea CompetenceArea { get; set; }
         [InverseProperty("Competence")]
         public virtual ICollection<CompetenceCertificate> CompetenceCertificate { get; set; }
         [InverseProperty("Competence")]
-        public virtual ICollection<EmpCompetenceLevel> EmpCompetenceLevel { get; set; }
-        [InverseProperty("Competence")]
-        public virtual ICollection<EmpRoleCompetence> EmpRoleCompetence { get; set; }
+        public virtual ICollection<CompetenceLevel> CompetenceLevel { get; set; }
         [InverseProperty("Competence")]
         public virtual ICollection<ProjectPositionCompetence> ProjectPositionCompetence { get; set; }
+        [InverseProperty("Competence")]
+        public virtual ICollection<RoleCompetence> RoleCompetence { get; set; }
         [InverseProperty("Competence")]
         public virtual ICollection<RoleGradeCompetence> RoleGradeCompetence { get; set; }
     }

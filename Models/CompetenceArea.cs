@@ -5,15 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class EmpCompetenceArea
+    public partial class CompetenceArea
     {
-        public EmpCompetenceArea()
+        public CompetenceArea()
         {
-            EmpCompetence = new HashSet<EmpCompetence>();
+            Competence = new HashSet<Competence>();
         }
 
         public int Id { get; set; }
-
         [Required]
         [StringLength(90)]
         public string Name { get; set; }
@@ -22,6 +21,6 @@ namespace Evoflare.API.Models
         public string Description { get; set; }
 
         [InverseProperty("CompetenceArea")]
-        public virtual ICollection<EmpCompetence> EmpCompetence { get; set; }
+        public virtual ICollection<Competence> Competence { get; set; }
     }
 }

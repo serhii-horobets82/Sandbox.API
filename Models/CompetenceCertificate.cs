@@ -18,10 +18,10 @@ namespace Evoflare.API.Models
         public virtual Certificate Certificate { get; set; }
         [ForeignKey("CompetenceId")]
         [InverseProperty("CompetenceCertificate")]
-        public virtual EmpCompetence Competence { get; set; }
+        public virtual Competence Competence { get; set; }
         [ForeignKey("CompetenceLevelId")]
         [InverseProperty("CompetenceCertificate")]
-        public virtual EmpCompetenceLevel CompetenceLevel { get; set; }
+        public virtual CompetenceLevel CompetenceLevel { get; set; }
         [ForeignKey("OrganizationId")]
         [InverseProperty("CompetenceCertificate")]
         public virtual Organization Organization { get; set; }

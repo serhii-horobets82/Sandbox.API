@@ -15,10 +15,10 @@ namespace Evoflare.API.Models
 
         [ForeignKey("CompetenceId")]
         [InverseProperty("ProjectPositionCompetence")]
-        public virtual EmpCompetence Competence { get; set; }
+        public virtual Competence Competence { get; set; }
         [ForeignKey("CompetenceLevelId")]
         [InverseProperty("ProjectPositionCompetence")]
-        public virtual EmpCompetenceLevel CompetenceLevel { get; set; }
+        public virtual CompetenceLevel CompetenceLevel { get; set; }
         [ForeignKey("ProjectPositionId")]
         [InverseProperty("ProjectPositionCompetence")]
         public virtual ProjectPosition ProjectPosition { get; set; }

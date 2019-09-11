@@ -9,8 +9,8 @@ namespace Evoflare.API.Models
     {
         public EcfRole()
         {
-            EmpRoleCompetence = new HashSet<EmpRoleCompetence>();
             PositionRole = new HashSet<PositionRole>();
+            RoleCompetence = new HashSet<RoleCompetence>();
         }
 
         public int Id { get; set; }
@@ -22,8 +22,8 @@ namespace Evoflare.API.Models
         public string Description { get; set; }
 
         [InverseProperty("Role")]
-        public virtual ICollection<EmpRoleCompetence> EmpRoleCompetence { get; set; }
-        [InverseProperty("Role")]
         public virtual ICollection<PositionRole> PositionRole { get; set; }
+        [InverseProperty("Role")]
+        public virtual ICollection<RoleCompetence> RoleCompetence { get; set; }
     }
 }

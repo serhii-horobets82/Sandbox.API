@@ -17,15 +17,14 @@ namespace Evoflare.API.Models
 
         public virtual DbSet<Certificate> Certificate { get; set; }
         public virtual DbSet<CertificationExam> CertificationExam { get; set; }
+        public virtual DbSet<Competence> Competence { get; set; }
+        public virtual DbSet<CompetenceArea> CompetenceArea { get; set; }
         public virtual DbSet<CompetenceCertificate> CompetenceCertificate { get; set; }
+        public virtual DbSet<CompetenceLevel> CompetenceLevel { get; set; }
         public virtual DbSet<CustomerContact> CustomerContact { get; set; }
         public virtual DbSet<EcfEmployeeEvaluation> EcfEmployeeEvaluation { get; set; }
         public virtual DbSet<EcfEvaluationResult> EcfEvaluationResult { get; set; }
         public virtual DbSet<EcfRole> EcfRole { get; set; }
-        public virtual DbSet<EmpCompetence> EmpCompetence { get; set; }
-        public virtual DbSet<EmpCompetenceArea> EmpCompetenceArea { get; set; }
-        public virtual DbSet<EmpCompetenceLevel> EmpCompetenceLevel { get; set; }
-        public virtual DbSet<EmpRoleCompetence> EmpRoleCompetence { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
         public virtual DbSet<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
@@ -47,6 +46,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<ProjectCareerPath> ProjectCareerPath { get; set; }
         public virtual DbSet<ProjectPosition> ProjectPosition { get; set; }
         public virtual DbSet<ProjectPositionCompetence> ProjectPositionCompetence { get; set; }
+        public virtual DbSet<RoleCompetence> RoleCompetence { get; set; }
         public virtual DbSet<RoleGrade> RoleGrade { get; set; }
         public virtual DbSet<RoleGradeCompetence> RoleGradeCompetence { get; set; }
         public virtual DbSet<Team> Team { get; set; }
@@ -61,14 +61,26 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-
-                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
+                optionsBuilder.UseSqlServer("Data Source=(LocalDb)\\MSSQLLocalDB;Initial Catalog=EvofalreDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                // optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+
+            modelBuilder.Entity<Competence>(entity =>
+            {
+                entity.HasIndex(e => e.CompetenceAreaId)
+                    .HasName("IX_EmpCompetence_CompetenceAreaId");
+
+                entity.HasOne(d => d.CompetenceArea)
+                    .WithMany(p => p.Competence)
+                    .HasForeignKey(d => d.CompetenceAreaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmpCompetence_EmpCompetenceArea");
+            });
 
             modelBuilder.Entity<CompetenceCertificate>(entity =>
             {
@@ -103,6 +115,18 @@ namespace Evoflare.API.Models
                     .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_CompetenceCertificate_Organization");
+            });
+
+            modelBuilder.Entity<CompetenceLevel>(entity =>
+            {
+                entity.HasIndex(e => e.CompetenceId)
+                    .HasName("IX_EmpCompetenceLevel_CompetenceId");
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.CompetenceLevel)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmpCompetenceLevel_EmpCompetence");
             });
 
             modelBuilder.Entity<CustomerContact>(entity =>
@@ -194,59 +218,6 @@ namespace Evoflare.API.Models
                 entity.HasIndex(e => e.RoleId)
                     .HasName("IX_Role")
                     .IsUnique();
-            });
-
-            //modelBuilder.Entity<EcfRoleCompetence>(entity =>
-            //{
-            //    entity.HasIndex(e => e.CompetenceId);
-
-            //    entity.HasIndex(e => e.RoleId);
-
-            //    entity.Property(e => e.CompetenceId).IsUnicode(false);
-            //});
-
-            modelBuilder.Entity<EmpCompetenceArea>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-            });
-
-            modelBuilder.Entity<EmpCompetence>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.CompetenceArea)
-                    .WithMany(p => p.EmpCompetence)
-                    .HasForeignKey(d => d.CompetenceAreaId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmpCompetence_EmpCompetenceArea");
-            });
-            
-            modelBuilder.Entity<EmpCompetenceLevel>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Competence)
-                    .WithMany(p => p.EmpCompetenceLevel)
-                    .HasForeignKey(d => d.CompetenceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmpCompetenceLevel_EmpCompetence");
-            });
-
-            modelBuilder.Entity<EmpRoleCompetence>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Competence)
-                    .WithMany(p => p.EmpRoleCompetence)
-                    .HasForeignKey(d => d.CompetenceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmpRoleCompetence_EmpCompetence");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.EmpRoleCompetence)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_EmpRoleCompetence_EcfRole");
             });
 
             modelBuilder.Entity<Employee>(entity =>
@@ -660,6 +631,27 @@ namespace Evoflare.API.Models
                     .HasConstraintName("FK_ProjectPositionCompetence_RoleGrade");
             });
 
+            modelBuilder.Entity<RoleCompetence>(entity =>
+            {
+                entity.HasIndex(e => e.CompetenceId)
+                    .HasName("IX_EmpRoleCompetence_CompetenceId");
+
+                entity.HasIndex(e => e.RoleId)
+                    .HasName("IX_EmpRoleCompetence_RoleId");
+
+                entity.HasOne(d => d.Competence)
+                    .WithMany(p => p.RoleCompetence)
+                    .HasForeignKey(d => d.CompetenceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmpRoleCompetence_EmpCompetence");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.RoleCompetence)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmpRoleCompetence_EcfRole");
+            });
+
             modelBuilder.Entity<RoleGrade>(entity =>
             {
                 entity.HasIndex(e => e.EmployeeTypeId);
@@ -754,6 +746,10 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<_360evaluationResult>(entity =>
             {
+                entity.HasIndex(e => e.EvaluationId);
+
+                entity.HasIndex(e => e._360questionnarieStatementId);
+
                 entity.HasOne(d => d.Evaluation)
                     .WithMany(p => p._360evaluationResult)
                     .HasForeignKey(d => d.EvaluationId)
@@ -796,6 +792,8 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<_360questionnarieStatement>(entity =>
             {
+                entity.HasIndex(e => e.QuestionnarieId);
+
                 entity.HasOne(d => d.Questionnarie)
                     .WithMany(p => p._360questionnarieStatement)
                     .HasForeignKey(d => d.QuestionnarieId)
