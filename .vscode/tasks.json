@@ -352,6 +352,12 @@
       "type": "shell",
       "command": "heroku pg:reset DATABASE_URL",
       "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Open",
+      "type": "shell",
+      "command": "heroku open -a evoflare-api",
+      "problemMatcher": []
     }
   ]
 }

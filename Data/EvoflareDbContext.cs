@@ -28,6 +28,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<Employee> Employee { get; set; }
         public virtual DbSet<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
+        public virtual DbSet<EmployeeSalary> EmployeeSalary { get; set; }
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
         public virtual DbSet<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual DbSet<Idea> Idea { get; set; }
@@ -61,7 +62,7 @@ namespace Evoflare.API.Models
             if (!optionsBuilder.IsConfigured)
             {
 
-                optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
+                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
             }
         }
 
@@ -340,6 +341,15 @@ namespace Evoflare.API.Models
                     .WithMany(p => p.EmployeeRelations)
                     .HasForeignKey(d => d.TeamId)
                     .HasConstraintName("FK_EmployeeRelations_Team");
+            });
+
+            modelBuilder.Entity<EmployeeSalary>(entity =>
+            {
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.EmployeeSalary)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeeSalary_Employee");
             });
 
             modelBuilder.Entity<EmployeeType>(entity =>
@@ -750,6 +760,10 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<_360evaluationResult>(entity =>
             {
+                entity.HasIndex(e => e.EvaluationId);
+
+                entity.HasIndex(e => e._360questionnarieStatementId);
+
                 entity.HasOne(d => d.Evaluation)
                     .WithMany(p => p._360evaluationResult)
                     .HasForeignKey(d => d.EvaluationId)
@@ -792,6 +806,8 @@ namespace Evoflare.API.Models
 
             modelBuilder.Entity<_360questionnarieStatement>(entity =>
             {
+                entity.HasIndex(e => e.QuestionnarieId);
+
                 entity.HasOne(d => d.Questionnarie)
                     .WithMany(p => p._360questionnarieStatement)
                     .HasForeignKey(d => d.QuestionnarieId)
