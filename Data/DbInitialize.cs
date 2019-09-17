@@ -353,8 +353,26 @@ namespace Evoflare.API.Data
             if (recreateDatabase || forceRecreate)
                 RecreateDatabase(applicationContext, retryTimeout);
             else
-                applicationContext.Database.Migrate();
-                //applicationContext.Database.EnsureCreated();
+            {
+                try
+                {
+                    applicationContext.Database.Migrate();
+                }
+                catch (SqlException ex)
+                {
+                    // There is already an object named 'xxx' in the database.
+                    if (ex.Number == 2714)
+                    {
+                        // insert "Initial" migation manually
+                        var migrationId = "20190917075817_Initial";
+                        var productVersion = "2.2.4-servicing-10062";
+                        applicationContext.Database.ExecuteSqlCommand($"INSERT INTO core.Migrations(MigrationId, ProductVersion) VALUES ('{migrationId}', '{productVersion}')", migrationId, productVersion);
+                        // retry migration
+                        applicationContext.Database.Migrate();
+                    }
+                }
+            }
+            //applicationContext.Database.EnsureCreated();
             // only create empty db
             if (configuration.GetValue("only-migrate", false))
             {
