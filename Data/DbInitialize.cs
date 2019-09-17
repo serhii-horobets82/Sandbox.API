@@ -353,7 +353,8 @@ namespace Evoflare.API.Data
             if (recreateDatabase || forceRecreate)
                 RecreateDatabase(applicationContext, retryTimeout);
             else
-                applicationContext.Database.EnsureCreated();
+                applicationContext.Database.Migrate();
+                //applicationContext.Database.EnsureCreated();
             // only create empty db
             if (configuration.GetValue("only-migrate", false))
             {

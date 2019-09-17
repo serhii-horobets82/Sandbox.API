@@ -76,7 +76,11 @@ namespace Evoflare.API
             {
                 services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection"),
-                    sqlServerOptions => sqlServerOptions.CommandTimeout(300))
+                    sqlServerOptions =>
+                    {
+                        sqlServerOptions.CommandTimeout(300);
+                        sqlServerOptions.MigrationsHistoryTable("Migrations", "core");
+                    })
                 );
             }
             else
@@ -93,7 +97,7 @@ namespace Evoflare.API
                 {
                     var databaseUri = new Uri(databaseUrl);
                     var userInfo = databaseUri.UserInfo.Split(':');
-
+                    var isLocal = databaseUri.Host == "localhost";
                     var builder = new NpgsqlConnectionStringBuilder
                     {
                         Host = databaseUri.Host,
@@ -102,11 +106,10 @@ namespace Evoflare.API
                         Password = userInfo[1],
                         Database = databaseUri.LocalPath.TrimStart('/'),
                         Pooling = true,
-                        UseSslStream = true,
-                        SslMode = SslMode.Require,
-                        TrustServerCertificate = true
+                        UseSslStream = !isLocal,
+                        SslMode = isLocal ? SslMode.Disable : SslMode.Require,
+                        TrustServerCertificate = !isLocal
                     };
-                    //Pooling=true;Use SSL Stream=True;SSL Mode=Require;TrustServerCertificate=True;
                     connectionString = builder.ToString();
                 }
 
