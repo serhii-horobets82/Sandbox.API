@@ -411,7 +411,11 @@ namespace Evoflare.API.Data
                     RecreateDatabase(applicationContext, retryTimeout);
                     recreateDatabase = true;
                 }
-                else return; // DB alredy has data    
+                else 
+                    {   // DB alredy has data but new tables seeding required 
+                        SeedEmployeeSalary(applicationContext);
+                        return;     
+                    }
             }
 
             // check for roles
