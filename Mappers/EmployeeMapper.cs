@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Boxed.Mapping;
 using Evoflare.API.Models;
@@ -41,6 +42,24 @@ namespace Evoflare.API.Mappers
                     Basic = e.Basic,
                     Bonus = e.Bonus
                 });
+
+                /* 
+                // fill one year salary plan (+/- 6 monthes from today)
+                var start = DateTime.Now.AddMonths(-6);
+                var salaryList = new List<ViewModels.EmployeeSalary>();
+                var lastSalaryRecord = source.EmployeeSalary.FirstOrDefault(e => e.Period < DateTime.Now);
+                for (int i = 0; i < 12; i++)
+                {
+                    salaryList.Add(new ViewModels.EmployeeSalary
+                    {
+                        Id = lastSalaryRecord.Id,
+                        Period = start.AddMonths(1),
+                        Basic = lastSalaryRecord.Basic,
+                        Bonus = lastSalaryRecord.Bonus
+                    });
+                }
+                destination.Salary = salaryList;
+                */
             }
         }
     }

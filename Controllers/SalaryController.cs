@@ -27,17 +27,18 @@ namespace Evoflare.API.Controllers
         public async Task<IEnumerable<ViewModels.Employee>> GetAllEmployee()
         {
             var employeeId = GetEmployeeId();
-            // get project only where I am a manager.
-            // TODO: manager could be on the Project level, also on Team level. Should filter teams if the last case.
-            var projects = await _context.Project
+
+            // get employees from projects only where I am a manager.
+            var employees = await _context.Project
                 .Where(p => p.EmployeeRelations.Any(r => r.ManagerId == employeeId))
-                .Include(_ => _.Team)
-                    .ThenInclude(t => t.EmployeeRelations)
+                .SelectMany(e => e.Team) // all teams 
+                .SelectMany(t => t.EmployeeRelations) // relations 
+                .Select(m => m.Employee)
+                .Where(m => m != null)
+                .Include(e => e.EmployeeSalary)
+                .Include(e => e.EmployeeType)
                 .ToListAsync();
 
-            var employees = _context.Employee
-                .Include(e => e.EmployeeSalary)
-                .Include(e => e.EmployeeType);
             return _employeeMapper.MapList(employees);
         }
 
@@ -56,7 +57,7 @@ namespace Evoflare.API.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> Edit(int id, ViewModels.EmployeeSalary vmSalary)
         {
-            var salary = await _context.EmployeeSalary.FindAsync(vmSalary.Id); 
+            var salary = await _context.EmployeeSalary.FindAsync(vmSalary.Id);
 
             if (salary == null)
                 return InvokeHttp404();
@@ -65,22 +66,24 @@ namespace Evoflare.API.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task<ActionResult<EmployeeSalary>> Post(int id, ViewModels.EmployeeSalary vmSalary)
+        public async Task<ActionResult<EmployeeSalary>> Post([FromRoute]int id, [FromBody]ViewModels.EmployeeSalary vmSalary)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var salary = new EmployeeSalary {
+            var salary = new EmployeeSalary
+            {
                 EmployeeId = id,
                 Basic = vmSalary.Basic,
                 Bonus = vmSalary.Bonus,
                 Period = vmSalary.Period
             };
-             _context.EmployeeSalary.Add(salary);
+            _context.EmployeeSalary.Add(salary);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSalary", new { id = salary.Id }, salary);
+
+            return Ok(salary);
         }
 
         [HttpDelete("{id}")]
