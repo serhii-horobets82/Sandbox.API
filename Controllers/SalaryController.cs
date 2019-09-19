@@ -32,11 +32,12 @@ namespace Evoflare.API.Controllers
             var employees = await _context.Project
                 .Where(p => p.EmployeeRelations.Any(r => r.ManagerId == employeeId))
                 .SelectMany(e => e.Team) // all teams 
-                .SelectMany(t => t.EmployeeRelations) // relations 
+                .SelectMany(t => t.EmployeeRelations)// relations 
                 .Select(m => m.Employee)
                 .Where(m => m != null)
                 .Include(e => e.EmployeeSalary)
                 .Include(e => e.EmployeeType)
+                .Distinct() 
                 .ToListAsync();
 
             return _employeeMapper.MapList(employees);
@@ -72,16 +73,28 @@ namespace Evoflare.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var salary = new EmployeeSalary
-            {
-                EmployeeId = id,
-                Basic = vmSalary.Basic,
-                Bonus = vmSalary.Bonus,
-                Period = vmSalary.Period
-            };
-            _context.EmployeeSalary.Add(salary);
-            await _context.SaveChangesAsync();
 
+            EmployeeSalary salary;
+            // update
+            if (vmSalary.Id < 0)
+            {
+                salary = new EmployeeSalary
+                {
+                    EmployeeId = id,
+                    Basic = vmSalary.Basic,
+                    Bonus = vmSalary.Bonus,
+                    Period = vmSalary.Period
+                };
+                _context.EmployeeSalary.Add(salary);
+            }
+            else
+            {
+                salary = _context.EmployeeSalary.Find(vmSalary.Id);
+                salary.Basic = vmSalary.Basic;
+                salary.Bonus = vmSalary.Bonus;
+                salary.Period = vmSalary.Period;
+            }
+            await _context.SaveChangesAsync();
 
             return Ok(salary);
         }
