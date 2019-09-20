@@ -15,6 +15,7 @@ using Evoflare.API.Auth;
 using Evoflare.API.Auth.Identity;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
+using Evoflare.API.Data;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
@@ -26,6 +27,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -115,7 +117,12 @@ namespace Evoflare.API
 
                 services.AddDbContext<EvoflareDbContext>(options => options.UseNpgsql(
                     connectionString,
-                    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
+                    pgOptions =>
+                    {
+                        pgOptions.CommandTimeout(300);
+                        pgOptions.MigrationsHistoryTable("Migrations", "core");
+                    })
+                    .ReplaceService<IMigrationsSqlGenerator, BaseMigrationsSqlGenerator>()
                 );
             }
 
