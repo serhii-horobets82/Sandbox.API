@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evoflare.API.Migrations
 {
     [DbContext(typeof(EvoflareDbContext))]
-    [Migration("20190917075817_Initial")]
+    [Migration("20190922111435_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -233,6 +233,49 @@ namespace Evoflare.API.Migrations
                     b.ToTable("CertificationExam");
                 });
 
+            modelBuilder.Entity("Evoflare.API.Models.Competence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CompetenceAreaId");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(800);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetenceAreaId")
+                        .HasName("IX_EmpCompetence_CompetenceAreaId");
+
+                    b.ToTable("Competence");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.CompetenceArea", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(600);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(90);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompetenceArea");
+                });
+
             modelBuilder.Entity("Evoflare.API.Models.CompetenceCertificate", b =>
                 {
                     b.Property<int>("Id")
@@ -241,10 +284,7 @@ namespace Evoflare.API.Migrations
 
                     b.Property<int>("CertificateId");
 
-                    b.Property<string>("CompetenceId")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
+                    b.Property<int>("CompetenceId");
 
                     b.Property<int>("CompetenceLevelId");
 
@@ -261,6 +301,28 @@ namespace Evoflare.API.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("CompetenceCertificate");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.CompetenceLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CompetenceId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(600);
+
+                    b.Property<int>("Level");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetenceId")
+                        .HasName("IX_EmpCompetenceLevel_CompetenceId");
+
+                    b.ToTable("CompetenceLevel");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.CustomerContact", b =>
@@ -293,45 +355,6 @@ namespace Evoflare.API.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("CustomerContact");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models.EcfCompetence", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Summary");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EcfCompetence");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models.EcfCompetenceLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CompetenceId")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Description");
-
-                    b.Property<int>("Level");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompetenceId");
-
-                    b.ToTable("EcfCompetenceLevel");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.EcfEmployeeEvaluation", b =>
@@ -377,10 +400,7 @@ namespace Evoflare.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Competence")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
+                    b.Property<int>("Competence");
 
                     b.Property<int?>("CompetenceLevel");
 
@@ -421,30 +441,6 @@ namespace Evoflare.API.Migrations
                         .HasName("IX_Role");
 
                     b.ToTable("EcfRole");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models.EcfRoleCompetence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CompetenceId")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
-
-                    b.Property<int>("CompetenceLevel");
-
-                    b.Property<int>("RoleId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompetenceId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("EcfRoleCompetence");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.Employee", b =>
@@ -556,6 +552,30 @@ namespace Evoflare.API.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("EmployeeRelations");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.EmployeeSalary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<int>("Basic");
+
+                    b.Property<int>("Bonus");
+
+                    b.Property<int>("EmployeeId");
+
+                    b.Property<DateTime>("Period")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeSalary");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.EmployeeType", b =>
@@ -976,10 +996,7 @@ namespace Evoflare.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CompetenceId")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
+                    b.Property<int>("CompetenceId");
 
                     b.Property<int>("CompetenceLevelId");
 
@@ -998,6 +1015,29 @@ namespace Evoflare.API.Migrations
                     b.HasIndex("RoleGradeId");
 
                     b.ToTable("ProjectPositionCompetence");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.RoleCompetence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CompetenceId");
+
+                    b.Property<int>("CompetenceLevel");
+
+                    b.Property<int>("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetenceId")
+                        .HasName("IX_EmpRoleCompetence_CompetenceId");
+
+                    b.HasIndex("RoleId")
+                        .HasName("IX_EmpRoleCompetence_RoleId");
+
+                    b.ToTable("RoleCompetence");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.RoleGrade", b =>
@@ -1030,10 +1070,7 @@ namespace Evoflare.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CompetenceId")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .IsUnicode(false);
+                    b.Property<int>("CompetenceId");
 
                     b.Property<int>("CompetenceLevelId");
 
@@ -1301,6 +1338,14 @@ namespace Evoflare.API.Migrations
                         .HasForeignKey("IdentityId");
                 });
 
+            modelBuilder.Entity("Evoflare.API.Models.Competence", b =>
+                {
+                    b.HasOne("Evoflare.API.Models.CompetenceArea", "CompetenceArea")
+                        .WithMany("Competence")
+                        .HasForeignKey("CompetenceAreaId")
+                        .HasConstraintName("FK_EmpCompetence_EmpCompetenceArea");
+                });
+
             modelBuilder.Entity("Evoflare.API.Models.CompetenceCertificate", b =>
                 {
                     b.HasOne("Evoflare.API.Models.Certificate", "Certificate")
@@ -1308,20 +1353,28 @@ namespace Evoflare.API.Migrations
                         .HasForeignKey("CertificateId")
                         .HasConstraintName("FK_CompetenceCertificate_Certificate");
 
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "Competence")
+                    b.HasOne("Evoflare.API.Models.Competence", "Competence")
                         .WithMany("CompetenceCertificate")
                         .HasForeignKey("CompetenceId")
-                        .HasConstraintName("FK_CompetenceCertificate_EcfCompetence");
+                        .HasConstraintName("FK_CompetenceCertificate_EmpCompetence");
 
-                    b.HasOne("Evoflare.API.Models.EcfCompetenceLevel", "CompetenceLevel")
+                    b.HasOne("Evoflare.API.Models.CompetenceLevel", "CompetenceLevel")
                         .WithMany("CompetenceCertificate")
                         .HasForeignKey("CompetenceLevelId")
-                        .HasConstraintName("FK_CompetenceCertificate_EcfCompetenceLevel");
+                        .HasConstraintName("FK_CompetenceCertificate_EmpCompetenceLevel");
 
                     b.HasOne("Evoflare.API.Models.Organization", "Organization")
                         .WithMany("CompetenceCertificate")
                         .HasForeignKey("OrganizationId")
                         .HasConstraintName("FK_CompetenceCertificate_Organization");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.CompetenceLevel", b =>
+                {
+                    b.HasOne("Evoflare.API.Models.Competence", "Competence")
+                        .WithMany("CompetenceLevel")
+                        .HasForeignKey("CompetenceId")
+                        .HasConstraintName("FK_EmpCompetenceLevel_EmpCompetence");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.CustomerContact", b =>
@@ -1335,14 +1388,6 @@ namespace Evoflare.API.Migrations
                         .WithMany("CustomerContact")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_CustomerContact_Project");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models.EcfCompetenceLevel", b =>
-                {
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "Competence")
-                        .WithMany("EcfCompetenceLevel")
-                        .HasForeignKey("CompetenceId")
-                        .HasConstraintName("FK_CompetenceLevel_Competence");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.EcfEmployeeEvaluation", b =>
@@ -1375,29 +1420,15 @@ namespace Evoflare.API.Migrations
 
             modelBuilder.Entity("Evoflare.API.Models.EcfEvaluationResult", b =>
                 {
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "CompetenceNavigation")
+                    b.HasOne("Evoflare.API.Models.RoleCompetence", "CompetenceNavigation")
                         .WithMany("EcfEvaluationResult")
                         .HasForeignKey("Competence")
-                        .HasConstraintName("FK_EcfEvaluation_EcfCompetence");
+                        .HasConstraintName("FK_EcfEvaluationResult_EmpRoleCompetence");
 
                     b.HasOne("Evoflare.API.Models.EcfEmployeeEvaluation", "Evaluation")
                         .WithMany("EcfEvaluationResult")
                         .HasForeignKey("EvaluationId")
                         .HasConstraintName("FK_EcfEvaluationResults_EcfEmployeeEvaluation");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models.EcfRoleCompetence", b =>
-                {
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "Competence")
-                        .WithMany("EcfRoleCompetence")
-                        .HasForeignKey("CompetenceId")
-                        .HasConstraintName("FK_EcfRoleCompetence_EcfCompetence");
-
-                    b.HasOne("Evoflare.API.Models.EcfRole", "Role")
-                        .WithMany("EcfRoleCompetence")
-                        .HasForeignKey("RoleId")
-                        .HasConstraintName("FK_EcfRoleCompetence_EcfRole")
-                        .HasPrincipalKey("RoleId");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.Employee", b =>
@@ -1472,6 +1503,14 @@ namespace Evoflare.API.Migrations
                         .WithMany("EmployeeRelations")
                         .HasForeignKey("TeamId")
                         .HasConstraintName("FK_EmployeeRelations_Team");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.EmployeeSalary", b =>
+                {
+                    b.HasOne("Evoflare.API.Models.Employee", "Employee")
+                        .WithMany("EmployeeSalary")
+                        .HasForeignKey("EmployeeId")
+                        .HasConstraintName("FK_EmployeeSalary_Employee");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.EmployeeType", b =>
@@ -1662,15 +1701,15 @@ namespace Evoflare.API.Migrations
 
             modelBuilder.Entity("Evoflare.API.Models.ProjectPositionCompetence", b =>
                 {
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "Competence")
+                    b.HasOne("Evoflare.API.Models.Competence", "Competence")
                         .WithMany("ProjectPositionCompetence")
                         .HasForeignKey("CompetenceId")
-                        .HasConstraintName("FK_ProjectPositionCompetence_EcfCompetence");
+                        .HasConstraintName("FK_ProjectPositionCompetence_EmpCompetence");
 
-                    b.HasOne("Evoflare.API.Models.EcfCompetenceLevel", "CompetenceLevel")
+                    b.HasOne("Evoflare.API.Models.CompetenceLevel", "CompetenceLevel")
                         .WithMany("ProjectPositionCompetence")
                         .HasForeignKey("CompetenceLevelId")
-                        .HasConstraintName("FK_ProjectPositionCompetence_EcfCompetenceLevel");
+                        .HasConstraintName("FK_ProjectPositionCompetence_EmpCompetenceLevel");
 
                     b.HasOne("Evoflare.API.Models.ProjectPosition", "ProjectPosition")
                         .WithMany("ProjectPositionCompetence")
@@ -1681,6 +1720,19 @@ namespace Evoflare.API.Migrations
                         .WithMany("ProjectPositionCompetence")
                         .HasForeignKey("RoleGradeId")
                         .HasConstraintName("FK_ProjectPositionCompetence_RoleGrade");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.RoleCompetence", b =>
+                {
+                    b.HasOne("Evoflare.API.Models.Competence", "Competence")
+                        .WithMany("RoleCompetence")
+                        .HasForeignKey("CompetenceId")
+                        .HasConstraintName("FK_EmpRoleCompetence_EmpCompetence");
+
+                    b.HasOne("Evoflare.API.Models.EcfRole", "Role")
+                        .WithMany("RoleCompetence")
+                        .HasForeignKey("RoleId")
+                        .HasConstraintName("FK_EmpRoleCompetence_EcfRole");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.RoleGrade", b =>
@@ -1698,15 +1750,15 @@ namespace Evoflare.API.Migrations
 
             modelBuilder.Entity("Evoflare.API.Models.RoleGradeCompetence", b =>
                 {
-                    b.HasOne("Evoflare.API.Models.EcfCompetence", "Competence")
+                    b.HasOne("Evoflare.API.Models.Competence", "Competence")
                         .WithMany("RoleGradeCompetence")
                         .HasForeignKey("CompetenceId")
-                        .HasConstraintName("FK_CareerPathSkills_EcfCompetence");
+                        .HasConstraintName("FK_RoleGradeCompetence_EmpCompetence");
 
-                    b.HasOne("Evoflare.API.Models.EcfCompetenceLevel", "CompetenceLevel")
+                    b.HasOne("Evoflare.API.Models.CompetenceLevel", "CompetenceLevel")
                         .WithMany("RoleGradeCompetence")
                         .HasForeignKey("CompetenceLevelId")
-                        .HasConstraintName("FK_CareerPathSkills_EcfCompetenceLevel");
+                        .HasConstraintName("FK_RoleGradeCompetence_EmpCompetenceLevel");
 
                     b.HasOne("Evoflare.API.Models.RoleGrade", "RoleGrade")
                         .WithMany("RoleGradeCompetence")
