@@ -1,0 +1,3 @@
+FROM postgres:latest
+ENV POSTGRES_PASSWORD=DatgE66VbHy7
+ENV POSTGRES_USER=evoflare

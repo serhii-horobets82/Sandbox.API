@@ -414,6 +414,8 @@ namespace Evoflare.API
                     // Show an example model for JsonPatchDocument<T>.
                     options.SchemaFilter<JsonPatchDocumentSchemaFilter>();
 
+                    options.CustomSchemaIds(e => e.FullName);
+
                     var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
                     foreach (var apiVersionDescription in provider.ApiVersionDescriptions)
                     {
