@@ -40,12 +40,12 @@ namespace Evoflare.API.Controllers
                     .ThenInclude(pp => pp.ProjectPositionCompetence)
                 .Where(p => p.ProjectId == projectId)
                 .ToListAsync();
-            var competences = await _context.EcfCompetence
-                .Include(c => c.EcfCompetenceLevel)
+            var competences = await _context.Competence
+                .Include(c => c.CompetenceLevel)
                     .ThenInclude(l => l.CompetenceCertificate)
                         .ThenInclude(c => c.Certificate)
                 .ToListAsync();
-            var skillsById = competences.ToDictionary(s => s.Id, s => s.EcfCompetenceLevel);
+            var skillsById = competences.ToDictionary(s => s.Id, s => s.CompetenceLevel);
             return result.Select(r => new
             {
                 CareerPathId = r.Id,

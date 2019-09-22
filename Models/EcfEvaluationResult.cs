@@ -9,16 +9,14 @@ namespace Evoflare.API.Models
     {
         public int Id { get; set; }
         public int EvaluationId { get; set; }
-        [Required]
-        [StringLength(3)]
-        public string Competence { get; set; }
+        public int Competence { get; set; }
         public int? CompetenceLevel { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? Date { get; set; }
 
         [ForeignKey("Competence")]
         [InverseProperty("EcfEvaluationResult")]
-        public virtual EcfCompetence CompetenceNavigation { get; set; }
+        public virtual RoleCompetence CompetenceNavigation { get; set; }
         [ForeignKey("EvaluationId")]
         [InverseProperty("EcfEvaluationResult")]
         public virtual EcfEmployeeEvaluation Evaluation { get; set; }

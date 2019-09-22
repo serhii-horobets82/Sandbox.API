@@ -497,14 +497,18 @@ namespace Evoflare.API.Data
                 SeedEmployeeEvaluation(applicationContext);
                 SeedCertificationExam(applicationContext);
 
-                SeedEcfCompetence(applicationContext);
-                SeedEcfCompetenceLevel(applicationContext);
+                SeedCompetenceArea(applicationContext);
+                SeedCompetence(applicationContext);
+                SeedCompetenceLevel(applicationContext);
+
                 // disable for now to make 360 work.
                 // TODO: This should be unlinked from 360 evaluation process. The initial implementation is incorrect.
                 //SeedEcfEmployeeEvaluation(applicationContext);
                 //SeedEcfEvaluationResult(applicationContext);
                 SeedEcfRole(applicationContext);
-                SeedEcfRoleCompetence(applicationContext);
+
+                SeedRoleCompetence(applicationContext);
+                //SeedEcfRoleCompetence(applicationContext);
 
                 SeedProject(applicationContext);
                 SeedPosition(applicationContext);

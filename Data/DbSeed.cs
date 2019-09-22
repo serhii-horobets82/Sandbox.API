@@ -84,12 +84,15 @@ namespace Evoflare.API.Data
                 SeedEmployeeEvaluation(applicationContext);
                 SeedCertificationExam(applicationContext);
 
-                SeedEcfCompetence(applicationContext);
-                SeedEcfCompetenceLevel(applicationContext);
+                SeedCompetenceArea(applicationContext);
+                SeedCompetence(applicationContext);
+                SeedCompetenceLevel(applicationContext);
+
                 SeedEcfEmployeeEvaluation(applicationContext);
                 SeedEcfEvaluationResult(applicationContext);
                 SeedEcfRole(applicationContext);
-                SeedEcfRoleCompetence(applicationContext);
+                SeedRoleCompetence(applicationContext);
+                //SeedEcfRoleCompetence(applicationContext);
 
                 SeedProject(applicationContext);
                 SeedPosition(applicationContext);

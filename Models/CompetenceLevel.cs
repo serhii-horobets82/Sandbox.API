@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evoflare.API.Models
 {
-    public partial class EcfCompetenceLevel
+    public partial class CompetenceLevel
     {
-        public EcfCompetenceLevel()
+        public CompetenceLevel()
         {
             CompetenceCertificate = new HashSet<CompetenceCertificate>();
             ProjectPositionCompetence = new HashSet<ProjectPositionCompetence>();
@@ -15,15 +15,15 @@ namespace Evoflare.API.Models
         }
 
         public int Id { get; set; }
-        [Required]
-        [StringLength(3)]
-        public string CompetenceId { get; set; }
+        public int CompetenceId { get; set; }
         public int Level { get; set; }
+        [Required]
+        [StringLength(600)]
         public string Description { get; set; }
 
         [ForeignKey("CompetenceId")]
-        [InverseProperty("EcfCompetenceLevel")]
-        public virtual EcfCompetence Competence { get; set; }
+        [InverseProperty("CompetenceLevel")]
+        public virtual Competence Competence { get; set; }
         [InverseProperty("CompetenceLevel")]
         public virtual ICollection<CompetenceCertificate> CompetenceCertificate { get; set; }
         [InverseProperty("CompetenceLevel")]

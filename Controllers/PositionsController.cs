@@ -72,18 +72,18 @@ namespace Evoflare.API.Controllers
                         Name = pr.Role.Name,
                         Summary = pr.Role.Summary,
                         Description = pr.Role.Description,
-                        EcfRoleCompetence = pr.Role.EcfRoleCompetence.Select(c => new EcfRoleCompetence
+                        RoleCompetence = pr.Role.RoleCompetence.Select(c => new RoleCompetence
                         {
                             Id = c.Id,
                             CompetenceId = c.CompetenceId,
                             CompetenceLevel = c.CompetenceLevel,
-                            Competence = new EcfCompetence
+                            Competence = new Competence
                             {
                                 Id = c.Competence.Id,
                                 Name = c.Competence.Name,
                                 Summary = c.Competence.Summary,
-                                EcfCompetenceLevel = c.Competence.EcfCompetenceLevel
-                                    .Select(l => new EcfCompetenceLevel
+                                CompetenceLevel = c.Competence.CompetenceLevel
+                                    .Select(l => new CompetenceLevel
                                     {
                                         Id = l.Id,
                                         Level = l.Level
@@ -103,7 +103,7 @@ namespace Evoflare.API.Controllers
             return _context.Position
                 .Include(position => position.PositionRole)
                     .ThenInclude(positionRole => positionRole.Role)
-                    .ThenInclude(role => role.EcfRoleCompetence)
+                    .ThenInclude(role => role.RoleCompetence)
                     .ThenInclude(roleCompetence => roleCompetence.Competence);
         }
 

@@ -90,6 +90,5 @@ namespace Evoflare.API.Models
         [ForeignKey("UserId")]
         [InverseProperty("Employee")]
         public virtual Evoflare.API.Auth.Models.ApplicationUser Users { get; set; }
- }
+    }
 }
-

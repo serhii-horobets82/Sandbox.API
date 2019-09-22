@@ -8,18 +8,16 @@ namespace Evoflare.API.Models
     public partial class RoleGradeCompetence
     {
         public int Id { get; set; }
-        [Required]
-        [StringLength(3)]
-        public string CompetenceId { get; set; }
+        public int CompetenceId { get; set; }
         public int CompetenceLevelId { get; set; }
         public int RoleGradeId { get; set; }
 
         [ForeignKey("CompetenceId")]
         [InverseProperty("RoleGradeCompetence")]
-        public virtual EcfCompetence Competence { get; set; }
+        public virtual Competence Competence { get; set; }
         [ForeignKey("CompetenceLevelId")]
         [InverseProperty("RoleGradeCompetence")]
-        public virtual EcfCompetenceLevel CompetenceLevel { get; set; }
+        public virtual CompetenceLevel CompetenceLevel { get; set; }
         [ForeignKey("RoleGradeId")]
         [InverseProperty("RoleGradeCompetence")]
         public virtual RoleGrade RoleGrade { get; set; }

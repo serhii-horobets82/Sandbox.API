@@ -187,7 +187,7 @@ namespace Evoflare.API.Controllers
 
         public class ProfileEcfCompetence
         {
-            public string Id { get; set; }
+            public int Id { get; set; }
             public string Name { get; set; }
             public int CompetenceLevel { get; set; }
             public int RoleLevel { get; set; }
@@ -199,8 +199,8 @@ namespace Evoflare.API.Controllers
         public async Task<List<ProfileEcfCompetence>> GetEmployeeProfileEcf()
         {
             // getting all the competences from DB
-            var competences = await _context.EcfCompetence
-                .Include(c => c.EcfCompetenceLevel)
+            var competences = await _context.Competence
+                .Include(c => c.CompetenceLevel)
                 .ToListAsync();
             var competencesById = competences.ToDictionary(c => c.Id);
             var employeeId = GetEmployeeId();
@@ -209,7 +209,7 @@ namespace Evoflare.API.Controllers
                 .Where(p => p.EmployeeId == employeeId)
                 .Select(p => p.Position)
                 .SelectMany(p => p.PositionRole.Select(r => r.Role))
-                .SelectMany(r => r.EcfRoleCompetence.Select(c => new { RoleCompetenceLevel = c.CompetenceLevel, c.CompetenceId }))
+                .SelectMany(r => r.RoleCompetence.Select(c => new { RoleCompetenceLevel = c.CompetenceLevel, c.CompetenceId }))
                 .ToListAsync();
 
             var lastEvaluation = await _context.EmployeeEvaluation
@@ -218,7 +218,7 @@ namespace Evoflare.API.Controllers
                 .FirstOrDefaultAsync(e => e.EmployeeId == employeeId && !e.Archived);
 
             var pastEvaluationsByCompetence = 
-                new Dictionary<string, (string competenceId, int competenceLevel, int roleCompetenceLevel)>();
+                new Dictionary<int, (int competenceId, int competenceLevel, int roleCompetenceLevel)>();
             if (lastEvaluation != null)
             {
                 if (lastEvaluation.EcfEmployeeEvaluation != null && lastEvaluation.EcfEmployeeEvaluation.Any())
@@ -256,7 +256,7 @@ namespace Evoflare.API.Controllers
                     CompetenceLevel = c.competenceLevel,
                     Levels = Enumerable.Range(1, 5).Select(i => 0).ToList()                    
                 };
-                foreach(var l in competence.EcfCompetenceLevel)
+                foreach(var l in competence.CompetenceLevel)
                 {
                     d.Levels[l.Level] = 1;
                 }
