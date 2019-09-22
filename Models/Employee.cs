@@ -17,6 +17,7 @@ namespace Evoflare.API.Models
             EmployeeEvaluationStartedBy = new HashSet<EmployeeEvaluation>();
             EmployeeRelationsEmployee = new HashSet<EmployeeRelations>();
             EmployeeRelationsManager = new HashSet<EmployeeRelations>();
+            EmployeeSalary = new HashSet<EmployeeSalary>();
             EvaluationSchedule = new HashSet<EvaluationSchedule>();
             Idea = new HashSet<Idea>();
             IdeaComment = new HashSet<IdeaComment>();
@@ -66,6 +67,8 @@ namespace Evoflare.API.Models
         public virtual ICollection<EmployeeRelations> EmployeeRelationsEmployee { get; set; }
         [InverseProperty("Manager")]
         public virtual ICollection<EmployeeRelations> EmployeeRelationsManager { get; set; }
+        [InverseProperty("Employee")]
+        public virtual ICollection<EmployeeSalary> EmployeeSalary { get; set; }
         [InverseProperty("Employee")]
         public virtual ICollection<EvaluationSchedule> EvaluationSchedule { get; set; }
         [InverseProperty("CreatedBy")]

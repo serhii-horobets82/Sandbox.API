@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evoflare.API.Migrations
 {
     [DbContext(typeof(EvoflareDbContext))]
-    [Migration("20190717205101_Initial")]
+    [Migration("20190917075817_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -26,16 +26,18 @@ namespace Evoflare.API.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AccessGroup");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<int>("DefaultPermission");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256);
+
+                    b.Property<string>("PolicyName");
 
                     b.HasKey("Id");
 
@@ -44,7 +46,7 @@ namespace Evoflare.API.Migrations
                         .HasName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRole","security");
+                    b.ToTable("Roles","security");
                 });
 
             modelBuilder.Entity("Evoflare.API.Auth.Models.ApplicationUser", b =>
@@ -107,7 +109,7 @@ namespace Evoflare.API.Migrations
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUser","security");
+                    b.ToTable("Users","security");
                 });
 
             modelBuilder.Entity("Evoflare.API.Auth.Models.UserProfile", b =>
@@ -157,6 +159,10 @@ namespace Evoflare.API.Migrations
                     b.Property<DateTime>("CreationDate");
 
                     b.Property<string>("Database");
+
+                    b.Property<string>("DatabaseType");
+
+                    b.Property<string>("Organization");
 
                     b.Property<string>("Version");
 
@@ -467,13 +473,15 @@ namespace Evoflare.API.Migrations
                         .HasMaxLength(30);
 
                     b.Property<string>("UserId")
-                        .HasMaxLength(10);
+                        .IsRequired();
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeTypeId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Employee");
                 });
@@ -681,7 +689,9 @@ namespace Evoflare.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -726,6 +736,32 @@ namespace Evoflare.API.Migrations
                     b.ToTable("IdeaView");
                 });
 
+            modelBuilder.Entity("Evoflare.API.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Active");
+
+                    b.Property<int>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("EmployeeId");
+
+                    b.Property<string>("Message")
+                        .IsRequired();
+
+                    b.Property<DateTime?>("ViewDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification");
+                });
+
             modelBuilder.Entity("Evoflare.API.Models.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -739,6 +775,23 @@ namespace Evoflare.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Organization");
+                });
+
+            modelBuilder.Entity("Evoflare.API.Models.OrganizationStructureType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrganizationStructureType");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.Pdp", b =>
@@ -844,6 +897,9 @@ namespace Evoflare.API.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1041,9 +1097,6 @@ namespace Evoflare.API.Migrations
 
                     b.Property<string>("StopDoing");
 
-                    b.Property<int>("_360feedbackGroupId")
-                        .HasColumnName("360FeedbackGroupId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EvaluationId");
@@ -1052,12 +1105,10 @@ namespace Evoflare.API.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.HasIndex("_360feedbackGroupId");
-
                     b.ToTable("360EmployeeEvaluation");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360evaluation", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360evaluationResult", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1065,80 +1116,34 @@ namespace Evoflare.API.Migrations
 
                     b.Property<int>("EvaluationId");
 
-                    b.Property<int>("FeedbackMarkId");
-
-                    b.Property<int>("OrganizationId");
-
-                    b.Property<int>("QuestionId");
+                    b.Property<int>("_360questionnarieStatementId")
+                        .HasColumnName("360QuestionnarieStatementId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EvaluationId");
 
-                    b.HasIndex("FeedbackMarkId");
+                    b.HasIndex("_360questionnarieStatementId");
 
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("360Evaluation");
+                    b.ToTable("360EvaluationResult");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360evaluationComment", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360evaluationSchedule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EvaluationId");
+                    b.Property<int>("EvaluationWindowMonths");
 
-                    b.Property<int>("OrganizationId");
+                    b.Property<int>("PeriodMonths");
 
-                    b.Property<string>("OtherComments");
-
-                    b.Property<string>("StartDoing");
-
-                    b.Property<string>("StopDoing");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EvaluationId");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.ToTable("360EvaluationComment");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360feedbackGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("360FeedbackGroup");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360feedbackMark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Mark");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("360FeedbackMark");
+                    b.ToTable("360EvaluationSchedule");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models._360pendingEvaluator", b =>
@@ -1167,74 +1172,40 @@ namespace Evoflare.API.Migrations
                     b.ToTable("360PendingEvaluator");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360question", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360questionnarie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Order");
+                    b.Property<bool>("IsForManager");
 
-                    b.Property<int>("OrganizationId");
-
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasMaxLength(250);
-
-                    b.Property<int>("QuestionToMarkId");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("QuestionToMarkId");
-
-                    b.ToTable("360Question");
+                    b.ToTable("360Questionnarie");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360questionToMark", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360questionnarieStatement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MarkId");
+                    b.Property<int>("Mark");
 
-                    b.Property<int>("OrganizationId");
-
-                    b.Property<int>("QuestionId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("360QuestionToMark");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360questionarie", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("OrganizationId");
+                    b.Property<int>("QuestionnarieId");
 
                     b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(250);
-
-                    b.Property<int>("_360feedbackGroupId")
-                        .HasColumnName("360FeedbackGroupId");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
+                    b.HasIndex("QuestionnarieId");
 
-                    b.HasIndex("_360feedbackGroupId");
-
-                    b.ToTable("360Questionarie");
+                    b.ToTable("360QuestionnarieStatement");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1254,7 +1225,7 @@ namespace Evoflare.API.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaim","security");
+                    b.ToTable("RoleClaims","security");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -1274,7 +1245,7 @@ namespace Evoflare.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaim","security");
+                    b.ToTable("UserClaims","security");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -1292,7 +1263,7 @@ namespace Evoflare.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogin","security");
+                    b.ToTable("UserLogins","security");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -1305,7 +1276,7 @@ namespace Evoflare.API.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRole","security");
+                    b.ToTable("UserRoles","security");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1320,7 +1291,7 @@ namespace Evoflare.API.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserToken","security");
+                    b.ToTable("UserTokens","security");
                 });
 
             modelBuilder.Entity("Evoflare.API.Auth.Models.UserProfile", b =>
@@ -1440,6 +1411,11 @@ namespace Evoflare.API.Migrations
                         .WithMany("Employee")
                         .HasForeignKey("OrganizationId")
                         .HasConstraintName("FK_Employee_Organization");
+
+                    b.HasOne("Evoflare.API.Auth.Models.ApplicationUser", "Users")
+                        .WithMany("Employee")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.EmployeeEvaluation", b =>
@@ -1573,12 +1549,12 @@ namespace Evoflare.API.Migrations
                     b.HasOne("Evoflare.API.Models.Idea", "Idea")
                         .WithMany("IdeaTagRef")
                         .HasForeignKey("IdeaId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasConstraintName("FK_IdeaTagRef_Idea");
 
                     b.HasOne("Evoflare.API.Models.IdeaTag", "Tag")
                         .WithMany("IdeaTagRef")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasConstraintName("FK_IdeaTagRef_IdeaTag");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models.IdeaView", b =>
@@ -1767,47 +1743,19 @@ namespace Evoflare.API.Migrations
                         .WithMany("_360employeeEvaluation")
                         .HasForeignKey("OrganizationId")
                         .HasConstraintName("FK_360EmployeeEvaluation_Organization");
-
-                    b.HasOne("Evoflare.API.Models._360feedbackGroup", "_360feedbackGroup")
-                        .WithMany("_360employeeEvaluation")
-                        .HasForeignKey("_360feedbackGroupId")
-                        .HasConstraintName("FK_360EmployeeEvaluation_360FeedbackGroup");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360evaluation", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360evaluationResult", b =>
                 {
                     b.HasOne("Evoflare.API.Models._360employeeEvaluation", "Evaluation")
-                        .WithMany("_360evaluation")
+                        .WithMany("_360evaluationResult")
                         .HasForeignKey("EvaluationId")
-                        .HasConstraintName("FK_360Evaluation_EmployeeEvaluation");
+                        .HasConstraintName("FK_360EvaluationResult_360EmployeeEvaluation");
 
-                    b.HasOne("Evoflare.API.Models._360feedbackMark", "FeedbackMark")
-                        .WithMany("_360evaluation")
-                        .HasForeignKey("FeedbackMarkId")
-                        .HasConstraintName("FK_360Evaluation_360FeedbackMark");
-
-                    b.HasOne("Evoflare.API.Models.Organization", "Organization")
-                        .WithMany("_360evaluation")
-                        .HasForeignKey("OrganizationId")
-                        .HasConstraintName("FK_360Evaluation_Organization");
-
-                    b.HasOne("Evoflare.API.Models._360questionarie", "Question")
-                        .WithMany("_360evaluation")
-                        .HasForeignKey("QuestionId")
-                        .HasConstraintName("FK_360Evaluation_360Question");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360evaluationComment", b =>
-                {
-                    b.HasOne("Evoflare.API.Models._360employeeEvaluation", "Evaluation")
-                        .WithMany("_360evaluationComment")
-                        .HasForeignKey("EvaluationId")
-                        .HasConstraintName("FK_360EvaluationComment_360EmployeeEvaluation");
-
-                    b.HasOne("Evoflare.API.Models.Organization", "Organization")
-                        .WithMany("_360evaluationComment")
-                        .HasForeignKey("OrganizationId")
-                        .HasConstraintName("FK_360EvaluationComment_Organization");
+                    b.HasOne("Evoflare.API.Models._360questionnarieStatement", "_360questionnarieStatement")
+                        .WithMany("_360evaluationResult")
+                        .HasForeignKey("_360questionnarieStatementId")
+                        .HasConstraintName("FK_360EvaluationResult_360QuestionnarieStatement");
                 });
 
             modelBuilder.Entity("Evoflare.API.Models._360pendingEvaluator", b =>
@@ -1828,43 +1776,12 @@ namespace Evoflare.API.Migrations
                         .HasConstraintName("FK_360PendingEvaluator_360PendingEvaluator");
                 });
 
-            modelBuilder.Entity("Evoflare.API.Models._360question", b =>
+            modelBuilder.Entity("Evoflare.API.Models._360questionnarieStatement", b =>
                 {
-                    b.HasOne("Evoflare.API.Models.Organization", "Organization")
-                        .WithMany("_360question")
-                        .HasForeignKey("OrganizationId")
-                        .HasConstraintName("FK_360Question_Organization");
-
-                    b.HasOne("Evoflare.API.Models._360questionToMark", "QuestionToMark")
-                        .WithMany("_360question")
-                        .HasForeignKey("QuestionToMarkId")
-                        .HasConstraintName("FK_360Question_360QuestionToMark");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360questionToMark", b =>
-                {
-                    b.HasOne("Evoflare.API.Models.Organization", "Organization")
-                        .WithMany("_360questionToMark")
-                        .HasForeignKey("OrganizationId")
-                        .HasConstraintName("FK_360QuestionToMark_Organization");
-
-                    b.HasOne("Evoflare.API.Models._360questionarie", "Question")
-                        .WithMany("_360questionToMark")
-                        .HasForeignKey("QuestionId")
-                        .HasConstraintName("FK_360QuestionToMark_360Questionarie");
-                });
-
-            modelBuilder.Entity("Evoflare.API.Models._360questionarie", b =>
-                {
-                    b.HasOne("Evoflare.API.Models.Organization", "Organization")
-                        .WithMany("_360questionarie")
-                        .HasForeignKey("OrganizationId")
-                        .HasConstraintName("FK_360Questionarie_Organization");
-
-                    b.HasOne("Evoflare.API.Models._360feedbackGroup", "_360feedbackGroup")
-                        .WithMany("_360questionarie")
-                        .HasForeignKey("_360feedbackGroupId")
-                        .HasConstraintName("FK_360Question_360FeedbackGroup");
+                    b.HasOne("Evoflare.API.Models._360questionnarie", "Questionnarie")
+                        .WithMany("_360questionnarieStatement")
+                        .HasForeignKey("QuestionnarieId")
+                        .HasConstraintName("FK_360QuestionnarieStatement_360Questionnarie");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

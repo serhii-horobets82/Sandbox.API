@@ -280,6 +280,25 @@
       "problemMatcher": []
     },
     {
+      "label": "heroku(API): Deploy(dev)",
+      "type": "shell",
+      "command": "echo Done",
+      "group": "build",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "child-task: Build image",
+        "child-task: Push to heroku(dev)",
+        "child-task: Release to heroku(dev)",
+        "heroku(API): Logs(dev)"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "child-task: Build image",
       "type": "shell",
       "command": "docker build --pull -t evoflare-api -f Dockerfile ..\\",
@@ -308,6 +327,20 @@
       "problemMatcher": []
     },
     {
+      "label": "child-task: Push to heroku(dev)",
+      "type": "shell",
+      "command": "heroku container:push web -a evoflare-api-dev --context-path ..\\",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "child-task: Release to heroku",
       "type": "shell",
       "command": "heroku container:release web -a evoflare-api",
@@ -322,9 +355,37 @@
       "problemMatcher": []
     },
     {
+      "label": "child-task: Release to heroku(dev)",
+      "type": "shell",
+      "command": "heroku container:release web -a evoflare-api-dev",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "heroku(API): Logs",
       "type": "shell",
       "command": "heroku logs -a evoflare-api --tail ",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Logs(dev)",
+      "type": "shell",
+      "command": "heroku logs -a evoflare-api-dev --tail ",
       "options": {
         "cwd": "${workspaceRoot}/Docker"
       },
@@ -351,6 +412,12 @@
       "label": "heroku(DB): Reset DB",
       "type": "shell",
       "command": "heroku pg:reset DATABASE_URL",
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku(API): Open",
+      "type": "shell",
+      "command": "heroku open -a evoflare-api",
       "problemMatcher": []
     }
   ]

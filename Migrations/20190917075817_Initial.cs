@@ -15,30 +15,32 @@ namespace Evoflare.API.Migrations
                 name: "core");
 
             migrationBuilder.CreateTable(
-                name: "360FeedbackGroup",
+                name: "360EvaluationSchedule",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Type = table.Column<string>(maxLength: 50, nullable: false)
+                    PeriodMonths = table.Column<int>(nullable: false),
+                    EvaluationWindowMonths = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_360FeedbackGroup", x => x.Id);
+                    table.PrimaryKey("PK_360EvaluationSchedule", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "360FeedbackMark",
+                name: "360Questionnarie",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Mark = table.Column<int>(nullable: false),
-                    Title = table.Column<string>(maxLength: 50, nullable: false)
+                    Name = table.Column<string>(nullable: false),
+                    IsForManager = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_360FeedbackMark", x => x.Id);
+                    table.PrimaryKey("PK_360Questionnarie", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -109,11 +111,29 @@ namespace Evoflare.API.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IdeaTag", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    Message = table.Column<string>(nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    CreatedBy = table.Column<int>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    ViewDate = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,12 +150,27 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrganizationStructureType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrganizationStructureType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Project",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 100, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     OrganizationId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -168,7 +203,9 @@ namespace Evoflare.API.Migrations
                     Name = table.Column<string>(nullable: false),
                     Version = table.Column<string>(nullable: true),
                     Database = table.Column<string>(nullable: true),
-                    CreationDate = table.Column<DateTime>(nullable: false)
+                    DatabaseType = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: false),
+                    Organization = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -190,7 +227,7 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetRole",
+                name: "Roles",
                 schema: "security",
                 columns: table => new
                 {
@@ -198,15 +235,16 @@ namespace Evoflare.API.Migrations
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
-                    AccessGroup = table.Column<string>(nullable: true)
+                    DefaultPermission = table.Column<int>(nullable: false),
+                    PolicyName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetRole", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUser",
+                name: "Users",
                 schema: "security",
                 columns: table => new
                 {
@@ -233,7 +271,28 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUser", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "360QuestionnarieStatement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    QuestionnarieId = table.Column<int>(nullable: false),
+                    Mark = table.Column<int>(nullable: false),
+                    Text = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_360QuestionnarieStatement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_360QuestionnarieStatement_360Questionnarie",
+                        column: x => x.QuestionnarieId,
+                        principalTable: "360Questionnarie",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -281,33 +340,6 @@ namespace Evoflare.API.Migrations
                         column: x => x.RoleId,
                         principalTable: "EcfRole",
                         principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "360Questionarie",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Text = table.Column<string>(maxLength: 250, nullable: false),
-                    _360FeedbackGroupId = table.Column<int>(name: "360FeedbackGroupId", nullable: false),
-                    OrganizationId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_360Questionarie", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_360Questionarie_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360Question_360FeedbackGroup",
-                        column: x => x._360FeedbackGroupId,
-                        principalTable: "360FeedbackGroup",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -419,7 +451,7 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetRoleClaim",
+                name: "RoleClaims",
                 schema: "security",
                 columns: table => new
                 {
@@ -431,12 +463,12 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetRoleClaim", x => x.Id);
+                    table.PrimaryKey("PK_RoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetRoleClaim_AspNetRole_RoleId",
+                        name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
                         principalSchema: "security",
-                        principalTable: "AspNetRole",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -457,16 +489,16 @@ namespace Evoflare.API.Migrations
                 {
                     table.PrimaryKey("PK_Profile", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Profile_AspNetUser_IdentityId",
+                        name: "FK_Profile_Users_IdentityId",
                         column: x => x.IdentityId,
                         principalSchema: "security",
-                        principalTable: "AspNetUser",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserClaim",
+                name: "UserClaims",
                 schema: "security",
                 columns: table => new
                 {
@@ -478,18 +510,18 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserClaim", x => x.Id);
+                    table.PrimaryKey("PK_UserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUserClaim_AspNetUser_UserId",
+                        name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "security",
-                        principalTable: "AspNetUser",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserLogin",
+                name: "UserLogins",
                 schema: "security",
                 columns: table => new
                 {
@@ -500,18 +532,18 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserLogin", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_AspNetUserLogin_AspNetUser_UserId",
+                        name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "security",
-                        principalTable: "AspNetUser",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserRole",
+                name: "UserRoles",
                 schema: "security",
                 columns: table => new
                 {
@@ -520,25 +552,25 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserRole", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_AspNetUserRole_AspNetRole_RoleId",
+                        name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
                         principalSchema: "security",
-                        principalTable: "AspNetRole",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AspNetUserRole_AspNetUser_UserId",
+                        name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "security",
-                        principalTable: "AspNetUser",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserToken",
+                name: "UserTokens",
                 schema: "security",
                 columns: table => new
                 {
@@ -549,12 +581,12 @@ namespace Evoflare.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserToken", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
-                        name: "FK_AspNetUserToken_AspNetUser_UserId",
+                        name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "security",
-                        principalTable: "AspNetUser",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -600,39 +632,12 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "360QuestionToMark",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    QuestionId = table.Column<int>(nullable: false),
-                    MarkId = table.Column<int>(nullable: false),
-                    OrganizationId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_360QuestionToMark", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_360QuestionToMark_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360QuestionToMark_360Questionarie",
-                        column: x => x.QuestionId,
-                        principalTable: "360Questionarie",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Employee",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<string>(maxLength: 10, nullable: true),
+                    UserId = table.Column<string>(nullable: false),
                     IsManager = table.Column<bool>(nullable: false),
                     EmployeeTypeId = table.Column<int>(nullable: false),
                     OrganizationId = table.Column<int>(nullable: false),
@@ -656,6 +661,13 @@ namespace Evoflare.API.Migrations
                         principalTable: "Organization",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Employee_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "security",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -723,34 +735,6 @@ namespace Evoflare.API.Migrations
                         name: "FK_ProjectCareerPath_Team",
                         column: x => x.TeamId,
                         principalTable: "Team",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "360Question",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    QuestionToMarkId = table.Column<int>(nullable: false),
-                    Question = table.Column<string>(maxLength: 250, nullable: false),
-                    Order = table.Column<int>(nullable: false),
-                    OrganizationId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_360Question", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_360Question_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360Question_360QuestionToMark",
-                        column: x => x.QuestionToMarkId,
-                        principalTable: "360QuestionToMark",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -978,7 +962,6 @@ namespace Evoflare.API.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     OrganizationId = table.Column<int>(nullable: false),
-                    _360FeedbackGroupId = table.Column<int>(name: "360FeedbackGroupId", nullable: false),
                     StartDoing = table.Column<string>(nullable: true),
                     StopDoing = table.Column<string>(nullable: true),
                     OtherComments = table.Column<string>(nullable: true)
@@ -1002,12 +985,6 @@ namespace Evoflare.API.Migrations
                         name: "FK_360EmployeeEvaluation_Organization",
                         column: x => x.OrganizationId,
                         principalTable: "Organization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360EmployeeEvaluation_360FeedbackGroup",
-                        column: x => x._360FeedbackGroupId,
-                        principalTable: "360FeedbackGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1142,17 +1119,17 @@ namespace Evoflare.API.Migrations
                 {
                     table.PrimaryKey("PK_IdeaTagRef", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdeaTagRef_Idea_IdeaId",
+                        name: "FK_IdeaTagRef_Idea",
                         column: x => x.IdeaId,
                         principalTable: "Idea",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_IdeaTagRef_IdeaTag_TagId",
+                        name: "FK_IdeaTagRef_IdeaTag",
                         column: x => x.TagId,
                         principalTable: "IdeaTag",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1304,70 +1281,27 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "360Evaluation",
+                name: "360EvaluationResult",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     EvaluationId = table.Column<int>(nullable: false),
-                    QuestionId = table.Column<int>(nullable: false),
-                    FeedbackMarkId = table.Column<int>(nullable: false),
-                    OrganizationId = table.Column<int>(nullable: false)
+                    _360QuestionnarieStatementId = table.Column<int>(name: "360QuestionnarieStatementId", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_360Evaluation", x => x.Id);
+                    table.PrimaryKey("PK_360EvaluationResult", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_360Evaluation_EmployeeEvaluation",
+                        name: "FK_360EvaluationResult_360EmployeeEvaluation",
                         column: x => x.EvaluationId,
                         principalTable: "360EmployeeEvaluation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_360Evaluation_360FeedbackMark",
-                        column: x => x.FeedbackMarkId,
-                        principalTable: "360FeedbackMark",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360Evaluation_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360Evaluation_360Question",
-                        column: x => x.QuestionId,
-                        principalTable: "360Questionarie",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "360EvaluationComment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    EvaluationId = table.Column<int>(nullable: false),
-                    StartDoing = table.Column<string>(nullable: true),
-                    StopDoing = table.Column<string>(nullable: true),
-                    OtherComments = table.Column<string>(nullable: true),
-                    OrganizationId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_360EvaluationComment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_360EvaluationComment_360EmployeeEvaluation",
-                        column: x => x.EvaluationId,
-                        principalTable: "360EmployeeEvaluation",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_360EvaluationComment_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
+                        name: "FK_360EvaluationResult_360QuestionnarieStatement",
+                        column: x => x._360QuestionnarieStatementId,
+                        principalTable: "360QuestionnarieStatement",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1450,39 +1384,14 @@ namespace Evoflare.API.Migrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_360EmployeeEvaluation_360FeedbackGroupId",
-                table: "360EmployeeEvaluation",
-                column: "360FeedbackGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Evaluation_EvaluationId",
-                table: "360Evaluation",
+                name: "IX_360EvaluationResult_EvaluationId",
+                table: "360EvaluationResult",
                 column: "EvaluationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_360Evaluation_FeedbackMarkId",
-                table: "360Evaluation",
-                column: "FeedbackMarkId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Evaluation_OrganizationId",
-                table: "360Evaluation",
-                column: "OrganizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Evaluation_QuestionId",
-                table: "360Evaluation",
-                column: "QuestionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360EvaluationComment_EvaluationId",
-                table: "360EvaluationComment",
-                column: "EvaluationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360EvaluationComment_OrganizationId",
-                table: "360EvaluationComment",
-                column: "OrganizationId");
+                name: "IX_360EvaluationResult_360QuestionnarieStatementId",
+                table: "360EvaluationResult",
+                column: "360QuestionnarieStatementId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_360PendingEvaluator_EvaluatorId",
@@ -1500,34 +1409,9 @@ namespace Evoflare.API.Migrations
                 column: "360EmployeeEvaluationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_360Question_OrganizationId",
-                table: "360Question",
-                column: "OrganizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Question_QuestionToMarkId",
-                table: "360Question",
-                column: "QuestionToMarkId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Questionarie_OrganizationId",
-                table: "360Questionarie",
-                column: "OrganizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360Questionarie_360FeedbackGroupId",
-                table: "360Questionarie",
-                column: "360FeedbackGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360QuestionToMark_OrganizationId",
-                table: "360QuestionToMark",
-                column: "OrganizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_360QuestionToMark_QuestionId",
-                table: "360QuestionToMark",
-                column: "QuestionId");
+                name: "IX_360QuestionnarieStatement_QuestionnarieId",
+                table: "360QuestionnarieStatement",
+                column: "QuestionnarieId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompetenceCertificate_CertificateId",
@@ -1624,6 +1508,11 @@ namespace Evoflare.API.Migrations
                 name: "IX_Employee_OrganizationId",
                 table: "Employee",
                 column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employee_UserId",
+                table: "Employee",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeEvaluation_EmployeeId",
@@ -1887,65 +1776,62 @@ namespace Evoflare.API.Migrations
                 column: "IdentityId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RoleClaims_RoleId",
+                schema: "security",
+                table: "RoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 schema: "security",
-                table: "AspNetRole",
+                table: "Roles",
                 column: "NormalizedName",
                 unique: true,
                 filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetRoleClaim_RoleId",
+                name: "IX_UserClaims_UserId",
                 schema: "security",
-                table: "AspNetRoleClaim",
+                table: "UserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserLogins_UserId",
+                schema: "security",
+                table: "UserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleId",
+                schema: "security",
+                table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 schema: "security",
-                table: "AspNetUser",
+                table: "Users",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "security",
-                table: "AspNetUser",
+                table: "Users",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserClaim_UserId",
-                schema: "security",
-                table: "AspNetUserClaim",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserLogin_UserId",
-                schema: "security",
-                table: "AspNetUserLogin",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRole_RoleId",
-                schema: "security",
-                table: "AspNetUserRole",
-                column: "RoleId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "360Evaluation");
+                name: "360EvaluationResult");
 
             migrationBuilder.DropTable(
-                name: "360EvaluationComment");
+                name: "360EvaluationSchedule");
 
             migrationBuilder.DropTable(
                 name: "360PendingEvaluator");
-
-            migrationBuilder.DropTable(
-                name: "360Question");
 
             migrationBuilder.DropTable(
                 name: "CertificationExam");
@@ -1981,6 +1867,12 @@ namespace Evoflare.API.Migrations
                 name: "IdeaView");
 
             migrationBuilder.DropTable(
+                name: "Notification");
+
+            migrationBuilder.DropTable(
+                name: "OrganizationStructureType");
+
+            migrationBuilder.DropTable(
                 name: "Pdp");
 
             migrationBuilder.DropTable(
@@ -2009,33 +1901,30 @@ namespace Evoflare.API.Migrations
                 schema: "core");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoleClaim",
+                name: "RoleClaims",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserClaim",
+                name: "UserClaims",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserLogin",
+                name: "UserLogins",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserRole",
+                name: "UserRoles",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserToken",
+                name: "UserTokens",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "360FeedbackMark");
+                name: "360QuestionnarieStatement");
 
             migrationBuilder.DropTable(
                 name: "360EmployeeEvaluation");
-
-            migrationBuilder.DropTable(
-                name: "360QuestionToMark");
 
             migrationBuilder.DropTable(
                 name: "EcfEmployeeEvaluation");
@@ -2062,15 +1951,11 @@ namespace Evoflare.API.Migrations
                 name: "EcfCompetenceLevel");
 
             migrationBuilder.DropTable(
-                name: "AspNetRole",
+                name: "Roles",
                 schema: "security");
 
             migrationBuilder.DropTable(
-                name: "AspNetUser",
-                schema: "security");
-
-            migrationBuilder.DropTable(
-                name: "360Questionarie");
+                name: "360Questionnarie");
 
             migrationBuilder.DropTable(
                 name: "EmployeeEvaluation");
@@ -2085,9 +1970,6 @@ namespace Evoflare.API.Migrations
                 name: "EcfCompetence");
 
             migrationBuilder.DropTable(
-                name: "360FeedbackGroup");
-
-            migrationBuilder.DropTable(
                 name: "Employee");
 
             migrationBuilder.DropTable(
@@ -2095,6 +1977,10 @@ namespace Evoflare.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmployeeType");
+
+            migrationBuilder.DropTable(
+                name: "Users",
+                schema: "security");
 
             migrationBuilder.DropTable(
                 name: "Project");

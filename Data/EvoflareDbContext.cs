@@ -28,6 +28,7 @@ namespace Evoflare.API.Models
         public virtual DbSet<Employee> Employee { get; set; }
         public virtual DbSet<EmployeeEvaluation> EmployeeEvaluation { get; set; }
         public virtual DbSet<EmployeeRelations> EmployeeRelations { get; set; }
+        public virtual DbSet<EmployeeSalary> EmployeeSalary { get; set; }
         public virtual DbSet<EmployeeType> EmployeeType { get; set; }
         public virtual DbSet<EvaluationSchedule> EvaluationSchedule { get; set; }
         public virtual DbSet<Idea> Idea { get; set; }
@@ -61,8 +62,8 @@ namespace Evoflare.API.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=(LocalDb)\\MSSQLLocalDB;Initial Catalog=EvofalreDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-                // optionsBuilder.UseSqlServer("Server=localhost;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
+
+                optionsBuilder.UseSqlServer("Server=localhost,14330;Database=EvoflareDB;User Id=sa;Password=DatgE66VbHy7");
             }
         }
 
@@ -319,6 +320,15 @@ namespace Evoflare.API.Models
                     .WithMany(p => p.EmployeeRelations)
                     .HasForeignKey(d => d.TeamId)
                     .HasConstraintName("FK_EmployeeRelations_Team");
+            });
+
+            modelBuilder.Entity<EmployeeSalary>(entity =>
+            {
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.EmployeeSalary)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EmployeeSalary_Employee");
             });
 
             modelBuilder.Entity<EmployeeType>(entity =>

@@ -15,6 +15,7 @@ using Evoflare.API.Auth;
 using Evoflare.API.Auth.Identity;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
+using Evoflare.API.Data;
 using Evoflare.API.Models;
 using Evoflare.API.OperationFilters;
 using Evoflare.API.Options;
@@ -26,6 +27,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -76,7 +78,11 @@ namespace Evoflare.API
             {
                 services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection"),
-                    sqlServerOptions => sqlServerOptions.CommandTimeout(300))
+                    sqlServerOptions =>
+                    {
+                        sqlServerOptions.CommandTimeout(300);
+                        sqlServerOptions.MigrationsHistoryTable("Migrations", "core");
+                    })
                 );
             }
             else
@@ -93,7 +99,7 @@ namespace Evoflare.API
                 {
                     var databaseUri = new Uri(databaseUrl);
                     var userInfo = databaseUri.UserInfo.Split(':');
-
+                    var isLocal = databaseUri.Host == "localhost";
                     var builder = new NpgsqlConnectionStringBuilder
                     {
                         Host = databaseUri.Host,
@@ -102,17 +108,21 @@ namespace Evoflare.API
                         Password = userInfo[1],
                         Database = databaseUri.LocalPath.TrimStart('/'),
                         Pooling = true,
-                        UseSslStream = true,
-                        SslMode = SslMode.Require,
-                        TrustServerCertificate = true
+                        UseSslStream = !isLocal,
+                        SslMode = isLocal ? SslMode.Disable : SslMode.Require,
+                        TrustServerCertificate = !isLocal
                     };
-                    //Pooling=true;Use SSL Stream=True;SSL Mode=Require;TrustServerCertificate=True;
                     connectionString = builder.ToString();
                 }
 
                 services.AddDbContext<EvoflareDbContext>(options => options.UseNpgsql(
                     connectionString,
-                    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
+                    pgOptions =>
+                    {
+                        pgOptions.CommandTimeout(300);
+                        pgOptions.MigrationsHistoryTable("Migrations", "core");
+                    })
+                    .ReplaceService<IMigrationsSqlGenerator, BaseMigrationsSqlGenerator>()
                 );
             }
 
