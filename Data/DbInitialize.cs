@@ -24,6 +24,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Text;
 using Evoflare.API.Auth.Identity;
+using Npgsql;
 
 namespace Evoflare.API.Data
 {
@@ -139,8 +140,6 @@ namespace Evoflare.API.Data
 
                             break;
                         case Constants.Roles.HR:
-                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
-                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
@@ -309,7 +308,18 @@ namespace Evoflare.API.Data
             {
                 // and create again
                 Log.Information("Creating database - start");
-                context.Database.EnsureCreated();
+                if (context.Database.IsSqlServer())
+                    context.Database.Migrate();
+                else
+                {
+                    context.Database.EnsureCreated();
+                    // 
+                    try {context.Database.Migrate();} catch (Exception){
+
+                    }
+                    context.Database.GetPendingMigrations().ToList().ForEach(e => InsertMigration(e, context));
+                }
+
                 Log.Information("Creating database - finish");
             }
             catch (Exception ex)
@@ -320,9 +330,16 @@ namespace Evoflare.API.Data
                 // Azure issue - need more time to restore :(
                 Thread.Sleep(timeout);
                 Log.Information("Creating database - start retry");
-                context.Database.EnsureCreated();
+                context.Database.EnsureCreated();  
                 Log.Information("Creating database - finish retry");
             }
+        }
+
+        private static void InsertMigration(string migrationId, DbContext context)
+        {
+            // insert "Initial" migration manually
+            var productVersion = "2.2.4-servicing-10062";
+            context.Database.ExecuteSqlCommand($"INSERT INTO core.\"Migrations\"(\"MigrationId\", \"ProductVersion\") VALUES ('{migrationId}', '{productVersion}')", migrationId, productVersion);
         }
 
         public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false)
@@ -354,33 +371,18 @@ namespace Evoflare.API.Data
                 RecreateDatabase(applicationContext, retryTimeout);
             else
             {
-                Action insertInitMigrarion = () =>
-                {
-                    // insert "Initial" migration manually
-                    var migrationId = "20190917075817_Initial";
-                    var productVersion = "2.2.4-servicing-10062";
-                    applicationContext.Database.ExecuteSqlCommand($"INSERT INTO core.Migrations(MigrationId, ProductVersion) VALUES ('{migrationId}', '{productVersion}')", migrationId, productVersion);
-                    // retry migration
-                    applicationContext.Database.Migrate();
-                };
-
                 try
                 {
                     applicationContext.Database.Migrate();
                 }
-                catch (Npgsql.PostgresException ex)
-                {
-                    if (ex.SqlState == "42704")
-                    {
-                        insertInitMigrarion();
-                    }
-                }
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
                     // There is already an object named 'xxx' in the database.
-                    if (ex.Number == 2714)
+                    if ((ex is PostgresException pgEx && pgEx.SqlState == "42P07") ||
+                       (ex is SqlException sqlEx && sqlEx.Number == 2714))
                     {
-                        insertInitMigrarion();
+                        var initMigration = applicationContext.Database.GetPendingMigrations().FirstOrDefault();
+                        InsertMigration(initMigration, applicationContext);
                     }
                 }
             }
