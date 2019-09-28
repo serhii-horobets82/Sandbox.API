@@ -249,8 +249,24 @@ namespace Evoflare.API.Controllers
         [HttpGet("i-evaluate-360")]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetIEvaluate360()
         {
+            var employeeId = GetEmployeeId();
+            var settings = await _context._360evaluationSchedule.FirstOrDefaultAsync();
+            
+            if (settings == null || settings.StartDate < DateTime.UtcNow)
+            {
+                return (await BuildRelations(_context, employeeId))
+                    .Select(e => new _360employeeEvaluation
+                    {
+                        EndDate = DateTime.MinValue,
+                        Evaluation = new EmployeeEvaluation
+                        {
+                            Employee = e
+                        }
+                    })
+                    .ToList();
+            }
             var employeesToEvaluate = await _context._360employeeEvaluation
-                .Where(e => e.EvaluatorEmployeeId == GetEmployeeId() /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
+                .Where(e => e.EvaluatorEmployeeId == employeeId /*&& e.EndDate == null && e.Evaluation.EndDate == null*/)
                 .Include(e => e.Evaluation.Employee)
                 .OrderByDescending(e => e.StartDate)
                 //.GroupBy(e => e.StartDate)
@@ -258,6 +274,31 @@ namespace Evoflare.API.Controllers
                 .ToListAsync();
 
             return employeesToEvaluate;
+        }
+
+        private static async Task<List<Employee>> BuildRelations(EvoflareDbContext context, int employeeId)
+        {
+            var relations = await context.EmployeeRelations
+                .Where(r => r.EmployeeId == employeeId)
+                .Include(r => r.Employee)
+                .Include(r => r.Manager)
+                .ToListAsync();
+            var teams = relations.Select(r => r.TeamId).Distinct().ToHashSet();
+            var directManagerIds = relations.Select(r => r.ManagerId).Where(m => m != null).Distinct().ToHashSet();
+            var directManagers = relations
+                .Select(r => r.Manager).Where(m => m != null)
+                .Where(e => directManagerIds.Contains(e.Id))
+                .ToList();
+
+            var peersAndManagers = relations.Where(r => teams.Contains(r.TeamId)).ToList();
+            var peers = peersAndManagers.Select(r => r.Employee).Where(e => e != null)
+                //.Concat(
+                //    peersAndManagers.Select(r => r.Manager).Where(m => m != null)
+                //)
+                .Where(e => e.Id != employeeId)
+                .Distinct().ToList();
+
+            return peers;
         }
 
         private bool EmployeeEvaluationExists(int id)

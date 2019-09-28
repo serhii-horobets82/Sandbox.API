@@ -181,13 +181,20 @@ namespace Evoflare.API.Controllers
                 .Distinct()
                 .OrderByDescending(d => d)
                 .FirstOrDefaultAsync();
-            var settings = await _context._360evaluationSchedule.FirstAsync();
-            return new
+            var settings = await _context._360evaluationSchedule.FirstOrDefaultAsync();
+            if (settings != null)
             {
-                StartDate = period,
-                EndDate = period.AddMonths(settings.EvaluationWindowMonths),
-                IsClosed = IsPeriodClosed(period, settings)
-            };
+                return new
+                {
+                    StartDate = period,
+                    EndDate = period.AddMonths(settings.EvaluationWindowMonths),
+                    IsClosed = IsPeriodClosed(period, settings)
+                };
+            }
+            else
+            {
+                return new { NotConfigured = true };
+            }
         }
 
         private bool IsPeriodClosed(DateTime date, _360evaluationSchedule settings)
