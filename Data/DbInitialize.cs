@@ -545,6 +545,7 @@ namespace Evoflare.API.Data
 
                 SeedOrganizationStructureType(applicationContext);
 
+                SeedEmployeeSalary(applicationContext);
                 //SeedNotificationType(applicationContext);
                 //SeedNotification(applicationContext);
             }

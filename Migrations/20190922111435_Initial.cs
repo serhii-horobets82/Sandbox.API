@@ -76,16 +76,17 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EcfCompetence",
+                name: "CompetenceArea",
                 columns: table => new
                 {
-                    Id = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
-                    Name = table.Column<string>(maxLength: 50, nullable: false),
-                    Summary = table.Column<string>(nullable: true)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 90, nullable: false),
+                    Description = table.Column<string>(maxLength: 600, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EcfCompetence", x => x.Id);
+                    table.PrimaryKey("PK_CompetenceArea", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,7 +103,6 @@ namespace Evoflare.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EcfRole", x => x.Id);
-                    table.UniqueConstraint("AK_EcfRole_RoleId", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
@@ -296,50 +296,23 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EcfCompetenceLevel",
+                name: "Competence",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CompetenceId = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
-                    Level = table.Column<int>(nullable: false),
-                    Description = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(maxLength: 50, nullable: false),
+                    CompetenceAreaId = table.Column<int>(nullable: false),
+                    Summary = table.Column<string>(maxLength: 800, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EcfCompetenceLevel", x => x.Id);
+                    table.PrimaryKey("PK_Competence", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompetenceLevel_Competence",
-                        column: x => x.CompetenceId,
-                        principalTable: "EcfCompetence",
+                        name: "FK_EmpCompetence_EmpCompetenceArea",
+                        column: x => x.CompetenceAreaId,
+                        principalTable: "CompetenceArea",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EcfRoleCompetence",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<int>(nullable: false),
-                    CompetenceId = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
-                    CompetenceLevel = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EcfRoleCompetence", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EcfRoleCompetence_EcfCompetence",
-                        column: x => x.CompetenceId,
-                        principalTable: "EcfCompetence",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EcfRoleCompetence_EcfRole",
-                        column: x => x.RoleId,
-                        principalTable: "EcfRole",
-                        principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -592,41 +565,49 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompetenceCertificate",
+                name: "CompetenceLevel",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CompetenceId = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
-                    CompetenceLevelId = table.Column<int>(nullable: false),
-                    CertificateId = table.Column<int>(nullable: false),
-                    OrganizationId = table.Column<int>(nullable: false)
+                    CompetenceId = table.Column<int>(nullable: false),
+                    Level = table.Column<int>(nullable: false),
+                    Description = table.Column<string>(maxLength: 600, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompetenceCertificate", x => x.Id);
+                    table.PrimaryKey("PK_CompetenceLevel", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompetenceCertificate_Certificate",
-                        column: x => x.CertificateId,
-                        principalTable: "Certificate",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CompetenceCertificate_EcfCompetence",
+                        name: "FK_EmpCompetenceLevel_EmpCompetence",
                         column: x => x.CompetenceId,
-                        principalTable: "EcfCompetence",
+                        principalTable: "Competence",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleCompetence",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    RoleId = table.Column<int>(nullable: false),
+                    CompetenceId = table.Column<int>(nullable: false),
+                    CompetenceLevel = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleCompetence", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmpRoleCompetence_EmpCompetence",
+                        column: x => x.CompetenceId,
+                        principalTable: "Competence",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CompetenceCertificate_EcfCompetenceLevel",
-                        column: x => x.CompetenceLevelId,
-                        principalTable: "EcfCompetenceLevel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CompetenceCertificate_Organization",
-                        column: x => x.OrganizationId,
-                        principalTable: "Organization",
+                        name: "FK_EmpRoleCompetence_EcfRole",
+                        column: x => x.RoleId,
+                        principalTable: "EcfRole",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -740,6 +721,46 @@ namespace Evoflare.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CompetenceCertificate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CompetenceId = table.Column<int>(nullable: false),
+                    CompetenceLevelId = table.Column<int>(nullable: false),
+                    CertificateId = table.Column<int>(nullable: false),
+                    OrganizationId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompetenceCertificate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompetenceCertificate_Certificate",
+                        column: x => x.CertificateId,
+                        principalTable: "Certificate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompetenceCertificate_EmpCompetence",
+                        column: x => x.CompetenceId,
+                        principalTable: "Competence",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompetenceCertificate_EmpCompetenceLevel",
+                        column: x => x.CompetenceLevelId,
+                        principalTable: "CompetenceLevel",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompetenceCertificate_Organization",
+                        column: x => x.OrganizationId,
+                        principalTable: "Organization",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmployeeEvaluation",
                 columns: table => new
                 {
@@ -777,6 +798,29 @@ namespace Evoflare.API.Migrations
                     table.ForeignKey(
                         name: "FK_EmployeeEvaluation_EmployeeStartedBy",
                         column: x => x.StartedById,
+                        principalTable: "Employee",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeSalary",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    Period = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Basic = table.Column<int>(nullable: false),
+                    Bonus = table.Column<int>(nullable: false),
+                    Archived = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeSalary", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeSalary_Employee",
+                        column: x => x.EmployeeId,
                         principalTable: "Employee",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -884,7 +928,7 @@ namespace Evoflare.API.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CompetenceId = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
+                    CompetenceId = table.Column<int>(nullable: false),
                     CompetenceLevelId = table.Column<int>(nullable: false),
                     RoleGradeId = table.Column<int>(nullable: false)
                 },
@@ -892,15 +936,15 @@ namespace Evoflare.API.Migrations
                 {
                     table.PrimaryKey("PK_RoleGradeCompetence", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CareerPathSkills_EcfCompetence",
+                        name: "FK_RoleGradeCompetence_EmpCompetence",
                         column: x => x.CompetenceId,
-                        principalTable: "EcfCompetence",
+                        principalTable: "Competence",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CareerPathSkills_EcfCompetenceLevel",
+                        name: "FK_RoleGradeCompetence_EmpCompetenceLevel",
                         column: x => x.CompetenceLevelId,
-                        principalTable: "EcfCompetenceLevel",
+                        principalTable: "CompetenceLevel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1248,22 +1292,22 @@ namespace Evoflare.API.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     RoleGradeId = table.Column<int>(nullable: false),
                     ProjectPositionId = table.Column<int>(nullable: false),
-                    CompetenceId = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
+                    CompetenceId = table.Column<int>(nullable: false),
                     CompetenceLevelId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProjectPositionCompetence", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProjectPositionCompetence_EcfCompetence",
+                        name: "FK_ProjectPositionCompetence_EmpCompetence",
                         column: x => x.CompetenceId,
-                        principalTable: "EcfCompetence",
+                        principalTable: "Competence",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ProjectPositionCompetence_EcfCompetenceLevel",
+                        name: "FK_ProjectPositionCompetence_EmpCompetenceLevel",
                         column: x => x.CompetenceLevelId,
-                        principalTable: "EcfCompetenceLevel",
+                        principalTable: "CompetenceLevel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1347,7 +1391,7 @@ namespace Evoflare.API.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     EvaluationId = table.Column<int>(nullable: false),
-                    Competence = table.Column<string>(unicode: false, maxLength: 3, nullable: false),
+                    Competence = table.Column<int>(nullable: false),
                     CompetenceLevel = table.Column<int>(nullable: true),
                     Date = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
@@ -1355,9 +1399,9 @@ namespace Evoflare.API.Migrations
                 {
                     table.PrimaryKey("PK_EcfEvaluationResult", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EcfEvaluation_EcfCompetence",
+                        name: "FK_EcfEvaluationResult_EmpRoleCompetence",
                         column: x => x.Competence,
-                        principalTable: "EcfCompetence",
+                        principalTable: "RoleCompetence",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1414,6 +1458,11 @@ namespace Evoflare.API.Migrations
                 column: "QuestionnarieId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmpCompetence_CompetenceAreaId",
+                table: "Competence",
+                column: "CompetenceAreaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompetenceCertificate_CertificateId",
                 table: "CompetenceCertificate",
                 column: "CertificateId");
@@ -1434,6 +1483,11 @@ namespace Evoflare.API.Migrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmpCompetenceLevel_CompetenceId",
+                table: "CompetenceLevel",
+                column: "CompetenceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomerContact_OrganizationId",
                 table: "CustomerContact",
                 column: "OrganizationId");
@@ -1442,11 +1496,6 @@ namespace Evoflare.API.Migrations
                 name: "IX_CustomerContact_ProjectId",
                 table: "CustomerContact",
                 column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EcfCompetenceLevel_CompetenceId",
-                table: "EcfCompetenceLevel",
-                column: "CompetenceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EcfEmployeeEvaluation_EndById",
@@ -1488,16 +1537,6 @@ namespace Evoflare.API.Migrations
                 table: "EcfRole",
                 column: "RoleId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EcfRoleCompetence_CompetenceId",
-                table: "EcfRoleCompetence",
-                column: "CompetenceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EcfRoleCompetence_RoleId",
-                table: "EcfRoleCompetence",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_EmployeeTypeId",
@@ -1563,6 +1602,11 @@ namespace Evoflare.API.Migrations
                 name: "IX_EmployeeRelations_TeamId",
                 table: "EmployeeRelations",
                 column: "TeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeSalary_EmployeeId",
+                table: "EmployeeSalary",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeType_OrganizationId",
@@ -1735,6 +1779,16 @@ namespace Evoflare.API.Migrations
                 column: "RoleGradeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmpRoleCompetence_CompetenceId",
+                table: "RoleCompetence",
+                column: "CompetenceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmpRoleCompetence_RoleId",
+                table: "RoleCompetence",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoleGrade_EmployeeTypeId",
                 table: "RoleGrade",
                 column: "EmployeeTypeId");
@@ -1846,10 +1900,10 @@ namespace Evoflare.API.Migrations
                 name: "EcfEvaluationResult");
 
             migrationBuilder.DropTable(
-                name: "EcfRoleCompetence");
+                name: "EmployeeRelations");
 
             migrationBuilder.DropTable(
-                name: "EmployeeRelations");
+                name: "EmployeeSalary");
 
             migrationBuilder.DropTable(
                 name: "EvaluationSchedule");
@@ -1927,6 +1981,9 @@ namespace Evoflare.API.Migrations
                 name: "360EmployeeEvaluation");
 
             migrationBuilder.DropTable(
+                name: "RoleCompetence");
+
+            migrationBuilder.DropTable(
                 name: "EcfEmployeeEvaluation");
 
             migrationBuilder.DropTable(
@@ -1942,13 +1999,10 @@ namespace Evoflare.API.Migrations
                 name: "Position");
 
             migrationBuilder.DropTable(
-                name: "EcfRole");
-
-            migrationBuilder.DropTable(
                 name: "ProjectPosition");
 
             migrationBuilder.DropTable(
-                name: "EcfCompetenceLevel");
+                name: "CompetenceLevel");
 
             migrationBuilder.DropTable(
                 name: "Roles",
@@ -1956,6 +2010,9 @@ namespace Evoflare.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "360Questionnarie");
+
+            migrationBuilder.DropTable(
+                name: "EcfRole");
 
             migrationBuilder.DropTable(
                 name: "EmployeeEvaluation");
@@ -1967,13 +2024,16 @@ namespace Evoflare.API.Migrations
                 name: "RoleGrade");
 
             migrationBuilder.DropTable(
-                name: "EcfCompetence");
+                name: "Competence");
 
             migrationBuilder.DropTable(
                 name: "Employee");
 
             migrationBuilder.DropTable(
                 name: "Team");
+
+            migrationBuilder.DropTable(
+                name: "CompetenceArea");
 
             migrationBuilder.DropTable(
                 name: "EmployeeType");
