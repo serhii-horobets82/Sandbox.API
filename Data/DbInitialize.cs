@@ -570,7 +570,7 @@ namespace Evoflare.API.Data
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
                         Organization = applicationContext.Organization.FirstOrDefault().Name,
-                        Database = $"{connection.DataSource}, v.{connection.ServerVersion}",
+                        Database = $"{connection.DataSource} ({connection.Database}) v.{connection.ServerVersion}",
                         DatabaseType = dbType.ToString()
                     };
                     if (recreateDatabase || string.IsNullOrEmpty(previousVersion))

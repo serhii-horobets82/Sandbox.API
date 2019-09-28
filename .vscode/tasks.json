@@ -6,6 +6,19 @@
       "type": "promptString",
       "description": "Name of migration",
       "default": "Initial"
+    },
+    {
+      "id": "herokuApp",
+      "type": "pickString",
+      "description": "Heroku app",
+      "options": [
+        "evoflare-api",
+        "evoflare-api-dev",
+        "evoflare-api-dev01",
+        "evoflare-api-dev02",
+        "evoflare-app-01"
+      ],
+      "default": "evoflare-api-dev"
     }
   ],
   "tasks": [
@@ -145,66 +158,9 @@
       ],
       "problemMatcher": []
     },
+
     {
-      "label": "docker: Build and run DB(mssql) container",
-      "type": "process",
-      "command": "start-docker-sql.cmd",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker: Build and run DB(postgres) container",
-      "type": "process",
-      "command": "start-docker-postgres.cmd",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker: Start DB(mssql) container",
-      "type": "shell",
-      "command": "docker start evoflare-db",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker: Stop DB(mssql) container",
-      "type": "shell",
-      "command": "docker stop evoflare-db",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker(API): Build and run container",
+      "label": "REM docker(API): Build and run container",
       "type": "process",
       "command": "start-docker-api.cmd",
       "group": "build",
@@ -218,48 +174,7 @@
       },
       "problemMatcher": []
     },
-    {
-      "label": "docker(API): Attach to container",
-      "type": "shell",
-      "command": "docker attach --sig-proxy evoflare-api",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker(API): Stop container",
-      "type": "shell",
-      "command": "docker stop evoflare-api",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "docker(API): Start container",
-      "type": "shell",
-      "command": "docker start evoflare-api",
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "group": "docker"
-      },
-      "problemMatcher": []
-    },
+    // ************************ HEROKU ************************
     {
       "label": "heroku(API): Deploy",
       "type": "shell",
@@ -369,9 +284,15 @@
       "problemMatcher": []
     },
     {
-      "label": "heroku(API): Logs",
+      "label": "heroku: Deploy",
       "type": "shell",
-      "command": "heroku logs -a evoflare-api --tail ",
+      "command": [
+        "heroku container:push web --recursive -a ${input:herokuApp} --context-path ..\\",
+        ";heroku container:release web -a ${input:herokuApp}"
+      ],
+      // "dependsOn":[
+      //   "docker: Build API container"
+      // ],
       "options": {
         "cwd": "${workspaceRoot}/Docker"
       },
@@ -383,9 +304,9 @@
       "problemMatcher": []
     },
     {
-      "label": "heroku(API): Logs(dev)",
+      "label": "heroku: Logs",
       "type": "shell",
-      "command": "heroku logs -a evoflare-api-dev --tail ",
+      "command": "heroku logs -a ${input:herokuApp} --tail",
       "options": {
         "cwd": "${workspaceRoot}/Docker"
       },
@@ -397,27 +318,300 @@
       "problemMatcher": []
     },
     {
-      "label": "heroku(API): Config",
+      "label": "heroku: View config",
       "type": "shell",
-      "command": "heroku config -a evoflare-api",
+      "command": "heroku config -a ${input:herokuApp}",
       "problemMatcher": []
     },
     {
-      "label": "heroku(DB): DB info",
+      "label": "heroku: Set config",
       "type": "shell",
-      "command": "heroku pg:info -a evoflare-api",
+      "command": "heroku config:set ASPNETCORE_ENVIRONMENT=Docker ASPNETCORE_URLS=http://*:$PORT -a ${input:herokuApp}",
       "problemMatcher": []
     },
     {
-      "label": "heroku(DB): Reset DB",
+      "label": "heroku: DB info",
+      "type": "shell",
+      "command": "heroku pg:info -a ${input:herokuApp}",
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku: Reset DB",
       "type": "shell",
       "command": "heroku pg:reset DATABASE_URL",
       "problemMatcher": []
     },
     {
-      "label": "heroku(API): Open",
+      "label": "heroku: Open",
       "type": "shell",
-      "command": "heroku open -a evoflare-api",
+      "command": "heroku open -a ${input:herokuApp}",
+      "problemMatcher": []
+    },
+    // ************************ DOCKER ************************
+    {
+      "label": "docker: Run registry",
+      "type": "shell",
+      "command": "docker run -d -p 50000:5000 --restart=always -v ./registry:/var/lib/registry --name evoflare-registry registry:2",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    //  ----------------------- Build  ------------------------
+    {
+      "label": "docker: Build API container",
+      "type": "shell",
+      "command": "docker build --no-cache --pull -t evoflare-api -f ./Dockerfile.api ..\\",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Build DB(mssql) container",
+      "type": "shell",
+      "command": "docker build --pull -t evoflare-db-mssql -f ./mssql/Dockerfile .",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Build DB(postgres) container",
+      "type": "shell",
+      "command": "docker build --pull -t evoflare-db-postgres -f ./postgres/Dockerfile . ",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    //  ----------------------- Run  --------------------------
+    {
+      "label": "docker(Registry): Run API image",
+      "type": "shell",
+      "command": "docker run --name evoflare-api -p 5000:80 -d -it localhost:50000/api",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Run DB(mssql) image",
+      "type": "shell",
+      "command": "docker run --name evoflare-db-mssql -p 14330:1433 -d -it -v ./mssql:/var/opt/mssql/data localhost:50000/db-mssql",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Run DB(postgres) image",
+      "type": "shell",
+      "command": "docker run --name evoflare-db-postgres -p 54320:5432 -d -it -v ./postgres:/var/lib/postgresql/data localhost:50000/db-postgres",
+      "problemMatcher": []
+    },
+    //  ----------------------- Attach  ------------------------
+    {
+      "label": "docker: Attach to API container",
+      "type": "shell",
+      "command": "docker attach --sig-proxy evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    //  ----------------------- Start  ------------------------
+    {
+      "label": "docker: Start API container",
+      "type": "shell",
+      "command": "docker start evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Start DB(mssql) container",
+      "type": "shell",
+      "command": "docker start evoflare-mssql",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Start DB(postgres) container",
+      "type": "shell",
+      "command": "docker start evoflare-db-postgres",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    //  ----------------------- Stop --------------------------
+    {
+      "label": "docker: Stop API container",
+      "type": "shell",
+      "command": "docker stop evoflare-api",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Stop DB(mssql) container",
+      "type": "shell",
+      "command": "docker stop evoflare-mssql",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: Stop DB(postgres) container",
+      "type": "shell",
+      "command": "docker stop evoflare-db-postgres",
+      "options": {
+        "cwd": "${workspaceRoot}/Docker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "docker"
+      },
+      "problemMatcher": []
+    },
+    //  ----------------------- Common --------------------------
+    {
+      "label": "docker(Common): Remove all images",
+      "type": "shell",
+      "command": "docker rmi $(docker images -a -q) -f",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Open registry",
+      "type": "shell",
+      "windows": {
+        "command": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+      },
+      "args": ["http://localhost:50000/v2/_catalog"],
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Common): Start registry",
+      "type": "shell",
+      "command": "docker run -d -p 50000:5000 --restart always --name evoflare-registry -v ./registry:/var/lib/registry registry:latest",
+      "problemMatcher": []
+    },
+    //  ----------------------- Tag image --------------------------
+    {
+      "label": "docker(Registry): Restore",
+      "type": "shell",
+      "command": "echo registry restore",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "docker(Common): Start registry",
+        "docker(Registry): Tag API image",
+        "docker(Registry): Tag DB(postgres) image",
+        "docker(Registry): Tag DB(mssql) image",
+        "docker(Registry): Push API image",
+        "docker(Registry): Push DB(postgres) image",
+        "docker(Registry): Push DB(mssql) image"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Tag API image",
+      "type": "shell",
+      "command": "docker image tag evoflare-api localhost:50000/api",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Tag DB(postgres) image",
+      "type": "shell",
+      "command": "docker image tag evoflare-db-postgres localhost:50000/db-postgres",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Tag DB(mssql) image",
+      "type": "shell",
+      "command": "docker image tag evoflare-db-mssql localhost:50000/db-mssql",
+      "problemMatcher": []
+    },
+    //  ----------------------- Push image --------------------------
+    {
+      "label": "docker(Registry): Push API image",
+      "type": "shell",
+      "command": "docker push localhost:50000/api",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Push DB(postgres) image",
+      "type": "shell",
+      "command": "docker push localhost:50000/db-postgres",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Push DB(mssql) image",
+      "type": "shell",
+      "command": "docker push localhost:50000/db-mssql",
+      "problemMatcher": []
+    },
+    //  ----------------------- Pull image --------------------------
+    {
+      "label": "docker(Registry): Pull mssql image",
+      "type": "shell",
+      "command": "docker pull localhost:50000/db-mssql",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker(Registry): Pull postgres image",
+      "type": "shell",
+      "command": "docker pull localhost:50000/db-postgres",
       "problemMatcher": []
     }
   ]

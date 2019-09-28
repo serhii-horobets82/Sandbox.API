@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+LABEL com.evoflare.product="evoflare.api"
 WORKDIR /app
 
 COPY . .

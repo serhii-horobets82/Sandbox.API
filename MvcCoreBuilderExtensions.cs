@@ -33,6 +33,9 @@ namespace Evoflare.API
                                 "http://evoflare.azurewebsites.net", 
                                 "https://evoflare-web.herokuapp.com",
                                 "https://evoflare-web-dev.herokuapp.com",
+                                "https://evoflare-web-dev01.herokuapp.com",
+                                "https://evoflare-web-dev02.herokuapp.com",
+                                "https://evoflare-app-01.herokuapp.com/",
                                 "http://evoflareappdev.z16.web.core.windows.net",
                                 "https://evoflareappdev.z16.web.core.windows.net"
                             )
