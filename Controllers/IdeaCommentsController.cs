@@ -31,9 +31,7 @@ namespace Evoflare.API.Controllers
         [HttpGet("{ideaId}/{id}")]
         public async Task<ActionResult<IdeaComment>> GetIdeaComment(int ideaId, int id)
         {
-            var ideaComment = await _context.IdeaComment
-                .Include(c => c.CreatedBy)
-                .FirstOrDefaultAsync(c => c.Id == id && c.IdeaId == ideaId);
+            var ideaComment = await GetComment(ideaId, id);
 
             if (ideaComment == null)
             {
@@ -41,6 +39,13 @@ namespace Evoflare.API.Controllers
             }
 
             return ideaComment;
+        }
+
+        private async Task<IdeaComment> GetComment(int ideaId, int id)
+        {
+            return await _context.IdeaComment
+                .Include(c => c.CreatedBy)
+                .FirstOrDefaultAsync(c => c.Id == id && c.IdeaId == ideaId);
         }
 
         //// PUT: api/IdeaComments/5
@@ -84,7 +89,10 @@ namespace Evoflare.API.Controllers
             _context.IdeaComment.Add(ideaComment);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetIdeaComment", new { id = ideaComment.Id, ideaId = ideaComment.IdeaId }, ideaComment);
+            return CreatedAtAction(
+                nameof(GetIdeaComment), 
+                new { id = ideaComment.Id, ideaId = ideaComment.IdeaId }, 
+                await GetComment(ideaComment.IdeaId, ideaComment.Id));
         }
 
         //// DELETE: api/IdeaComments/5
