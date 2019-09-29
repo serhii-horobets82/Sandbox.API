@@ -24,7 +24,7 @@ namespace Evoflare.API.Data
             {
                 items = new[]
                 {
-                    new Organization {Id = 1, Name = @"Smart CORP" },
+                    new Organization {Id = 1, Name = $"{context.Database.GetDbConnection().Database}" },
                 };
             }
             context.Organization.AddRange(items);

@@ -24,6 +24,7 @@ namespace Evoflare.API.Data
 
             var items = context.Employee.ToList().Select((emp, i) => GenerateSalary(i, emp));
 
+
             context.EmployeeSalary.AddRange(items);
 
             context.SaveChanges();

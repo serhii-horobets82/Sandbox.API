@@ -10,20 +10,19 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Label="Package">
-    <Version>0.0.1.9</Version>
+    <Version>0.0.1.10</Version>
     <Authors>EvoFlare teams</Authors>
     <Company>EvoFlare teams</Company>
     <Product>EvoFlare</Product>
-    <Description>API backend for SPA sites 
-https://evoflare.azurewebsites.net 
-https://evoflare.z19.web.core.windows.net
-https://evoflare-secondary.z19.web.core.windows.net</Description>
-    <Copyright>Copyright EvoFlare © EvoFlare . All rights Reserved</Copyright>
+    <Description>API backend for SPA sites 
+https://evoflare-api-.herokuapp.com
+  </Description>
+    <Copyright>Copyright EvoFlare © EvoFlare 2019. All rights Reserved</Copyright>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Evoflare.API.Program</StartupObject>
-    <AssemblyVersion>0.0.1.9</AssemblyVersion>
-    <FileVersion>0.0.1.9</FileVersion>
+    <AssemblyVersion>0.0.1.10</AssemblyVersion>
+    <FileVersion>0.0.1.10</FileVersion>
     <PackageTags />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

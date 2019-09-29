@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
-LABEL com.evoflare.product="evoflare.api"
+
 WORKDIR /sources
 
 COPY . .
@@ -14,4 +14,4 @@ COPY --from=build /app .
 
 COPY --from=localhost:50000/web:latest /app/dist ./wwwroot
  
-CMD ASPNETCORE_ENVIRONMENT=Production dotnet Evoflare.API.dll
+CMD ASPNETCORE_ENVIRONMENT=Docker ASPNETCORE_URLS=http://*:$PORT dotnet Evoflare.API.dll

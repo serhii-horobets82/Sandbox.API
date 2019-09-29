@@ -313,10 +313,7 @@ namespace Evoflare.API.Data
                 else
                 {
                     context.Database.EnsureCreated();
-                    // 
-                    try {context.Database.Migrate();} catch (Exception){
-
-                    }
+                    try {context.Database.Migrate();} catch (Exception){}
                     context.Database.GetPendingMigrations().ToList().ForEach(e => InsertMigration(e, context));
                 }
 
@@ -570,7 +567,7 @@ namespace Evoflare.API.Data
                         Version = currentVersion,
                         CreationDate = DateTime.Now,
                         Organization = applicationContext.Organization.FirstOrDefault().Name,
-                        Database = $"{connection.DataSource}, v.{connection.ServerVersion}",
+                        Database = $"{connection.DataSource} ({connection.Database}) v.{connection.ServerVersion}",
                         DatabaseType = dbType.ToString()
                     };
                     if (recreateDatabase || string.IsNullOrEmpty(previousVersion))
