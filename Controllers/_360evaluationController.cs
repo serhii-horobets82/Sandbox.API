@@ -288,9 +288,10 @@ namespace Evoflare.API.Controllers
                     .Where(r => teams.Contains(r.TeamId))
                     .ToList();
                 var peers = peersAndManagers.Select(r => r.Employee).Where(e => e != null)
-                    //.Concat(
-                    //    peersAndManagers.Select(r => r.Manager).Where(m => m != null)
-                    //)
+                    .Concat(
+                        peersAndManagers.Select(r => r.Manager).Where(m => m != null)
+                    )
+                    .Concat(directManagers)
                     .Where(e => e.Id != employee.Id)
                     .Distinct().ToList();
                 employeePeers.Add(employee, peers);
