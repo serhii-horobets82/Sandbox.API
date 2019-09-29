@@ -313,10 +313,7 @@ namespace Evoflare.API.Data
                 else
                 {
                     context.Database.EnsureCreated();
-                    // 
-                    try {context.Database.Migrate();} catch (Exception){
-
-                    }
+                    try {context.Database.Migrate();} catch (Exception){}
                     context.Database.GetPendingMigrations().ToList().ForEach(e => InsertMigration(e, context));
                 }
 
