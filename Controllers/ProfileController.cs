@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Evoflare.API.Auth.Identity;
-using Evoflare.API.Auth.Models;
 using Evoflare.API.Models;
 using Evoflare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -96,10 +94,7 @@ namespace Evoflare.API.Controllers
                 employeeId = GetEmployeeId(),
                 organizationId = GetOrganizationId(),
                 organizationName = GetOrganizationName(),
-                isSysAdmin = User.IsSysAdmin(),
-                isAdmin = User.IsAdmin(),
-                isManager = User.IsManager(),
-                isHR = User.IsHr()
+                accessDescriptor = UiAccessMatrix.GetAccessRights(User.GetRole())
             });
         }
     }

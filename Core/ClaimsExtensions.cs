@@ -59,6 +59,13 @@ namespace Evoflare.API
             return roles.All(rm => rm.Value == Roles.HR);
         }
 
+        public static string GetRole(this ClaimsPrincipal claimsPrincipal)
+        {
+            var roles = claimsPrincipal.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType);
+            var singleRole = roles.FirstOrDefault();
+            return singleRole != null ? singleRole.Value : Roles.User;
+        }
+
         public static void AddPermission(this ClaimsIdentity claimsIdentity, PermissionClaimValue claimValue) =>
                 claimsIdentity.AddClaim(claimValue.ToClaim());
 
