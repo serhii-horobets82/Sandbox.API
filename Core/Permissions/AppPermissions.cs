@@ -2,6 +2,16 @@
 
 namespace Evoflare.API.Core.Permissions
 {
+
+    public static class CommonPermission
+    {
+        public const string Add = "add";
+        public const string Edit = "edit";
+        public const string Delete = "delete";
+        public const string View = "view";
+    }
+
+
     [Flags]
     public enum AccessFlag
     {
@@ -24,12 +34,14 @@ namespace Evoflare.API.Core.Permissions
             public const string View = "admin.view";
         }
 
-        public static class SalaryPermission
+        public class SalaryPermission
         {
-            public const string Add = "salary.add";
-            public const string Edit = "salary.edit";
-            public const string Delete = "salary.delete";
-            public const string View = "salary.view";
+            private const string moduleId = "salary";
+
+            public static string Add  = $"{moduleId}.{CommonPermission.Add}"; 
+            public static string Edit = $"{moduleId}.{CommonPermission.Edit}";
+            public static string Delete = $"{moduleId}.{CommonPermission.Delete}";
+            public static string View = $"{moduleId}.{CommonPermission.View}";
         }
 
         public static class EmployeePermission

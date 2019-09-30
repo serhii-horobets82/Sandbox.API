@@ -67,6 +67,7 @@ namespace Evoflare.API.Models
             if (Equals(role, Roles.SysAdmin)) { return Export(SysAdmin); }
             if (Equals(role, Roles.Admin)) { return Export(Admin); }
             if (Equals(role, Roles.Manager)) { return Export(Manager); }
+            if (Equals(role, Roles.ChiefManager)) { return Export(Manager); }
             if (Equals(role, Roles.HR)) { return Export(Hr); }
 
             return Export(User);

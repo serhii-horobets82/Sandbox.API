@@ -94,6 +94,7 @@ namespace Evoflare.API.Controllers
                 employeeId = GetEmployeeId(),
                 organizationId = GetOrganizationId(),
                 organizationName = GetOrganizationName(),
+                permissions = User.GetUserPermissions(),
                 accessDescriptor = UiAccessMatrix.GetAccessRights(User.GetRole())
             });
         }

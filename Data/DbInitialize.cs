@@ -120,8 +120,8 @@ namespace Evoflare.API.Data
 
                             break;
                         case Constants.Roles.Manager:
-                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
-                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            //await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            //await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
                             await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
                             break;
@@ -202,7 +202,7 @@ namespace Evoflare.API.Data
             await userManager.AddToRoleAsync(user, roleName);
         }
 
-        private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, string userEmail, string roleName, Employee empl)
+        private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, string userEmail, string roleName, Employee empl, Claim extraClaim = null)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
@@ -233,10 +233,12 @@ namespace Evoflare.API.Data
 
                     await userManager.CreateAsync(user, DefaultPassword);
 
-                    await userManager.AddClaimsAsync(user, new Claim[]{
+                    var claims = new Claim[]{
                         new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                        new Claim(JwtClaimTypes.Email, userEmail)
-                    });
+                        new Claim(JwtClaimTypes.Email, userEmail)};
+                    if (extraClaim != null)
+                        claims = claims.Append(extraClaim).ToArray();
+                    await userManager.AddClaimsAsync(user, claims);
 
                     // Add random profile
                     dbContext.Profile.Add(new UserProfile
@@ -313,7 +315,7 @@ namespace Evoflare.API.Data
                 else
                 {
                     context.Database.EnsureCreated();
-                    try {context.Database.Migrate();} catch (Exception){}
+                    try { context.Database.Migrate(); } catch (Exception) { }
                     context.Database.GetPendingMigrations().ToList().ForEach(e => InsertMigration(e, context));
                 }
 
@@ -327,7 +329,7 @@ namespace Evoflare.API.Data
                 // Azure issue - need more time to restore :(
                 Thread.Sleep(timeout);
                 Log.Information("Creating database - start retry");
-                context.Database.EnsureCreated();  
+                context.Database.EnsureCreated();
                 Log.Information("Creating database - finish retry");
             }
         }
@@ -469,7 +471,17 @@ namespace Evoflare.API.Data
                     foreach (var employee in employees)
                     {
                         var userRole = userManager.MapTypeToRole(employee.EmployeeTypeId);
-                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee).Wait();
+                        // TODO Remove later 
+                        Claim claim = null;
+                        if (employee.Id == 24)
+                        {
+                            userRole = Roles.ChiefManager;
+                        }
+                        else if (employee.Id == 2)
+                        {
+                            claim = new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit);
+                        }
+                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
                     }
 
                     // sysdadmin

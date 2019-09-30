@@ -58,6 +58,8 @@ namespace Evoflare.API.Data
 				new EmployeeRelations {Id = 35, EmployeeId = 16, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
 				new EmployeeRelations {Id = 36, EmployeeId = 17, ManagerId = null, TeamId = 10, ProjectId = 4, PositionId = null, OrganizationId = 1, Archived = false },
 
+				new EmployeeRelations {Id = 37, EmployeeId = null, ManagerId = 24, TeamId = 5, ProjectId = 2, PositionId = null, OrganizationId = 1, Archived = false },
+				new EmployeeRelations {Id = 38, EmployeeId = null, ManagerId = 24, TeamId = null, ProjectId = 2, PositionId = null, OrganizationId = 1, Archived = false },	
             };
             context.EmployeeRelations.AddRange(items);
 
