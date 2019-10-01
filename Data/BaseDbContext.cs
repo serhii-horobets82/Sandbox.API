@@ -18,6 +18,7 @@ namespace Evoflare.API.Models
 
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
+        public virtual DbSet<Installation> Installations { get; set; }
         public virtual DbSet<AppVersion> AppVersion { get; set; }
         public virtual DbSet<UserProfile> Profile { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +65,11 @@ namespace Evoflare.API.Models
             modelBuilder.Entity<ActivityLog>(entity =>
             {
                 entity.ToTable("ActivityLogs", CoreSchemaName);
+            });
+
+             modelBuilder.Entity<Installation>(entity =>
+            {
+                entity.ToTable("Installations", CoreSchemaName);
             });
 
             modelBuilder.Entity<AppVersion>(entity =>

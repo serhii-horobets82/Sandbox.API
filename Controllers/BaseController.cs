@@ -38,13 +38,11 @@ namespace Evoflare.API.Controllers
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // Do something before the action executes.
             base.OnActionExecuting(context);
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            context.HttpContext.Response.Headers.Add("xxxx", new string[] { "yyyy" });
             base.OnActionExecuted(context);
         }
     }

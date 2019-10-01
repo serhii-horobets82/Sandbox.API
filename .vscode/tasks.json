@@ -22,7 +22,8 @@
         "evoflare-api-dev",
         "evoflare-api-dev01",
         "evoflare-api-dev02",
-        "evoflare-app"
+        "evoflare-app",
+        "api-evoflare"
       ],
       "default": "evoflare-api-dev"
     },

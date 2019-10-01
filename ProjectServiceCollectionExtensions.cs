@@ -2,6 +2,7 @@ namespace Evoflare.API
 {
     using Boxed.Mapping;
     using Evoflare.API.Commands;
+    using Evoflare.API.Core.Models;
     using Evoflare.API.Mappers;
     using Evoflare.API.Models;
     using Evoflare.API.Repositories;
@@ -33,7 +34,8 @@ namespace Evoflare.API
         public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
             services
                 .AddSingleton<ICarRepository, CarRepository>()
-                .AddSingleton<IRepository<Employee>, Repository<Employee>>();
+                .AddSingleton<IRepository<Employee>, Repository<Employee>>()
+                .AddSingleton<IRepository<Installation>, Repository<Installation>>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services;

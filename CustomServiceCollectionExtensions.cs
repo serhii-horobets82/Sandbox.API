@@ -147,6 +147,7 @@ namespace Evoflare.API
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
             services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
             services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
+            services.Configure<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)));
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -293,6 +294,7 @@ namespace Evoflare.API
                     configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
                 .ConfigureAndValidateSingleton<AppSettings>(
                     configuration.GetSection(nameof(AppSettings)))
+                .ConfigureAndValidateSingleton<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)))
                 .ConfigureAndValidateSingleton<ClientSetting>(configuration.GetSection(nameof(ClientSetting)))
                 .ConfigureAndValidateSingleton<ThirdParty>(configuration.GetSection(nameof(ThirdParty)));
         }

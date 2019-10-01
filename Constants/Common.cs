@@ -1,6 +1,10 @@
 ﻿namespace Evoflare.API.Constants
 {
 
+    public class CustomHeaders
+    {
+        public const string ServerId = "X-Server-ID";
+    }
 
 
     /// <summary>

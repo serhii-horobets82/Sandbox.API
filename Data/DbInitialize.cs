@@ -426,6 +426,7 @@ namespace Evoflare.API.Data
                 else
                 {   // DB already has data but new tables seeding required 
                     SeedEmployeeSalary(applicationContext);
+                    SeedInstallation(applicationContext);
                     return;
                 }
             }
