@@ -15,7 +15,7 @@ namespace Evoflare.API.Configuration
         // Connection string name from list of ConnectionStrings (appsettings)
         public string ConnStrSettingsName { get; set; } = "DefaultConnection";
         // Environment variable name with connection string 
-        public string ConnStrEnvVarName { get; set; } = "DATABASE_URL";
+        public string ConnStrEnvVarName { get; set; }
         public DataBaseType Type { get; set; } = DataBaseType.MSSQL;
         public int CommandTimeout { get; set; } = 300;
     }

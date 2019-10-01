@@ -10,6 +10,7 @@ using System;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Evoflare.API.Data
 {
@@ -26,12 +27,23 @@ namespace Evoflare.API.Data
         private readonly IConfiguration configuration;
         private readonly IConnectionStringBuilder connectionStringBuilder;
         private readonly IHttpContextAccessor contextAccessor;
+        private readonly IServiceProvider serviceProvider;
 
-        public DbContextFactory(IConfiguration configuration, IConnectionStringBuilder connectionStringBuilder, IHttpContextAccessor contextAccessor)
+        private List<DBInstance> dbInstances;
+
+        public DbContextFactory(
+            IConfiguration configuration,
+            IConnectionStringBuilder connectionStringBuilder,
+            IHttpContextAccessor contextAccessor,
+            IServiceProvider serviceProvider)
         {
             this.configuration = configuration;
             this.connectionStringBuilder = connectionStringBuilder;
             this.contextAccessor = contextAccessor;
+            this.serviceProvider = serviceProvider;
+
+            // read configuration 
+            this.dbInstances = this.configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
         }
 
         public EvoflareDbContext Create()
@@ -47,11 +59,10 @@ namespace Evoflare.API.Data
         public EvoflareDbContext CreateFromHeaders()
         {
             var dbContextBuilder = new DbContextOptionsBuilder<EvoflareDbContext>();
-
-            if (contextAccessor.HttpContext.Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
+            if (dbInstances != null && contextAccessor.HttpContext.Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
             {
+                // get ID from request header
                 var serverId = headerValues.First();
-                var dbInstances = configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
                 var instance = dbInstances?.FirstOrDefault(i => i.Id == serverId);
                 if (instance != null)
                 {
@@ -67,11 +78,12 @@ namespace Evoflare.API.Data
                     }
                     else if (instance.Type == DataBaseType.POSTGRES)
                     {
-                        var connectionString = configuration.GetConnectionString(instance.ConnStrSettingsName);
-                        // Search env variable first 
-                        if (!string.IsNullOrEmpty(instance.ConnStrEnvVarName))
-                            connectionString = Environment.GetEnvironmentVariable(instance.ConnStrEnvVarName) ?? connectionString;
-
+                        // trying to find env variable with ID name 
+                        var connectionString = Environment.GetEnvironmentVariable(instance.Id);
+                        if (string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(instance.ConnStrEnvVarName))
+                        {
+                            connectionString = Environment.GetEnvironmentVariable(instance.ConnStrEnvVarName) ?? configuration.GetConnectionString(instance.ConnStrSettingsName);
+                        }
                         // Parse as database URL
                         if (connectionString.StartsWith("postgres://"))
                         {
@@ -101,10 +113,11 @@ namespace Evoflare.API.Data
                                 pgOptions.MigrationsHistoryTable("Migrations", "core");
                             });
                     }
+                    return new EvoflareDbContext(dbContextBuilder.Options);
                 }
             }
-
-            return new EvoflareDbContext(dbContextBuilder.Options);
+            // default startup context
+            return serviceProvider.GetRequiredService<EvoflareDbContext>();
         }
     }
 
