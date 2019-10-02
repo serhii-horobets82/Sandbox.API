@@ -59,6 +59,8 @@ namespace Evoflare.API.Data
         public EvoflareDbContext CreateFromHeaders()
         {
             var dbContextBuilder = new DbContextOptionsBuilder<EvoflareDbContext>();
+            // default startup context
+            var defaultStartupContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
             if (dbInstances != null && contextAccessor.HttpContext.Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
             {
                 // get ID from request header
@@ -80,10 +82,17 @@ namespace Evoflare.API.Data
                     {
                         // trying to find env variable with ID name 
                         var connectionString = Environment.GetEnvironmentVariable(instance.Id);
-                        if (string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(instance.ConnStrEnvVarName))
+                        if (string.IsNullOrEmpty(connectionString))
                         {
-                            connectionString = Environment.GetEnvironmentVariable(instance.ConnStrEnvVarName) ?? configuration.GetConnectionString(instance.ConnStrSettingsName);
+                            connectionString = configuration.GetConnectionString(instance.ConnStrSettingsName);
+                            // then trying find by env variable name  
+                            if (!string.IsNullOrEmpty(instance.ConnStrEnvVarName))
+                                connectionString = Environment.GetEnvironmentVariable(instance.ConnStrEnvVarName);
                         }
+                        // still empty - return default 
+                        if (string.IsNullOrEmpty(connectionString))
+                            return defaultStartupContext;
+
                         // Parse as database URL
                         if (connectionString.StartsWith("postgres://"))
                         {
@@ -116,8 +125,8 @@ namespace Evoflare.API.Data
                     return new EvoflareDbContext(dbContextBuilder.Options);
                 }
             }
-            // default startup context
-            return serviceProvider.GetRequiredService<EvoflareDbContext>();
+
+            return defaultStartupContext;
         }
     }
 

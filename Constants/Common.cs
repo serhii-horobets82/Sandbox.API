@@ -4,6 +4,7 @@
     public class CustomHeaders
     {
         public const string ServerId = "X-Server-ID";
+        public const string ApiKey = "X-Api-Key";
     }
 
 

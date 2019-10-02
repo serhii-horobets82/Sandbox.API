@@ -2,7 +2,8 @@
 {
     public static class PolicyTypes
     {
-            
+        public const string ApiKeyPolicy = "ApiKey";
+        
         public static class SysAdminPolicy
         {
             public const string Crud = "admin.crud";

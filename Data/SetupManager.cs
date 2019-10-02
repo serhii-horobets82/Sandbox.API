@@ -1,10 +1,5 @@
-using System;
-using System.Globalization;
-using Evoflare.API.Models;
-
 namespace Evoflare.API.Data
 {
-
     public class SetupConfig
     {
         public PredefinedConfig Id { get; set; }
@@ -17,6 +12,8 @@ namespace Evoflare.API.Data
         public string AdminEmail { get; set; }
         public string OrganizationName { get; set; }
         public string DefaultPassword { get; set; }
+        public bool ForceRecreate { get; set; } = false;
+        public bool IsRestartAfter { get; set; } = false;
     }
 
     public enum PredefinedConfig

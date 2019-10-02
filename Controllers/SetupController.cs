@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Evoflare.API.Configuration;
+using Evoflare.API.Constants;
 using Evoflare.API.Core.Permissions;
 using Evoflare.API.Data;
 using Evoflare.API.Models;
@@ -11,24 +15,26 @@ using static Evoflare.API.PoliciesExtensions;
 namespace Evoflare.API.Controllers
 {
 
-    [Authorize(Policy = nameof(AdminRequirement), AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
     public class SetupController : ControllerBase
     {
-        private readonly EvoflareDbContext context;
+        private readonly EvoflareDbContext context; 
         private readonly IServiceProvider serviceProvider;
         private readonly IConfiguration configuration;
+        private readonly IDbContextFactory contextFactory;
 
 
         public SetupController(
             EvoflareDbContext context,
             IServiceProvider serviceProvider,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IDbContextFactory contextFactory)
         {
             this.context = context;
             this.serviceProvider = serviceProvider;
             this.configuration = configuration;
+            this.contextFactory = contextFactory;
         }
 
         [HttpGet]
@@ -42,9 +48,26 @@ namespace Evoflare.API.Controllers
         [Authorize(Policy = PolicyTypes.AdminPolicy.Crud)]
         public IActionResult ResetDB(SetupParams setupParams)
         {
-            //DbInitializer.Initialize(serviceProvider, configuration, true);
             DbInitializer.Seed(setupParams, context, serviceProvider, configuration);
             return Ok(setupParams);
+        }
+
+
+        [HttpPost("init-db")]
+        [Authorize(Policy = PolicyTypes.ApiKeyPolicy)]
+        public IActionResult SetupDB(SetupParams setupParams)
+        {
+            var dbInstances = this.configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
+
+            if (dbInstances != null && Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
+            {
+                // get ID from request header
+                var serverId = headerValues.First();
+                var context = contextFactory.CreateFromHeaders();
+                DbInitializer.Seed(setupParams, context, serviceProvider, configuration);
+                return Ok(context.AppVersion.First());
+            }
+            return BadRequest();
         }
 
         [HttpPost("seed-360-feedback")]

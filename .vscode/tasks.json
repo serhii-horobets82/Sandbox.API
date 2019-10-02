@@ -36,11 +36,10 @@
         "dev02.evoflare@gmail.com",
         "dev03.evoflare@gmail.com",
         "dev04.evoflare@gmail.com",
-        "dev05.evoflare@gmail.com",
+        "dev05.evoflare@gmail.com"
       ],
       "default": "dev01.evoflare@gmail.com"
-    },
-    
+    }
   ],
   "tasks": [
     {
@@ -200,6 +199,23 @@
       "label": "heroku: Login",
       "type": "shell",
       "command": "echo Use Email:${input:herokuUser};heroku login -i;heroku container:login;heroku apps;",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku: Create secondary DB (5 pcs)",
+      "type": "shell",
+      "command": [
+        "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuApp} --as DB01 --name db-${input:herokuApp}-01;",
+        "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuApp} --as DB02 --name db-${input:herokuApp}-02;",
+        "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuApp} --as DB03 --name db-${input:herokuApp}-03;",
+        "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuApp} --as DB04 --name db-${input:herokuApp}-04;",
+        "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuApp} --as DB05 --name db-${input:herokuApp}-05;",
+      ],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
