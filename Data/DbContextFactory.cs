@@ -5,12 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using Boxed.AspNetCore;
 using System;
-using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Evoflare.API.Data
 {
@@ -18,12 +15,13 @@ namespace Evoflare.API.Data
     {
         EvoflareDbContext Create();
 
+        EvoflareDbContext CreateDefault();
+
         EvoflareDbContext CreateFromHeaders();
     }
 
     public class DbContextFactory : IDbContextFactory
     {
-
         private readonly IConfiguration configuration;
         private readonly IConnectionStringBuilder connectionStringBuilder;
         private readonly IHttpContextAccessor contextAccessor;
@@ -43,7 +41,7 @@ namespace Evoflare.API.Data
             this.serviceProvider = serviceProvider;
 
             // read configuration 
-            this.dbInstances = this.configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
+            this.dbInstances = configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
         }
 
         public EvoflareDbContext Create()
@@ -56,11 +54,83 @@ namespace Evoflare.API.Data
             return new EvoflareDbContext(optionsBuilder.Options);
         }
 
+        public EvoflareDbContext CreateDefault()
+        {
+            var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
+            var instance = new DBInstance
+            {
+                Id = "Default",
+                Type = appSettings.DataBaseType
+            };
+            if (appSettings.DataBaseType == DataBaseType.MSSQL)
+                instance.ConnectionStringEnvironmentName = "DATABASE_URL";
+            var builder = BuildContext<EvoflareDbContext>(instance);
+            return new EvoflareDbContext(builder.Options);
+        }
+
+        private DbContextOptionsBuilder<TContext> BuildContext<TContext>(DBInstance dbInstance) where TContext : DbContext
+        {
+            var builder = new DbContextOptionsBuilder<TContext>();
+
+            // MS SQL 
+            if (dbInstance.Type == DataBaseType.MSSQL)
+            {
+                builder.UseSqlServer(
+                    configuration.GetConnectionString(dbInstance.ConnectionStringName),
+                    sqlServerOptions =>
+                    {
+                        sqlServerOptions.CommandTimeout(dbInstance.CommandTimeout);
+                        sqlServerOptions.MigrationsHistoryTable(DatabaseOptions.MigrationTableName, DatabaseOptions.MigrationTableScheme);
+                    });
+            }
+            else if (dbInstance.Type == DataBaseType.POSTGRES)
+            {
+                // trying to find env variable with ID name 
+                var connectionString = Environment.GetEnvironmentVariable(dbInstance.Id);
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    connectionString = configuration.GetConnectionString(dbInstance.ConnectionStringName);
+                    // then trying find by env variable name  
+                    if (!string.IsNullOrEmpty(dbInstance.ConnectionStringEnvironmentName))
+                        connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;
+                }
+                if (string.IsNullOrEmpty(connectionString))
+                    throw new ArgumentException("Can't build connection string");
+
+                // Parse as database URL
+                if (connectionString.StartsWith("postgres://"))
+                {
+                    var databaseUri = new Uri(connectionString);
+                    var userInfo = databaseUri.UserInfo.Split(':');
+                    var isLocal = databaseUri.Host == "localhost";
+                    connectionString = new NpgsqlConnectionStringBuilder
+                    {
+                        Host = databaseUri.Host,
+                        Port = databaseUri.Port,
+                        Username = userInfo[0],
+                        Password = userInfo[1],
+                        Database = databaseUri.LocalPath.TrimStart('/'),
+                        Pooling = true,
+                        UseSslStream = !isLocal,
+                        SslMode = isLocal ? SslMode.Disable : SslMode.Require,
+                        TrustServerCertificate = !isLocal
+                    }.ToString();
+                }
+
+                builder.UseNpgsql(
+                    connectionString,
+                    pgOptions =>
+                    {
+                        pgOptions.CommandTimeout(dbInstance.CommandTimeout);
+                        pgOptions.MigrationsHistoryTable(DatabaseOptions.MigrationTableName, DatabaseOptions.MigrationTableScheme);
+                    });
+            }
+
+            return builder;
+        }
+
         public EvoflareDbContext CreateFromHeaders()
         {
-            var dbContextBuilder = new DbContextOptionsBuilder<EvoflareDbContext>();
-            // default startup context
-            var defaultStartupContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
             if (dbInstances != null && contextAccessor.HttpContext.Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
             {
                 // get ID from request header
@@ -68,65 +138,11 @@ namespace Evoflare.API.Data
                 var instance = dbInstances?.FirstOrDefault(i => i.Id == serverId);
                 if (instance != null)
                 {
-                    if (instance.Type == DataBaseType.MSSQL)
-                    {
-                        dbContextBuilder.UseSqlServer(
-                            configuration.GetConnectionString(instance.ConnStrSettingsName),
-                            sqlServerOptions =>
-                            {
-                                sqlServerOptions.CommandTimeout(instance.CommandTimeout);
-                                sqlServerOptions.MigrationsHistoryTable("Migrations", "core");
-                            });
-                    }
-                    else if (instance.Type == DataBaseType.POSTGRES)
-                    {
-                        // trying to find env variable with ID name 
-                        var connectionString = Environment.GetEnvironmentVariable(instance.Id);
-                        if (string.IsNullOrEmpty(connectionString))
-                        {
-                            connectionString = configuration.GetConnectionString(instance.ConnStrSettingsName);
-                            // then trying find by env variable name  
-                            if (!string.IsNullOrEmpty(instance.ConnStrEnvVarName))
-                                connectionString = Environment.GetEnvironmentVariable(instance.ConnStrEnvVarName);
-                        }
-                        // still empty - return default 
-                        if (string.IsNullOrEmpty(connectionString))
-                            return defaultStartupContext;
-
-                        // Parse as database URL
-                        if (connectionString.StartsWith("postgres://"))
-                        {
-                            var databaseUri = new Uri(connectionString);
-                            var userInfo = databaseUri.UserInfo.Split(':');
-                            var isLocal = databaseUri.Host == "localhost";
-                            var builder = new NpgsqlConnectionStringBuilder
-                            {
-                                Host = databaseUri.Host,
-                                Port = databaseUri.Port,
-                                Username = userInfo[0],
-                                Password = userInfo[1],
-                                Database = databaseUri.LocalPath.TrimStart('/'),
-                                Pooling = true,
-                                UseSslStream = !isLocal,
-                                SslMode = isLocal ? SslMode.Disable : SslMode.Require,
-                                TrustServerCertificate = !isLocal
-                            };
-                            connectionString = builder.ToString();
-                        }
-
-                        dbContextBuilder.UseNpgsql(
-                            connectionString,
-                            pgOptions =>
-                            {
-                                pgOptions.CommandTimeout(instance.CommandTimeout);
-                                pgOptions.MigrationsHistoryTable("Migrations", "core");
-                            });
-                    }
-                    return new EvoflareDbContext(dbContextBuilder.Options);
+                    var builder = BuildContext<EvoflareDbContext>(instance);
+                    return new EvoflareDbContext(builder.Options);
                 }
             }
-
-            return defaultStartupContext;
+            return CreateDefault();
         }
     }
 

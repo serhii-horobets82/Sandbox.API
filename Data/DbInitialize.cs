@@ -152,60 +152,9 @@ namespace Evoflare.API.Data
             }
         }
 
-        /// <summary>
-        /// Add user to a role if the user exists, otherwise, create the user and adds him to the role.
-        /// </summary>
-        /// <param name="serviceProvider">Service Provider</param>
-        /// <param name="userEmail">User Email</param>
-        /// <param name="userPwd">User Password. Used to create the user if not exists.</param>
-        /// <param name="roleName">Role Name</param>
-        /// <param name="firstName">First Name</param>
-        /// <param name="lastName">Last Name</param>
-        /// <param name="gender"></param>
-        /// <param name="age"></param>
-        private static async Task AddUserToRole(IServiceProvider serviceProvider, string userEmail, string userPwd,
-            string roleName, string firstName, string lastName, Gender gender, int age)
+        private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, EvoflareDbContext dbContext, string userEmail, string roleName, Employee empl, Claim extraClaim = null)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var dbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
-            var user = await userManager.FindByEmailAsync(userEmail);
-
-            if (user == null)
-            {
-                user = new ApplicationUser
-                {
-                    UserName = userEmail,
-                    Email = userEmail,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    EmailConfirmed = true,
-                    Gender = gender,
-                    Age = age
-                };
-
-                var result = await userManager.CreateAsync(user, userPwd);
-
-                await userManager.AddClaimsAsync(user, new Claim[]{
-                        new Claim(JwtClaimTypes.Name, $"{firstName} {lastName}"),
-                        new Claim(JwtClaimTypes.Email, userEmail)
-                });
-
-                // Add random profile
-                dbContext.Profile.Add(new UserProfile
-                {
-                    IdentityId = user.Id,
-                    Location = DefaultLocation,
-                    Locale = DefaultLocale,
-                    PictureUrl = DefaultPictureUrl
-                });
-            }
-            await userManager.AddToRoleAsync(user, roleName);
-        }
-
-        private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, string userEmail, string roleName, Employee empl, Claim extraClaim = null)
-        {
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var dbContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
             var user = await userManager.FindByEmailAsync(userEmail);
 
             if (user == null)
@@ -466,7 +415,7 @@ namespace Evoflare.API.Data
                         {
                             claim = new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit);
                         }
-                        CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
+                        CreateOrUpdateEmployee(serviceProvider, applicationContext, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
                     }
                 }
                 SeedEmployeeEvaluation(applicationContext);

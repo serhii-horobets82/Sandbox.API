@@ -109,7 +109,7 @@ namespace Evoflare.API.Data
                     {
                         claim = new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit);
                     }
-                    CreateOrUpdateEmployee(serviceProvider, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
+                    CreateOrUpdateEmployee(serviceProvider, applicationContext, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
                 }
 
                 SeedEmployeeEvaluation(applicationContext);
@@ -154,22 +154,22 @@ namespace Evoflare.API.Data
             else
             {
                 var empl = new Employee { Name = "System", Surname = "Admin", EmployeeTypeId = 10, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "sysadmin@evoflare.com", Constants.Roles.SysAdmin, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "sysadmin@evoflare.com", Constants.Roles.SysAdmin, empl).Wait();
                 // // admin
                 empl = new Employee { Name = "Regular", Surname = "Admin", EmployeeTypeId = 11, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "admin@evoflare.com", Constants.Roles.Admin, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "admin@evoflare.com", Constants.Roles.Admin, empl).Wait();
                 // // chief.manager
                 empl = new Employee { Name = "Chief", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "chief.manager@evoflare.com", Constants.Roles.ChiefManager, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "chief.manager@evoflare.com", Constants.Roles.ChiefManager, empl).Wait();
                 // // manager
                 empl = new Employee { Name = "Regular", Surname = "Manager", EmployeeTypeId = 1, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "manager@evoflare.com", Constants.Roles.Manager, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "manager@evoflare.com", Constants.Roles.Manager, empl).Wait();
                 // // chief.hr
                 empl = new Employee { Name = "Chief", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "chief.hr@evoflare.com", Constants.Roles.ChiefHR, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "chief.hr@evoflare.com", Constants.Roles.ChiefHR, empl).Wait();
                 // // hr
                 empl = new Employee { Name = "Regular", Surname = "HR", EmployeeTypeId = 12, HiringDate = DateTime.Parse("2010-01-01"), OrganizationId = 1 };
-                CreateOrUpdateEmployee(serviceProvider, "hr@evoflare.com", Constants.Roles.HR, empl).Wait();
+                CreateOrUpdateEmployee(serviceProvider, applicationContext, "hr@evoflare.com", Constants.Roles.HR, empl).Wait();
             }
 
             PatchDatabase(applicationContext);

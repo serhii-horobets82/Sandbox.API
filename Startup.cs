@@ -50,7 +50,7 @@ namespace Evoflare.API
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDatabaseContexts(this.configuration)
+                //.AddDatabaseContexts(this.configuration)
                 .AddCorrelationIdFluent()
                 .AddCustomCaching()
                 .AddCustomOptions(this.configuration)
@@ -131,7 +131,7 @@ namespace Evoflare.API
                 .UseMvc()
                 .UseSwagger()
                 .UseCustomSwaggerUI(GetType().GetTypeInfo().Assembly)
-                .UseDbSeed(this.configuration)
+                //.UseDbSeed(this.configuration)
                 .UseSignalR(route =>
                 {
                     route.MapHub<NotificationHub>("/hubs/notification-hub");

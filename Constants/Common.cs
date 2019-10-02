@@ -7,6 +7,16 @@
         public const string ApiKey = "X-Api-Key";
     }
 
+    public class DatabaseOptions
+    {
+        public const string CoreSchemaName = "core";
+        public const string SecuritySchemaName = "security";
+        public const string DefaultConnectionName = "DefaultConnection";
+        public const string MigrationTableName = "Migrations";
+        public const string MigrationTableScheme = "core";
+        public const int CommandTimeout = 300;
+    }
+
 
     /// <summary>
     ///     Codes for the representation of human sexes is an international standard
