@@ -27,7 +27,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -36,7 +35,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -47,20 +45,14 @@ namespace Evoflare.API
         public ReplacementTypeMappingSource(
             TypeMappingSourceDependencies dependencies,
             RelationalTypeMappingSourceDependencies relationalDependencies,
-            ISqlGenerationHelper sqlGenerationHelper)
-            : base(dependencies, relationalDependencies, sqlGenerationHelper)
-        {
-        }
+            ISqlGenerationHelper sqlGenerationHelper) : base(dependencies, relationalDependencies, sqlGenerationHelper) { }
 
         protected override RelationalTypeMapping FindMapping(in RelationalTypeMappingInfo mappingInfo)
         {
-            if (mappingInfo.StoreTypeName == "datetime")
-            {
-            }
+            if (mappingInfo.StoreTypeName == "datetime") { }
             return base.FindMapping(mappingInfo);
         }
     }
-
 
     /// <summary>
     ///     <see cref="IServiceCollection" /> extension methods which extend ASP.NET Core services.
@@ -121,39 +113,39 @@ namespace Evoflare.API
             };
 
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(configureOptions =>
-            {
-                configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                configureOptions.TokenValidationParameters = tokenValidationParameters;
-                configureOptions.SaveToken = true;
-
-                // We have to hook the OnMessageReceived event in order to
-                // allow the JWT authentication handler to read the access
-                // token from the query string when a WebSocket or 
-                // Server-Sent Events request comes in.
-                configureOptions.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context =>
-                    {
-                        var accessToken = context.Request.Query["access_token"];
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(configureOptions =>
+                {
+                    configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                    configureOptions.TokenValidationParameters = tokenValidationParameters;
+                    configureOptions.SaveToken = true;
 
-                        // If the request is for our hub...
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hubs")))
+                    // We have to hook the OnMessageReceived event in order to
+                    // allow the JWT authentication handler to read the access
+                    // token from the query string when a WebSocket or 
+                    // Server-Sent Events request comes in.
+                    configureOptions.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
                         {
-                            // Read the token out of the query string
-                            context.Token = accessToken;
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hubs")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    };
+                });
 
             // add identity
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -183,7 +175,6 @@ namespace Evoflare.API
 
             return services;
         }
-
 
         public static IServiceCollection AddCorrelationIdFluent(this IServiceCollection services)
         {
@@ -257,9 +248,9 @@ namespace Evoflare.API
                     {
                         // Add additional MIME types (other than the built in defaults) to enable GZIP compression for.
                         var customMimeTypes = services
-                                              .BuildServiceProvider()
-                                              .GetRequiredService<CompressionOptions>()
-                                              .MimeTypes ?? Enumerable.Empty<string>();
+                            .BuildServiceProvider()
+                            .GetRequiredService<CompressionOptions>()
+                            .MimeTypes ?? Enumerable.Empty<string>();
                         options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(customMimeTypes);
                     })
                 .Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
@@ -335,16 +326,14 @@ namespace Evoflare.API
                     options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                     {
                         Description = "JWT Authorization header using the Bearer scheme",
-                        Name = "Authorization",
-                        In = "header",
-                        Type = "apiKey"
+                            Name = "Authorization",
+                            In = "header",
+                            Type = "apiKey"
                     });
 
                     options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                    {
-                        {"Bearer", Enumerable.Empty<string>()}
+                    { { "Bearer", Enumerable.Empty<string>() }
                     });
-
 
                     options.DescribeAllEnumsAsStrings();
                     options.DescribeAllParametersInCamelCase();
@@ -370,14 +359,14 @@ namespace Evoflare.API
                         var info = new Info
                         {
                             Title = assemblyProduct,
-                            Description = apiVersionDescription.IsDeprecated
-                                ? $"{assemblyDescription} This API version has been deprecated."
-                                : assemblyDescription,
+                            Description = apiVersionDescription.IsDeprecated ?
+                            $"{assemblyDescription} This API version has been deprecated." :
+                            assemblyDescription,
                             Version = assemblyVersion,
                             Contact = new Contact()
                             {
-                                Name = "Evoflare team",
-                                Email = "mail.evoflare@gmail.com"
+                            Name = "Evoflare team",
+                            Email = "mail.evoflare@gmail.com"
                             }
                         };
                         options.SwaggerDoc(apiVersionDescription.GroupName, info);

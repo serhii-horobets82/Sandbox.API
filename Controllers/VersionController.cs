@@ -1,14 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
+using Evoflare.API.Core.Models;
+using Evoflare.API.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Annotations;
-using Evoflare.API.Data;
-using Microsoft.AspNetCore.Authorization;
-using System;
 using Npgsql;
-using System.Data.SqlClient;
-using Evoflare.API.Core.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Evoflare.API.Controllers
 {
@@ -17,40 +16,29 @@ namespace Evoflare.API.Controllers
     [AllowAnonymous]
     public class VersionController : BaseController
     {
-        private readonly IDbContextFactory contextFactory;
+        private readonly IRepository<AppVersion> appVersionRepository;
 
-        public VersionController(IDbContextFactory contextFactory)
+        public VersionController(IRepository<AppVersion> appVersionRepository)
         {
-            this.contextFactory = contextFactory;
+            this.appVersionRepository = appVersionRepository;
         }
 
         [HttpGet(Name = "GetAppVersion")]
         [SwaggerResponse(StatusCodes.Status200OK, "Version of application in database", typeof(AppVersion))]
         public async Task<IActionResult> GetAppVersion()
         {
-            var context = contextFactory.CreateFromHeaders();
             try
             {
-                var version = await context.AppVersion.FirstOrDefaultAsync();
+                var version = await appVersionRepository.GetListAsync();
                 return Ok(version);
             }
             catch (Exception ex)
             {
                 // 42P01: relation "core.AppVersion" does not exist - Database empty
                 if ((ex is PostgresException pgEx && pgEx.SqlState == "42P01") ||
-                   (ex is SqlException sqlEx && sqlEx.Number == 2714))
+                    (ex is SqlException sqlEx && sqlEx.Number == 2714))
                 {
                     return BadRequest("Database is empty!");
-                    //     var setupParams = new SetupParams
-                    //     {
-                    //         Id = PredefinedConfig.DefaultConfig,
-                    //         AdminEmail = "xxx@evoflare.com",
-                    //         OrganizationName = "xxxx",
-                    //         DefaultPassword = "qwerty",
-                    //     };
-                    //     DbInitializer.Seed(setupParams, context, serviceProvider, configuration);
-                    //     var version = await context.AppVersion.FirstOrDefaultAsync();
-                    //     return Ok(version);
                 }
                 return BadRequest(ex);
             }

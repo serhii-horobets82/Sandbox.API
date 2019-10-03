@@ -34,8 +34,9 @@ namespace Evoflare.API
         public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
             services
                 .AddSingleton<ICarRepository, CarRepository>()
-                .AddSingleton<IRepository<Employee>, Repository<Employee>>()
-                .AddSingleton<IRepository<Installation>, Repository<Installation>>();
+                .AddTransient<IRepository<Employee>, Repository<Employee>>()
+                .AddTransient<IRepository<AppVersion>, Repository<AppVersion>>()
+                .AddTransient<IRepository<Installation>, Repository<Installation>>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services;

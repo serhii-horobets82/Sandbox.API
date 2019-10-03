@@ -11,7 +11,6 @@ namespace Evoflare.API.Data
         public PredefinedConfig Id { get; set; }
         public string AdminEmail { get; set; }
         public string OrganizationName { get; set; }
-        public string DefaultPassword { get; set; }
         public bool ForceRecreate { get; set; } = false;
         public bool IsRestartAfter { get; set; } = false;
     }
