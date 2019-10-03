@@ -70,62 +70,11 @@ namespace Evoflare.API
         public static IServiceCollection AddDatabaseContexts(this IServiceCollection services,
             IConfiguration configuration, string connectionName = "DefaultConnection")
         {
-            var appSettings = configuration.GetSection<AppSettings>();
-            var dbType = appSettings.DataBaseType;
-
-            var assemblyName = Assembly.GetExecutingAssembly().GetName();
-            if (dbType == DataBaseType.MSSQL)
+            services.AddTransient(provider =>
             {
-                services.AddDbContext<EvoflareDbContext>(options => options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
-                    sqlServerOptions =>
-                    {
-                        sqlServerOptions.CommandTimeout(300);
-                        sqlServerOptions.MigrationsHistoryTable("Migrations", "core");
-                    })
-                );
-            }
-            else
-            {
-                //var mapping = services.AddEntityFrameworkNpgsql().AddDbContext<EvoflareDbContext>(options => options.ReplaceService<IRelationalTypeMappingSource, ReplacementTypeMappingSource>().UseNpgsql(
-                //    configuration.GetConnectionString("DefaultConnectionPostgres"),
-                //    npgsqlOptions => npgsqlOptions.CommandTimeout(300))
-                //).BuildServiceProvider().GetRequiredService<IRelationalTypeMappingSource>();
-                var connectionString = configuration.GetConnectionString("DefaultConnectionPostgres");
-
-                // Check enviroment for DATABASE_URL (heroku postgres)
-                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? configuration.GetValue<string>("DATABASE_URL");
-                if (databaseUrl != null)
-                {
-                    var databaseUri = new Uri(databaseUrl);
-                    var userInfo = databaseUri.UserInfo.Split(':');
-                    var isLocal = databaseUri.Host == "localhost";
-                    var builder = new NpgsqlConnectionStringBuilder
-                    {
-                        Host = databaseUri.Host,
-                        Port = databaseUri.Port,
-                        Username = userInfo[0],
-                        Password = userInfo[1],
-                        Database = databaseUri.LocalPath.TrimStart('/'),
-                        Pooling = true,
-                        UseSslStream = !isLocal,
-                        SslMode = isLocal ? SslMode.Disable : SslMode.Require,
-                        TrustServerCertificate = !isLocal
-                    };
-                    connectionString = builder.ToString();
-                }
-
-                services.AddDbContext<EvoflareDbContext>(options => options.UseNpgsql(
-                    connectionString,
-                    pgOptions =>
-                    {
-                        pgOptions.CommandTimeout(300);
-                        pgOptions.MigrationsHistoryTable("Migrations", "core");
-                    })
-                    .ReplaceService<IMigrationsSqlGenerator, BaseMigrationsSqlGenerator>()
-                );
-            }
-
+                var context = provider.GetService<IDbContextFactory>();
+                return context.CreateFromHeaders();
+            });
             return services;
         }
 
@@ -134,7 +83,6 @@ namespace Evoflare.API
         {
             var appSettings = configuration.GetSection<AppSettings>();
             var secretKey = Encoding.ASCII.GetBytes(appSettings.Secret);
-
 
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtIssuerOptions));
             var signingKey = new SymmetricSecurityKey(secretKey);
@@ -147,7 +95,6 @@ namespace Evoflare.API
             services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
             services.Configure<GithubAuthSettings>(configuration.GetSection(nameof(GithubAuthSettings)));
             services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
-            services.Configure<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)));
 
             // Configure JwtIssuerOptions
             services.Configure<JwtIssuerOptions>(options =>
@@ -294,7 +241,6 @@ namespace Evoflare.API
                     configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
                 .ConfigureAndValidateSingleton<AppSettings>(
                     configuration.GetSection(nameof(AppSettings)))
-                .ConfigureAndValidateSingleton<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)))
                 .ConfigureAndValidateSingleton<ClientSetting>(configuration.GetSection(nameof(ClientSetting)))
                 .ConfigureAndValidateSingleton<ThirdParty>(configuration.GetSection(nameof(ThirdParty)));
         }

@@ -14,7 +14,7 @@ namespace Evoflare.API.Models
     {
         public BaseDbContext() { }
         public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options) { }
-
+       
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Installation> Installations { get; set; }
@@ -27,9 +27,9 @@ namespace Evoflare.API.Models
             var configuration = Evoflare.API.Data.Extensions.Configuration;
 
             var appSettings = configuration.GetSection<AppSettings>();
-            var dbType = appSettings.DataBaseType;
+            var dbType = appSettings.DatabaseType;
 
-            if (dbType == DataBaseType.POSTGRES)
+            if (dbType == DatabaseType.POSTGRES)
             {
                 // postgres workaround
                 foreach (var pb in modelBuilder.Model

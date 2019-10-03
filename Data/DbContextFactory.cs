@@ -8,6 +8,7 @@ using System.Linq;
 using System;
 using Npgsql;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Evoflare.API.Data
 {
@@ -27,21 +28,22 @@ namespace Evoflare.API.Data
         private readonly IHttpContextAccessor contextAccessor;
         private readonly IServiceProvider serviceProvider;
 
-        private List<DBInstance> dbInstances;
+
+        private List<DatabaseInstance> dbInstances;
 
         public DbContextFactory(
             IConfiguration configuration,
             IConnectionStringBuilder connectionStringBuilder,
             IHttpContextAccessor contextAccessor,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider
+            )
         {
             this.configuration = configuration;
             this.connectionStringBuilder = connectionStringBuilder;
             this.contextAccessor = contextAccessor;
             this.serviceProvider = serviceProvider;
-
             // read configuration 
-            this.dbInstances = configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
+            this.dbInstances = configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>();
         }
 
         public EvoflareDbContext Create()
@@ -57,23 +59,23 @@ namespace Evoflare.API.Data
         public EvoflareDbContext CreateDefault()
         {
             var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
-            var instance = new DBInstance
+            var instance = new DatabaseInstance
             {
                 Id = "Default",
-                Type = appSettings.DataBaseType
+                Type = appSettings.DatabaseType
             };
-            if (appSettings.DataBaseType == DataBaseType.MSSQL)
+            if (appSettings.DatabaseType == DatabaseType.POSTGRES)
                 instance.ConnectionStringEnvironmentName = "DATABASE_URL";
             var builder = BuildContext<EvoflareDbContext>(instance);
             return new EvoflareDbContext(builder.Options);
         }
 
-        private DbContextOptionsBuilder<TContext> BuildContext<TContext>(DBInstance dbInstance) where TContext : DbContext
+        private DbContextOptionsBuilder<TContext> BuildContext<TContext>(DatabaseInstance dbInstance) where TContext : DbContext
         {
             var builder = new DbContextOptionsBuilder<TContext>();
 
             // MS SQL 
-            if (dbInstance.Type == DataBaseType.MSSQL)
+            if (dbInstance.Type == DatabaseType.MSSQL)
             {
                 builder.UseSqlServer(
                     configuration.GetConnectionString(dbInstance.ConnectionStringName),
@@ -83,7 +85,7 @@ namespace Evoflare.API.Data
                         sqlServerOptions.MigrationsHistoryTable(DatabaseOptions.MigrationTableName, DatabaseOptions.MigrationTableScheme);
                     });
             }
-            else if (dbInstance.Type == DataBaseType.POSTGRES)
+            else if (dbInstance.Type == DatabaseType.POSTGRES)
             {
                 // trying to find env variable with ID name 
                 var connectionString = Environment.GetEnvironmentVariable(dbInstance.Id);

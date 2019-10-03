@@ -85,8 +85,8 @@ namespace Evoflare.API.Services
             await _userManager.SetLockoutEnabledAsync(user, false);
 
             // set aspnet role according to selected employee type 
-            var roleName = _userManager.MapTypeToRole(invite.Role);
-            await _userManager.AddToRoleAsync(user, roleName);
+            if(invite.RoleName != null)
+                await _userManager.AddToRoleAsync(user, invite.RoleName);
 
             _context.Profile.Add(new UserProfile
             {

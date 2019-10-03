@@ -236,7 +236,7 @@ namespace Evoflare.API.Data
             return content;
         }
 
-        public static void RecreateDatabase(DbContext context, int timeout)
+        public static void RecreateDatabase(DbContext context, int timeout = 300)
         {
             // drop database
             Log.Information("Truncate database - start");
@@ -296,7 +296,7 @@ namespace Evoflare.API.Data
             var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
             var appSettings = configuration.GetSection<AppSettings>();
-            var dbType = appSettings.DataBaseType;
+            var dbType = appSettings.DatabaseType;
 
             var exportData = configuration.GetValue("AppSettings:ExportData", false) || configuration.GetValue("export-data", false);
             // flag from config - recreate DB on application starts (if true) 
@@ -386,7 +386,9 @@ namespace Evoflare.API.Data
                 OrganizationName = "Unknown company",
                 DefaultPassword = "qwerty",
             };
-            DbInitializer.Seed(setupParams, applicationContext, serviceProvider, configuration);
+            //DbInitializer.Seed(setupParams, applicationContext, serviceProvider, configuration);
+
+            /* 
 
             // check for roles
             if (!applicationContext.Roles.Any())
@@ -556,9 +558,9 @@ namespace Evoflare.API.Data
                         }
                     }
                 }
-                */
                 #endregion
-            }
+                }
+                */
         }
     }
 }

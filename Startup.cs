@@ -50,7 +50,7 @@ namespace Evoflare.API
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                //.AddDatabaseContexts(this.configuration)
+                .AddDatabaseContexts(this.configuration)
                 .AddCorrelationIdFluent()
                 .AddCustomCaching()
                 .AddCustomOptions(this.configuration)

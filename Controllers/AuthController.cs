@@ -2,12 +2,10 @@
 using Evoflare.API.Auth;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Helpers;
-using Evoflare.API.Models;
 using Evoflare.API.Services;
 using Evoflare.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Controllers
 {
@@ -21,7 +19,6 @@ namespace Evoflare.API.Controllers
         private readonly UserManager<ApplicationUser> userManager;
 
         public AuthController(
-            EvoflareDbContext dbContext,
             UserManager<ApplicationUser> userManager,
             IJwtFactory jwtFactory,
             IActivityLogService activityLogService)

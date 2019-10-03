@@ -48,7 +48,7 @@ namespace Evoflare.API.Controllers
         [Authorize(Policy = PolicyTypes.ApiKeyPolicy)]
         public IActionResult SetupDB(SetupParams setupParams)
         {
-            var dbInstances = this.configuration.GetSection("DatabaseSettings").Get<List<DBInstance>>();
+            var dbInstances = this.configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>();
 
             if (dbInstances != null && Request.Headers.TryGetValue(CustomHeaders.ServerId, out var headerValues))
             {

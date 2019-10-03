@@ -117,6 +117,5 @@ namespace Evoflare.API.Auth.Identity
         IQueryable<ApplicationUser> Users { get; }
         ClaimsPrincipal User { get; }
         Task<string> SendEmailConfirmationMessage(ApplicationUser user);
-        string MapTypeToRole(int type);
     }
 }

@@ -69,6 +69,8 @@ namespace Evoflare.API.Controllers
         [Required]
         public int Role { get; set; }
 
+        public string RoleName { get; set; }
+
         public string UserName { get; set; }
     }
 }

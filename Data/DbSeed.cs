@@ -1,28 +1,22 @@
-﻿using Evoflare.API.Auth.Models;
-using Evoflare.API.Core.Models;
+﻿using Evoflare.API.Core.Models;
 using Evoflare.API.Constants;
 using Evoflare.API.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using System;
-using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Boxed.AspNetCore;
 using Evoflare.API.Configuration;
-using System.Collections.Generic;
 using Evoflare.API.Core.Permissions;
-using System.Threading.Tasks;
 using System.Security.Claims;
-using Evoflare.API.Auth;
 using System.Globalization;
 using System.Data.SqlClient;
 using Evoflare.API.Auth.Identity;
 using Npgsql;
+using Microsoft.AspNetCore.Identity;
+using Evoflare.API.Auth.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Evoflare.API.Data
 {
@@ -55,13 +49,10 @@ namespace Evoflare.API.Data
 
         public static void Seed(SetupParams setupParams, EvoflareDbContext applicationContext, IServiceProvider serviceProvider, IConfiguration configuration)
         {
-            var userManager = serviceProvider.GetRequiredService<IUserManager>();
-            var appSettings = configuration.GetSection<AppSettings>();
-            var dbType = appSettings.DataBaseType;
-            var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
-
             if (setupParams.ForceRecreate)
-                RecreateDatabase(applicationContext, retryTimeout);
+            {
+                RecreateDatabase(applicationContext);
+            }
 
             try
             {
@@ -98,7 +89,14 @@ namespace Evoflare.API.Data
             {
                 foreach (var employee in defaultEmployeeList)
                 {
-                    var userRole = userManager.MapTypeToRole(employee.EmployeeTypeId);
+                    var userRole = Constants.Roles.User;
+                    switch (employee.EmployeeTypeId)
+                    {
+                        case 10: userRole = Constants.Roles.SysAdmin; break;
+                        case 11: userRole = Constants.Roles.Admin; break;
+                        case 1: userRole = Constants.Roles.Manager; break;
+                        case 12: userRole = Constants.Roles.HR; break;
+                    }
                     // TODO Remove later 
                     Claim claim = null;
                     if (employee.Id == 24)
@@ -178,6 +176,7 @@ namespace Evoflare.API.Data
             var connection = applicationContext.Database.GetDbConnection();
             try
             {
+                var dbType = applicationContext.Database.IsNpgsql() ? DatabaseType.POSTGRES : DatabaseType.MSSQL;
                 var appAppVersion = new AppVersion
                 {
                     Name = assemblyInfo.Name,
