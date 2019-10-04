@@ -17,7 +17,6 @@
         public const int CommandTimeout = 300;
     }
 
-
     /// <summary>
     ///     Codes for the representation of human sexes is an international standard
     ///     ISO/IEC 5218
@@ -46,6 +45,7 @@
 
     public static class JwtClaimIdentifiers
     {
+        public const string DatabaseId = "dbId";
         public const string EmployeeId = "empId";
         public const string OrganizationId = "orgId";
         public const string OrganizationName = "orgName";

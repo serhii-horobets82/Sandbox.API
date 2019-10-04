@@ -1,12 +1,13 @@
+using System.Linq;
 using Boxed.AspNetCore;
 using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
 using Evoflare.API.Constants;
 using Evoflare.API.Core.Models;
+using Evoflare.API.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Evoflare.API.Models
 {
@@ -14,7 +15,7 @@ namespace Evoflare.API.Models
     {
         public BaseDbContext() { }
         public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options) { }
-       
+
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Installation> Installations { get; set; }
@@ -24,21 +25,18 @@ namespace Evoflare.API.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            var configuration = Evoflare.API.Data.Extensions.Configuration;
-
-            var appSettings = configuration.GetSection<AppSettings>();
+            var appSettings = ConfigurationManager.AppSettings;
             var dbType = appSettings.DatabaseType;
 
             if (dbType == DatabaseType.POSTGRES)
             {
                 // postgres workaround
                 foreach (var pb in modelBuilder.Model
-                    .GetEntityTypes()
-                    .SelectMany(t => t.GetProperties())
-                    .Where(p => p.GetAnnotations().Any(b => b.Name == "Relational:ColumnType" && b.Value.ToString() == "datetime"))
-                    .Select(p =>
-                        modelBuilder.Entity(p.DeclaringEntityType.ClrType).Property(p.Name))
-                    )
+                        .GetEntityTypes()
+                        .SelectMany(t => t.GetProperties())
+                        .Where(p => p.GetAnnotations().Any(b => b.Name == "Relational:ColumnType" && b.Value.ToString() == "datetime"))
+                        .Select(p =>
+                            modelBuilder.Entity(p.DeclaringEntityType.ClrType).Property(p.Name)))
                 {
                     pb.HasColumnType("timestamp"); // MSSQL datetime maped to PG timestamp
                     if (pb.Metadata.DeclaringEntityType.Name == "Evoflare.API.Models.Position" || pb.Metadata.DeclaringEntityType.Name == "Evoflare.API.Models.PositionRole")
@@ -53,7 +51,7 @@ namespace Evoflare.API.Models
             // Workaroound 
             modelBuilder.Entity<Employee>(entity =>
             {
-                entity.Metadata.RemoveIndex(new[] { entity.Property(r => r.UserId).Metadata });
+                entity.Metadata.RemoveIndex(new [] { entity.Property(r => r.UserId).Metadata });
             });
             //
 
@@ -63,7 +61,7 @@ namespace Evoflare.API.Models
                 entity.ToTable("ActivityLogs", DatabaseOptions.CoreSchemaName);
             });
 
-             modelBuilder.Entity<Installation>(entity =>
+            modelBuilder.Entity<Installation>(entity =>
             {
                 entity.ToTable("Installations", DatabaseOptions.CoreSchemaName);
             });
@@ -93,11 +91,11 @@ namespace Evoflare.API.Models
             // == security =======
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                entity.ToTable(name: "Users", schema: DatabaseOptions.SecuritySchemaName);
+                entity.ToTable(name: "Users", schema : DatabaseOptions.SecuritySchemaName);
             });
             modelBuilder.Entity<ApplicationRole>(entity =>
             {
-                entity.ToTable(name: "Roles", schema: DatabaseOptions.SecuritySchemaName);
+                entity.ToTable(name: "Roles", schema : DatabaseOptions.SecuritySchemaName);
             });
             modelBuilder.Entity<IdentityUserClaim<string>>(entity =>
             {

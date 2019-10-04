@@ -64,8 +64,8 @@ namespace Evoflare.API
         {
             services.AddTransient(provider =>
             {
-                var context = provider.GetService<IDbContextFactory>();
-                return context.CreateFromHeaders();
+                var contextFactory = provider.GetService<IDbContextFactory>();
+                return contextFactory.CreateCustom();
             });
             return services;
         }

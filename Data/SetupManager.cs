@@ -6,13 +6,23 @@ namespace Evoflare.API.Data
         public string Description { get; set; }
     }
 
+    public class RandomData
+    {
+        public int Users { get; set; } = 10;
+        public int Managers { get; set; } = 3;
+        public int HRs { get; set; } = 2;
+    }
+
     public class SetupParams
     {
         public PredefinedConfig Id { get; set; }
         public string AdminEmail { get; set; }
-        public string OrganizationName { get; set; }
+        public string OrganizationName { get; set; } = "Evoflare Corp";
+        public string OrganizationDomain { get; set; } = "evoflare.com";
         public bool ForceRecreate { get; set; } = false;
         public bool IsRestartAfter { get; set; } = false;
+
+        public RandomData RandomData { get; set; } = null;
     }
 
     public enum PredefinedConfig

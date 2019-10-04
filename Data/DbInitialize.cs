@@ -23,8 +23,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Serilog;
 
-namespace Evoflare.API.Data {
-    public static partial class DbInitializer {
+namespace Evoflare.API.Data
+{
+    public static partial class DbInitializer
+    {
         public const string DefaultPassword = "qwerty";
         private const string DefaultLocation = "Ukraine";
         private const string DefaultLocale = "en";
@@ -35,22 +37,25 @@ namespace Evoflare.API.Data {
         /// </summary>
         /// <param name="serviceProvider">Service Provider</param>
         /// <param name="roleName">Role Name</param>
-        private static void CreateRole (IServiceProvider serviceProvider, string roleName) {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>> ();
+        private static void CreateRole(IServiceProvider serviceProvider, string roleName)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-            var roleExists = roleManager.RoleExistsAsync (roleName);
-            roleExists.Wait ();
+            var roleExists = roleManager.RoleExistsAsync(roleName);
+            roleExists.Wait();
 
             if (roleExists.Result) return;
 
-            var roleResult = roleManager.CreateAsync (new ApplicationRole (roleName));
-            roleResult.Wait ();
+            var roleResult = roleManager.CreateAsync(new ApplicationRole(roleName));
+            roleResult.Wait();
         }
 
-        private static async Task CreateRoles (IServiceProvider serviceProvider) {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>> ();
-            var roles = new List<ApplicationRole> {
-                new ApplicationRole { Name = Constants.Roles.SysAdmin, DefaultPermission = AccessFlag.GodMode, PolicyName = nameof (PolicyTypes.SysAdminPolicy) },
+        private static async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            var roles = new List<ApplicationRole>
+            {
+                new ApplicationRole { Name = Constants.Roles.SysAdmin, DefaultPermission = AccessFlag.GodMode, PolicyName = nameof(PolicyTypes.SysAdminPolicy) },
                 new ApplicationRole { Name = Constants.Roles.Admin, DefaultPermission = AccessFlag.Manage, PolicyName = "AdminPolicy" },
                 new ApplicationRole { Name = Constants.Roles.ChiefManager, DefaultPermission = AccessFlag.Manage, PolicyName = "ManagerPolicy" },
                 new ApplicationRole { Name = Constants.Roles.Manager, DefaultPermission = AccessFlag.Read | AccessFlag.Create | AccessFlag.Edit | AccessFlag.Details, PolicyName = "ManagerPolicy" },
@@ -59,80 +64,83 @@ namespace Evoflare.API.Data {
                 new ApplicationRole { Name = Constants.Roles.User },
             };
 
-            foreach (var role in roles) {
-                var result = await roleManager.RoleExistsAsync (role.Name);
-                if (!result) {
-                    await roleManager.CreateAsync (role);
+            foreach (var role in roles)
+            {
+                var result = await roleManager.RoleExistsAsync(role.Name);
+                if (!result)
+                {
+                    await roleManager.CreateAsync(role);
 
-                    var foundRole = await roleManager.FindByNameAsync (role.Name);
+                    var foundRole = await roleManager.FindByNameAsync(role.Name);
 
-                    switch (foundRole.Name) {
+                    switch (foundRole.Name)
+                    {
                         case Constants.Roles.SysAdmin:
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SystemPermission.Manage));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SystemPermission.Manage));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.OrganizationsPermission.Manage));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Manage));
                             break;
 
                         case Constants.Roles.Admin:
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.AdminPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.AdminPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.UsersPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.UsersPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
 
                             break;
                         case Constants.Roles.ChiefManager:
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
                             break;
                         case Constants.Roles.Manager:
                             //await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
                             //await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
                             break;
                         case Constants.Roles.ChiefHR:
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.OrganizationsPermission.Details));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.View));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.Delete));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Delete));
 
                             break;
                         case Constants.Roles.HR:
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.SalaryPermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.SalaryPermission.View));
 
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
-                            await roleManager.AddClaimAsync (foundRole, new Claim (CustomClaims.Permission, AppPermissions.EmployeePermission.View));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Add));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.Edit));
+                            await roleManager.AddClaimAsync(foundRole, new Claim(CustomClaims.Permission, AppPermissions.EmployeePermission.View));
 
                             break;
                     }
@@ -140,16 +148,23 @@ namespace Evoflare.API.Data {
             }
         }
 
-        private static async Task CreateOrUpdateEmployee (IServiceProvider serviceProvider, EvoflareDbContext dbContext, string userEmail, string roleName, Employee empl, Claim extraClaim = null) {
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>> ();
-            var user = await userManager.FindByEmailAsync (userEmail);
+        private static async Task CreateOrUpdateEmployee(IServiceProvider serviceProvider, EvoflareDbContext dbContext, string userEmail, string roleName, Employee empl, Claim extraClaim = null)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await userManager.FindByEmailAsync(userEmail);
 
-            if (user == null) {
-                // var trans = dbContext.Database.BeginTransaction();
-                if (empl.Id != 0 && dbContext.Database.IsSqlServer ())
-                    dbContext.Database.ExecuteSqlCommand ("SET IDENTITY_INSERT [Employee] ON");
-                try {
-                    user = new ApplicationUser {
+            if (user == null)
+            {
+
+                var trans = dbContext.Database.BeginTransaction();
+                if (empl.Id != 0 && dbContext.Database.IsSqlServer())
+                {
+                    dbContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT [Employee] ON");
+                }
+                try
+                {
+                    user = new ApplicationUser
+                    {
                         UserName = userEmail,
                         Email = userEmail,
                         FirstName = empl.Name,
@@ -162,177 +177,214 @@ namespace Evoflare.API.Data {
 
                     empl.UserId = user.Id;
                     empl.NameTemp = $"{user.LastName} {user.FirstName}";
-                    await dbContext.Employee.AddAsync (empl);
+                    await dbContext.Employee.AddAsync(empl);
 
-                    await userManager.CreateAsync (user, DefaultPassword);
+                    dbContext.SaveChanges();
 
-                    var claims = new Claim[] {
-                        new Claim (JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                        new Claim (JwtClaimTypes.Email, userEmail)
+                    await userManager.CreateAsync(user, DefaultPassword);
+
+                    var claims = new Claim[]
+                    {
+                        new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                        new Claim(JwtClaimTypes.Email, userEmail)
                     };
                     if (extraClaim != null)
-                        claims = claims.Append (extraClaim).ToArray ();
-                    await userManager.AddClaimsAsync (user, claims);
+                        claims = claims.Append(extraClaim).ToArray();
+                    await userManager.AddClaimsAsync(user, claims);
 
                     // Add random profile
-                    dbContext.Profile.Add (new UserProfile {
+                    dbContext.Profile.Add(new UserProfile
+                    {
                         IdentityId = user.Id,
                             Location = DefaultLocation,
                             Locale = DefaultLocale,
                             PictureUrl = DefaultPictureUrl
                     });
 
-                    await userManager.AddToRoleAsync (user, roleName);
+                    await userManager.AddToRoleAsync(user, roleName);
 
-                    //dbContext.Entry(empl).Reload();
-                    //dbContext.Entry(user).Reload();
+                    dbContext.Entry(empl).Reload();
+                    dbContext.Entry(user).Reload();
 
-                    //trans.Commit();
-                } catch (Exception ex) { //
-                    //trans.Rollback();
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                { //
+                    trans.Rollback();
                     throw ex;
                 }
             }
         }
 
         /// Additional changes in DB after re-creation
-        public static void PatchDatabase (DbContext context) {
-            if (context.Database.IsNpgsql ()) {
-                context.Database.ExecuteSqlCommand (ReadEmbeddedResource ("Evoflare.API.Database.patchPg.sql"));
+        public static void PatchDatabase(DbContext context)
+        {
+            if (context.Database.IsNpgsql())
+            {
+                context.Database.ExecuteSqlCommand(ReadEmbeddedResource("Evoflare.API.Database.patchPg.sql"));
             }
         }
 
-        public static string ReadEmbeddedResource (string key) {
-            var assembly = Assembly.GetExecutingAssembly ();
+        public static string ReadEmbeddedResource(string key)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
             var content = "";
-            using (var stream = assembly.GetManifestResourceStream (key)) {
-                using (var reader = new StreamReader (stream, Encoding.UTF8)) {
-                    content = reader.ReadToEnd ();
+            using(var stream = assembly.GetManifestResourceStream(key))
+            {
+                using(var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    content = reader.ReadToEnd();
                 }
             }
             return content;
         }
 
-        public static void RecreateDatabase (DbContext context, int timeout = 300) {
+        public static void RecreateDatabase(DbContext context, int timeout = 300)
+        {
             // drop database
-            Log.Information ("Truncate database - start");
-            try {
+            Log.Information("Truncate database - start");
+            try
+            {
                 var resourceKey = "Evoflare.API.Database.dropTables.sql";
-                if (context.Database.IsNpgsql ())
+                if (context.Database.IsNpgsql())
                     resourceKey = "Evoflare.API.Database.dropTablesPg.sql";
-                context.Database.ExecuteSqlCommand (ReadEmbeddedResource (resourceKey));
+                context.Database.ExecuteSqlCommand(ReadEmbeddedResource(resourceKey));
 
-                Log.Logger.Information ("Truncate database - finish");
-            } catch (Exception ex) {
-                Log.Error (ex, "Error truncated database");
+                Log.Logger.Information("Truncate database - finish");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error truncated database");
             }
 
-            try {
+            try
+            {
                 // and create again
-                Log.Information ("Creating database - start");
-                if (context.Database.IsSqlServer ())
-                    context.Database.Migrate ();
-                else {
-                    context.Database.EnsureCreated ();
-                    try { context.Database.Migrate (); } catch (Exception) { }
-                    context.Database.GetPendingMigrations ().ToList ().ForEach (e => InsertMigration (e, context));
+                Log.Information("Creating database - start");
+                if (context.Database.IsSqlServer())
+                    context.Database.Migrate();
+                else
+                {
+                    context.Database.EnsureCreated();
+                    try { context.Database.Migrate(); }
+                    catch (Exception) { }
+                    context.Database.GetPendingMigrations().ToList().ForEach(e => InsertMigration(e, context));
                 }
 
-                Log.Information ("Creating database - finish");
-            } catch (Exception ex) {
-                Log.Error (ex, "Error creating database");
-                Log.Information ($"Start sleep for {timeout} sec");
+                Log.Information("Creating database - finish");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating database");
+                Log.Information($"Start sleep for {timeout} sec");
 
                 // Azure issue - need more time to restore :(
-                Thread.Sleep (timeout);
-                Log.Information ("Creating database - start retry");
-                context.Database.EnsureCreated ();
-                Log.Information ("Creating database - finish retry");
+                Thread.Sleep(timeout);
+                Log.Information("Creating database - start retry");
+                context.Database.EnsureCreated();
+                Log.Information("Creating database - finish retry");
             }
         }
 
-        private static void InsertMigration (string migrationId, DbContext context) {
+        private static void InsertMigration(string migrationId, DbContext context)
+        {
             // insert "Initial" migration manually
             var productVersion = "2.2.4-servicing-10062";
-            context.Database.ExecuteSqlCommand ($"INSERT INTO core.\"Migrations\"(\"MigrationId\", \"ProductVersion\") VALUES ('{migrationId}', '{productVersion}')", migrationId, productVersion);
+            context.Database.ExecuteSqlCommand($"INSERT INTO core.\"Migrations\"(\"MigrationId\", \"ProductVersion\") VALUES ('{migrationId}', '{productVersion}')", migrationId, productVersion);
         }
 
-        public static void Initialize (IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false) {
+        public static void Initialize(IServiceProvider serviceProvider, IConfiguration configuration, bool forceRecreate = false)
+        {
             // main context, user\roles\auth
-            var userManager = serviceProvider.GetRequiredService<IUserManager> ();
-            var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext> ();
+            var userManager = serviceProvider.GetRequiredService<IUserManager>();
+            var applicationContext = serviceProvider.GetRequiredService<EvoflareDbContext>();
 
-            var appSettings = configuration.GetSection<AppSettings> ();
+            var appSettings = configuration.GetSection<AppSettings>();
             var dbType = appSettings.DatabaseType;
 
-            var exportData = configuration.GetValue ("AppSettings:ExportData", false) || configuration.GetValue ("export-data", false);
+            var exportData = configuration.GetValue("AppSettings:ExportData", false) || configuration.GetValue("export-data", false);
             // flag from config - recreate DB on application starts (if true) 
-            var recreateDatabase = configuration.GetValue ("AppSettings:RecreateDbOnStart", false);
-            var retryTimeout = configuration.GetValue ("AppSettings:RetryTimeout", 60) * 1000;
+            var recreateDatabase = configuration.GetValue("AppSettings:RecreateDbOnStart", false);
+            var retryTimeout = configuration.GetValue("AppSettings:RetryTimeout", 60) * 1000;
 
-            if (exportData) {
-                Log.Information ("Start generate seed classes");
+            if (exportData)
+            {
+                Log.Information("Start generate seed classes");
                 // generate seed-clasess in Data\Seed folder
-                ExportDataFromDB.Run (applicationContext);
-                Log.Information ("Finish generate seed classes");
+                ExportDataFromDB.Run(applicationContext);
+                Log.Information("Finish generate seed classes");
 
-                Program.Shutdown ();
+                Program.Shutdown();
                 return;
             }
 
             if (recreateDatabase || forceRecreate)
-                RecreateDatabase (applicationContext, retryTimeout);
-            else {
-                try {
-                    applicationContext.Database.Migrate ();
-                } catch (Exception ex) {
+                RecreateDatabase(applicationContext, retryTimeout);
+            else
+            {
+                try
+                {
+                    applicationContext.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
                     // There is already an object named 'xxx' in the database.
                     if ((ex is PostgresException pgEx && pgEx.SqlState == "42P07") ||
-                        (ex is SqlException sqlEx && sqlEx.Number == 2714)) {
-                        var initMigration = applicationContext.Database.GetPendingMigrations ().FirstOrDefault ();
-                        InsertMigration (initMigration, applicationContext);
+                        (ex is SqlException sqlEx && sqlEx.Number == 2714))
+                    {
+                        var initMigration = applicationContext.Database.GetPendingMigrations().FirstOrDefault();
+                        InsertMigration(initMigration, applicationContext);
                     }
                 }
             }
             // only create empty db
-            if (configuration.GetValue ("only-migrate", false)) {
-                Program.Shutdown ();
+            if (configuration.GetValue("only-migrate", false))
+            {
+                Program.Shutdown();
                 return;
             }
 
-            var assemblyInfo = Assembly.GetExecutingAssembly ().GetName ();
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             // version of assembly, format x.y.z.w  
-            var currentVersion = assemblyInfo.Version.ToString ();
+            var currentVersion = assemblyInfo.Version.ToString();
             // version in database table AppVersion
             string previousVersion = null;
 
-            try {
+            try
+            {
                 // check core table AppVersion for records
-                if (applicationContext.AppVersion.Any ())
-                    previousVersion = applicationContext.AppVersion.AsNoTracking ().FirstOrDefault ()?.Version;
+                if (applicationContext.AppVersion.Any())
+                    previousVersion = applicationContext.AppVersion.AsNoTracking().FirstOrDefault()?.Version;
 
                 // workaround to update db without migration 
-                applicationContext.Users.Where (e => e.Age > 0).ToList ();
-                applicationContext.Roles.Where (e => e.DefaultPermission > 0).ToList ();
-            } catch {
+                applicationContext.Users.Where(e => e.Age > 0).ToList();
+                applicationContext.Roles.Where(e => e.DefaultPermission > 0).ToList();
+            }
+            catch
+            {
                 // if something wrong - init database from scratch
-                RecreateDatabase (applicationContext, retryTimeout);
+                RecreateDatabase(applicationContext, retryTimeout);
                 recreateDatabase = true;
             }
 
-            if (previousVersion != null) {
+            if (previousVersion != null)
+            {
                 // For new assembly version - recreate database    
-                if (previousVersion != currentVersion) {
-                    RecreateDatabase (applicationContext, retryTimeout);
+                if (previousVersion != currentVersion)
+                {
+                    RecreateDatabase(applicationContext, retryTimeout);
                     recreateDatabase = true;
-                } else { // DB already has data but new tables seeding required 
-                    SeedEmployeeSalary (applicationContext);
-                    SeedInstallation (applicationContext);
+                }
+                else
+                { // DB already has data but new tables seeding required 
+                    SeedEmployeeSalary(applicationContext);
+                    SeedInstallation(applicationContext);
                     return;
                 }
             }
 
-            var setupParams = new SetupParams {
+            var setupParams = new SetupParams
+            {
                 Id = PredefinedConfig.DefaultConfig,
                 AdminEmail = "admin@evoflare.com",
                 OrganizationName = "Unknown company"

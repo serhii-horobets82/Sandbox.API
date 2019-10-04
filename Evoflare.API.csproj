@@ -48,6 +48,7 @@ https://evoflare-api-.herokuapp.com
     <EmbeddedResource Include="Database\dropTablesPg.sql" />
     <EmbeddedResource Include="Database\patchPg.sql" />
     <EmbeddedResource Include="Database\dropTables.sql" />
+    <EmbeddedResource Include="Data\Random\persons.json" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Boxed.AspNetCore" Version="3.2.0" />

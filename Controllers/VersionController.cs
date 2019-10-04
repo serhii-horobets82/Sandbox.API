@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using Evoflare.API.Core.Models;
 using Evoflare.API.Repositories;
@@ -29,16 +30,16 @@ namespace Evoflare.API.Controllers
         {
             try
             {
-                var version = await appVersionRepository.GetListAsync();
-                return Ok(version);
+                var versions = await appVersionRepository.GetListAsync();
+                return Ok(versions.FirstOrDefault());
             }
             catch (Exception ex)
             {
                 // 42P01: relation "core.AppVersion" does not exist - Database empty
                 if ((ex is PostgresException pgEx && pgEx.SqlState == "42P01") ||
-                    (ex is SqlException sqlEx && sqlEx.Number == 2714))
+                    (ex is SqlException sqlEx && sqlEx.Number == 4060))
                 {
-                    return BadRequest("Database is empty!");
+                    return BadRequest("Database doesn't exist or is empty!");
                 }
                 return BadRequest(ex);
             }

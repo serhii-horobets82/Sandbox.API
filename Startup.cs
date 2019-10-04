@@ -4,20 +4,20 @@ using Evoflare.API.Services;
 
 namespace Evoflare.API
 {
+    using System;
     using Boxed.AspNetCore;
-    using CorrelationId;
     using Constants;
+    using CorrelationId;
+    using Evoflare.API.Data;
+    using Evoflare.API.Hubs;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Diagnostics.HealthChecks;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using System;
-    using Evoflare.API.Hubs;
-    using Evoflare.API.Data;
 
     /// <summary>
     /// The main start-up class for the application.
@@ -39,7 +39,7 @@ namespace Evoflare.API
             this.configuration = configuration;
             this.hostingEnvironment = hostingEnvironment;
             // share configuration through a static class
-            Evoflare.API.Data.Extensions.Configuration = configuration;
+            ConfigurationManager.Init(configuration);
         }
 
         /// <summary>
@@ -81,18 +81,18 @@ namespace Evoflare.API
                 .AddCustomAuthentication(this.configuration)
                 .AddCustomPolicies(this.configuration)
                 .AddMvcCore()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                    .AddApiExplorer()
-                    .AddAuthorization()
-                    .AddDataAnnotations()
-                    .AddJsonFormatters()
-                    .AddCustomJsonOptions(this.hostingEnvironment)
-                    .AddCustomCors()
-                    .AddCustomMvcOptions(this.hostingEnvironment)
-                    .AddJsonOptions(options =>
-                    {
-                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    });
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddApiExplorer()
+                .AddAuthorization()
+                .AddDataAnnotations()
+                .AddJsonFormatters()
+                .AddCustomJsonOptions(this.hostingEnvironment)
+                .AddCustomCors()
+                .AddCustomMvcOptions(this.hostingEnvironment)
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                });
 
             services.AddSignalR();
 
@@ -118,8 +118,7 @@ namespace Evoflare.API
                 .UseResponseCaching()
                 .UseResponseCompression()
                 .UseCors(CorsPolicyName.AllowAny)
-                .UseIf(
-                    !this.hostingEnvironment.IsDevelopment(),
+                .UseIf(!this.hostingEnvironment.IsDevelopment(),
                     x => x.UseHsts())
                 .UseIf(
                     this.hostingEnvironment.IsDevelopment(),

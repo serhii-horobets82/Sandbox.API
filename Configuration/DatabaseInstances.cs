@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using Evoflare.API.Constants;
 
 namespace Evoflare.API.Configuration
 {
-    public enum DatabaseType{
+    public enum DatabaseType
+    {
         MSSQL,
         POSTGRES
     }
@@ -14,7 +13,6 @@ namespace Evoflare.API.Configuration
         // Avaliable database instances for current running  API 
         public DatabaseInstance[] DBInstances { get; set; }
     }
-    
 
     public class DatabaseInstance
     {
