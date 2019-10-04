@@ -1,6 +1,7 @@
 namespace Evoflare.API
 {
     using Boxed.Mapping;
+    using Evoflare.API.Auth.Models;
     using Evoflare.API.Commands;
     using Evoflare.API.Core.Models;
     using Evoflare.API.Mappers;
@@ -35,6 +36,7 @@ namespace Evoflare.API
             services
                 .AddSingleton<ICarRepository, CarRepository>()
                 .AddTransient<IRepository<Employee>, Repository<Employee>>()
+                .AddTransient<IRepository<ApplicationUser>, Repository<ApplicationUser>>()
                 .AddTransient<IRepository<AppVersion>, Repository<AppVersion>>()
                 .AddTransient<IRepository<Installation>, Repository<Installation>>();
 

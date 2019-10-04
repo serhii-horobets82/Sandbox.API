@@ -29,5 +29,7 @@ namespace Evoflare.API.Auth.Models
 
         [InverseProperty("Users")]
         public virtual ICollection<Employee> Employee { get; set; }
+
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 }

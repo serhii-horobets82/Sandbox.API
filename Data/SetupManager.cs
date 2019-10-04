@@ -11,6 +11,7 @@ namespace Evoflare.API.Data
         public int Users { get; set; } = 10;
         public int Managers { get; set; } = 3;
         public int HRs { get; set; } = 2;
+        public int Admins { get; set; } = 1;
     }
 
     public class SetupParams

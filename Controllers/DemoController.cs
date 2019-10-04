@@ -1,10 +1,15 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Evoflare.API.Auth.Identity;
+using Evoflare.API.Auth.Models;
 using Evoflare.API.Data;
 using Evoflare.API.Models;
 using Evoflare.API.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Controllers
 {
@@ -13,17 +18,25 @@ namespace Evoflare.API.Controllers
     [AllowAnonymous]
     public class DemoController : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
-        public DemoController(IRepository<Employee> employeeRepository)
+        private readonly IRepository<Employee> employeeRepository;
+        private readonly IRepository<ApplicationUser> userRepository;
+        private readonly IUserManager userManager;
+        public DemoController(IRepository<Employee> employeeRepository, IUserManager userManager, IRepository<ApplicationUser> userRepository)
         {
-            _employeeRepository = employeeRepository;
+            this.employeeRepository = employeeRepository;
+            this.userRepository = userRepository;
+            this.userManager = userManager;
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetDemoUsers()
+        public IActionResult GetDemoUsers()
         {
-            var users = await _employeeRepository.GetListAsync(e => e.EmployeeType, e => e.Users);
-            var result = users.Where(e => e.Users.LockoutEnabled).Select(e => new { Id = e.Id, Name = e.Name, Surname = e.Surname, Email = e.Users.Email, Type = e.EmployeeType.Id, TypeName = e.EmployeeType.Type, Password = DbInitializer.DefaultPassword });
+            var users = userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).Where(e => e.LockoutEnabled).ToList();
+            Func<ApplicationUser, IList<string>> getRoles = (ApplicationUser user) =>
+            {
+                return userManager.GetRolesAsync(user).Result;
+            };
+            var result = users.Select(e => new { Id = e.Id, Roles = getRoles(e), Name = e.FirstName, Surname = e.LastName, Email = e.Email, Password = DbInitializer.DefaultPassword });
             return new OkObjectResult(result);
         }
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Evoflare.API.Models
 {
-    public class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public BaseDbContext() { }
         public BaseDbContext(DbContextOptions<EvoflareDbContext> options) : base(options) { }
@@ -97,6 +97,25 @@ namespace Evoflare.API.Models
             {
                 entity.ToTable(name: "Roles", schema : DatabaseOptions.SecuritySchemaName);
             });
+            modelBuilder.Entity<ApplicationUserRole>(entity =>
+            {
+                entity.ToTable("UserRoles", DatabaseOptions.SecuritySchemaName);
+                entity.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+                entity.HasOne(ur => ur.Role)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+
+                entity.HasOne(ur => ur.User)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
+            // modelBuilder.Entity<IdentityUserRole<string>>(entity =>
+            // {
+            //     entity.ToTable("UserRoles", DatabaseOptions.SecuritySchemaName);
+            // });
             modelBuilder.Entity<IdentityUserClaim<string>>(entity =>
             {
                 entity.ToTable("UserClaims", DatabaseOptions.SecuritySchemaName);
@@ -109,14 +128,12 @@ namespace Evoflare.API.Models
             {
                 entity.ToTable("RoleClaims", DatabaseOptions.SecuritySchemaName);
             });
-            modelBuilder.Entity<IdentityUserRole<string>>(entity =>
-            {
-                entity.ToTable("UserRoles", DatabaseOptions.SecuritySchemaName);
-            });
+
             modelBuilder.Entity<IdentityUserToken<string>>(entity =>
             {
                 entity.ToTable("UserTokens", DatabaseOptions.SecuritySchemaName);
             });
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
@@ -9,14 +10,13 @@ using Evoflare.API.Auth.Models;
 using Evoflare.API.Configuration;
 using Evoflare.API.Constants;
 using Evoflare.API.Core.Models;
-using Evoflare.API.Core.Permissions;
 using Evoflare.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Npgsql;
+using Serilog;
 
 namespace Evoflare.API.Data
 {
@@ -47,8 +47,58 @@ namespace Evoflare.API.Data
             new Employee { Id = 27, UserId = @"afdd760d-d2aa-412f-a368-57ad67f88c47", IsManager = false, EmployeeTypeId = 12, OrganizationId = 1, NameTemp = @"HR Regular", HiringDate = DateTime.ParseExact("2010-01-01T00:00:00.0000000", "O", CultureInfo.InvariantCulture), Name = @"Regular", Surname = @"HR" },
         };
 
+        private static void CreateUser(EvoflareDbContext context, UserManager<ApplicationUser> manager, Person person, string role, SetupParams setupParams)
+        {
+            var userEmail = $"{person.Name}.{person.Surname}@{setupParams.OrganizationDomain}".ToLower();
+
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = userEmail,
+                Email = userEmail,
+                FirstName = person.Name,
+                LastName = person.Surname,
+                EmailConfirmed = true,
+                Gender = person.Gender == "male" ? Gender.Male : Gender.Female
+            };
+            Log.Information($"Creating user {userEmail}, id={user.Id}");
+            manager.CreateAsync(user, DefaultPassword).Wait();
+
+            var claims = new Claim[]
+            {
+                new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                new Claim(JwtClaimTypes.Email, userEmail)
+            };;
+            manager.AddClaimsAsync(user, claims).Wait();
+            manager.AddToRoleAsync(user, role).Wait();
+
+            // Add random profile
+            context.Profile.Add(new UserProfile
+            {
+                IdentityId = user.Id,
+                    Location = person.Region,
+                    Locale = DefaultLocale,
+                    PictureUrl = person.Photo
+            });
+
+            var employee = new Employee
+            {
+                UserId = user.Id,
+                IsManager = false,
+                EmployeeTypeId = 2,
+                OrganizationId = 1,
+                NameTemp = $"{person.Name} {person.Surname}",
+                HiringDate = DateTime.ParseExact(person.Birthday.Dmy, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                Name = user.FirstName,
+                Surname = user.LastName
+            };
+
+            context.Employee.AddAsync(employee).Wait();
+        }
+
         public static void Seed(SetupParams setupParams, EvoflareDbContext applicationContext, IServiceProvider serviceProvider, IConfiguration configuration)
         {
+            Log.Information($"Start seeding...");
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             if (setupParams.ForceRecreate)
@@ -87,61 +137,15 @@ namespace Evoflare.API.Data
             SeedOrganization(applicationContext, entitiesOrganization);
             SeedEmployeeType(applicationContext);
 
-            var randomDataManager = new RandomDataManager();
+            var rdm = new RandomDataManager();
 
             if (setupParams.RandomData != null)
             {
-                for (var i = 0; i < setupParams.RandomData.Users; i++)
-                {
-                    var person = randomDataManager.GetRandomPerson();
-                    var userEmail = $"{person.Name}{person.Surname}@{setupParams.OrganizationDomain}";
-                    var user = new ApplicationUser
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        UserName = userEmail,
-                        Email = userEmail,
-                        FirstName = person.Name,
-                        LastName = person.Surname,
-                        EmailConfirmed = true,
-                        Gender = person.Gender == "male" ? Gender.Male : Gender.Female
-                    };
-
-                    var employee = new Employee
-                    {
-                        UserId = user.Id,
-                        IsManager = false,
-                        EmployeeTypeId = 2,
-                        OrganizationId = 1,
-                        NameTemp = $"{person.Name} {person.Surname}",
-                        HiringDate = DateTime.ParseExact(person.Birthday.Dmy, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-                        Name = user.FirstName,
-                        Surname = user.LastName
-                    };
-
-                    applicationContext.Employee.AddAsync(employee).Wait();
-                    userManager.CreateAsync(user, DefaultPassword).Wait();
-
-                    var claims = new Claim[]
-                    {
-                        new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                        new Claim(JwtClaimTypes.Email, userEmail)
-                    };;
-                    userManager.AddClaimsAsync(user, claims).Wait();
-
-                    // Add random profile
-                    applicationContext.Profile.Add(new UserProfile
-                    {
-                        IdentityId = user.Id,
-                            Location = person.Region,
-                            Locale = DefaultLocale,
-                            PictureUrl = person.Photo
-                    });
-
-                    userManager.AddToRoleAsync(user, Roles.User);
-
-                }
+                setupParams.RandomData.Users.Times(() => CreateUser(applicationContext, userManager, rdm.GetRandomPerson(), Roles.User, setupParams));
+                setupParams.RandomData.Managers.Times(() => CreateUser(applicationContext, userManager, rdm.GetRandomPerson(), Roles.Manager, setupParams));
+                setupParams.RandomData.HRs.Times(() => CreateUser(applicationContext, userManager, rdm.GetRandomPerson(), Roles.HR, setupParams));
+                setupParams.RandomData.Admins.Times(() => CreateUser(applicationContext, userManager, rdm.GetRandomPerson(), Roles.Admin, setupParams));
             }
-            applicationContext.SaveChanges();
 
             if (setupParams.Id == PredefinedConfig.DefaultConfig)
             {
@@ -176,7 +180,7 @@ namespace Evoflare.API.Data
                     //CreateOrUpdateEmployee(serviceProvider, applicationContext, $"user{employee.Id}@evoflare.com", userRole, employee, claim).Wait();
                 }*/
 
-                SeedEmployeeEvaluation(applicationContext);
+                //SeedEmployeeEvaluation(applicationContext);
                 SeedCertificationExam(applicationContext);
 
                 SeedCompetenceArea(applicationContext);
@@ -201,7 +205,7 @@ namespace Evoflare.API.Data
                 SeedCertificate(applicationContext);
                 SeedCompetenceCertificate(applicationContext);
 
-                SeedEmployeeRelations(applicationContext);
+                //SeedEmployeeRelations(applicationContext);
 
                 SeedIdea(applicationContext);
                 SeedIdeaComment(applicationContext);
@@ -248,7 +252,7 @@ namespace Evoflare.API.Data
                     Name = assemblyInfo.Name,
                     Version = currentVersion,
                     CreationDate = DateTime.Now,
-                    Organization = applicationContext.Organization.FirstOrDefault().Name,
+                    Organization = setupParams.OrganizationName,
                     Database = $"{connection.DataSource} ({connection.Database}) v.{connection.ServerVersion}",
                     DatabaseType = dbType.ToString()
                 };

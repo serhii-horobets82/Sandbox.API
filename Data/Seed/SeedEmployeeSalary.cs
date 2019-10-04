@@ -1,10 +1,9 @@
-using Evoflare.API.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Globalization;
 using System.Linq;
-
+using Evoflare.API.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Evoflare.API.Data
 {
@@ -24,7 +23,6 @@ namespace Evoflare.API.Data
 
             var items = context.Employee.ToList().Select((emp, i) => GenerateSalary(i, emp));
 
-
             context.EmployeeSalary.AddRange(items);
 
             context.SaveChanges();
@@ -40,11 +38,9 @@ namespace Evoflare.API.Data
 
         private static EmployeeSalary GenerateSalary(int index, Employee emp)
         {
-            var gen = new Random();
-            var randomDay = DateTime.Now;
-            randomDay.AddYears(-1 * gen.Next(10));
-            randomDay.AddMonths(gen.Next(12));
-            return new EmployeeSalary { Id = (index + 1), EmployeeId = emp.Id, Period = randomDay, Basic = gen.Next(50) * 100, Bonus = gen.Next(10) * 100, Archived = false };
+            var random = new Random(DateTime.Now.Second);
+            var randomDay = DateTime.Now.AddYears(-1 * random.Next(10)).AddMonths(random.Next(12));
+            return new EmployeeSalary { Id = (index + 1), EmployeeId = emp.Id, Period = randomDay, Basic = random.Next(50) * 100, Bonus = random.Next(10) * 100, Archived = false };
         }
     }
 }

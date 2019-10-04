@@ -9,6 +9,7 @@ namespace Evoflare.API.Data
     {
         public List<Person> Persons { get; set; }
 
+        private HashSet<int> usedIndexes = new HashSet<int>();
         public RandomDataManager()
         {
             var resourceKey = "Evoflare.API.Data.Random.persons.json";
@@ -17,7 +18,15 @@ namespace Evoflare.API.Data
         public Person GetRandomPerson()
         {
             var rand = new Random(DateTime.Now.Second);
-            return Persons.ElementAt(rand.Next(Persons.Count - 1));
+            var index = rand.Next(Persons.Count - 1);
+            while (usedIndexes.Contains(index))
+            {
+                index = rand.Next(Persons.Count - 1);
+                if (usedIndexes.Count >= Persons.Count)
+                    usedIndexes.Clear();
+            }
+            usedIndexes.Add(index);
+            return Persons.ElementAt(index);
         }
     }
 
