@@ -1,15 +1,16 @@
 namespace Evoflare.API
 {
+    using System.Linq;
     using Boxed.AspNetCore;
     using Evoflare.API.Constants;
+    using Evoflare.API.Filters;
     using Evoflare.API.Options;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.Extensions.DependencyInjection;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
-    using System.Linq;
+    using Newtonsoft.Json;
 
     public static class MvcCoreBuilderExtensions
     {
@@ -26,32 +27,32 @@ namespace Evoflare.API
                     options.AddPolicy(
                         CorsPolicyName.AllowAny,
                         x => x
-                            //.AllowAnyOrigin()
-                            .WithOrigins(
-                                "http://localhost:8080", 
-                                "https://evoflare.azurewebsites.net", 
-                                "http://evoflare.azurewebsites.net", 
-                                "https://evoflare-web.herokuapp.com",
-                                "https://evoflare-web-dev.herokuapp.com",
-                                "https://evoflare-web-dev01.herokuapp.com",
-                                "https://evoflare-web-dev02.herokuapp.com",
-                                "https://evoflare-app-01.herokuapp.com/",
-                                "https://evoflare-app-02.herokuapp.com/",
-                                "https://evoflare-app.herokuapp.com/",
-                                "http://evoflareappdev.z16.web.core.windows.net",
-                                "https://evoflareappdev.z16.web.core.windows.net"
-                            )
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials());
+                        //.AllowAnyOrigin()
+                        .WithOrigins(
+                            "http://localhost:8080",
+                            "https://evoflare.azurewebsites.net",
+                            "http://evoflare.azurewebsites.net",
+                            "https://evoflare-web.herokuapp.com",
+                            "https://evoflare-web-dev.herokuapp.com",
+                            "https://evoflare-web-dev01.herokuapp.com",
+                            "https://evoflare-web-dev02.herokuapp.com",
+                            "https://evoflare-app-01.herokuapp.com/",
+                            "https://evoflare-app-02.herokuapp.com/",
+                            "https://evoflare-app.herokuapp.com/",
+                            "http://evoflareappdev.z16.web.core.windows.net",
+                            "https://evoflareappdev.z16.web.core.windows.net"
+                        )
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
                 });
 
         /// <summary>
         /// Adds customized JSON serializer settings.
         /// </summary>
         public static IMvcCoreBuilder AddCustomJsonOptions(
-            this IMvcCoreBuilder builder,
-            IHostingEnvironment hostingEnvironment) =>
+                this IMvcCoreBuilder builder,
+                IHostingEnvironment hostingEnvironment) =>
             builder.AddJsonOptions(
                 options =>
                 {
@@ -73,11 +74,14 @@ namespace Evoflare.API
                 });
 
         public static IMvcCoreBuilder AddCustomMvcOptions(
-            this IMvcCoreBuilder builder,
-            IHostingEnvironment hostingEnvironment) =>
+                this IMvcCoreBuilder builder,
+                IHostingEnvironment hostingEnvironment) =>
             builder.AddMvcOptions(
                 options =>
                 {
+                    // Global exception handling
+                    options.Filters.Add<ExceptionActionFilter>();
+
                     // Controls how controller actions cache content from the appsettings.json file.
                     var cacheProfileOptions = builder
                         .Services

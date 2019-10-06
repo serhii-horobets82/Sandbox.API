@@ -1,4 +1,5 @@
 using Evoflare.API.Constants;
+using Newtonsoft.Json;
 
 namespace Evoflare.API.Configuration
 {
@@ -19,12 +20,13 @@ namespace Evoflare.API.Configuration
         // Unique instance id (used also for header X-Server-ID)
         public string Id { get; set; }
         // Organization/customer name
-        public string Name { get; set; }
+        public string Name { get; set; } = "Default";
         // Used for domain-based balancer ( [prefix].evoflare.com )
         public string DomainPrefix { get; set; }
         // Connection string name from list of ConnectionStrings (appsettings)
         public string ConnectionStringName { get; set; } = DatabaseOptions.DefaultConnectionName;
         // Environment variable name with connection string 
+        [JsonIgnore]
         public string ConnectionStringEnvironmentName { get; set; }
         public DatabaseType Type { get; set; } = DatabaseType.MSSQL;
         public int CommandTimeout { get; set; } = DatabaseOptions.CommandTimeout;

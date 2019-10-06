@@ -9,8 +9,16 @@ namespace Evoflare.API.Data
         public static void Init(IConfiguration configuration)
         {
             Configuration = configuration;
-            DatabaseInstances = configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>();
             AppSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
+            DatabaseInstances = configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>();
+            // Add primary DB 
+            DatabaseInstances.Insert(0,
+                new DatabaseInstance
+                {
+                    Id = "Primary",
+                        Type = AppSettings.DatabaseType,
+                        ConnectionStringEnvironmentName = (AppSettings.DatabaseType == DatabaseType.POSTGRES) ? "DATABASE_URL" : ""
+                });
         }
 
         public static IConfiguration Configuration { get; set; }

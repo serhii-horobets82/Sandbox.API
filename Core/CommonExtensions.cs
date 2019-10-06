@@ -101,17 +101,17 @@ namespace Evoflare.API
             return null;
         }
 
-        // 
         public static DatabaseInstance GetCurrentDbInstance(this IHttpContextAccessor httpContextAccessor)
         {
-            var serverId = httpContextAccessor.GetServerId();
-
             var dbInstances = ConfigurationManager.DatabaseInstances;
-            if (dbInstances != null && serverId != null)
+            var serverId = httpContextAccessor.GetServerId();
+            // if empty - get primary DB
+            if (string.IsNullOrEmpty(serverId))
+                return dbInstances.First();
+            else
             {
                 return dbInstances?.FirstOrDefault(i => i.Id == serverId);
             }
-            return null;
         }
 
         public static IQueryable Set(this DbContext context, Type T)

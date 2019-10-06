@@ -12,8 +12,6 @@ namespace Evoflare.API.Data
     {
         EvoflareDbContext Create();
 
-        EvoflareDbContext CreateDefault();
-
         EvoflareDbContext CreateCustom();
     }
 
@@ -47,32 +45,11 @@ namespace Evoflare.API.Data
             return new EvoflareDbContext(optionsBuilder.Options);
         }
 
-        public EvoflareDbContext CreateDefault()
-        {
-            var appSettings = ConfigurationManager.AppSettings;
-            var instance = new DatabaseInstance
-            {
-                Id = "Default",
-                Type = appSettings.DatabaseType
-            };
-            if (appSettings.DatabaseType == DatabaseType.POSTGRES){
-                instance.ConnectionStringEnvironmentName = "DATABASE_URL";
-            }
-
-            var builder = configuration.BuildDbContext<EvoflareDbContext>(instance);
-
-            return new EvoflareDbContext(builder.Options);
-        }
-
         public EvoflareDbContext CreateCustom()
         {
             var instance = contextAccessor.GetCurrentDbInstance();
-            if (instance != null)
-            {
-                var builder = configuration.BuildDbContext<EvoflareDbContext>(instance);
-                return new EvoflareDbContext(builder.Options);
-            }
-            return CreateDefault();
+            var builder = configuration.BuildDbContext<EvoflareDbContext>(instance);
+            return new EvoflareDbContext(builder.Options);
         }
     }
 
