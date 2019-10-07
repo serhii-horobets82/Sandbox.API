@@ -31,8 +31,10 @@ namespace Evoflare.API.Controllers
         {
             try
             {
-                var versions = await appVersionRepository.GetListAsync();
-                return Ok(versions.FirstOrDefault());
+                var version = (await appVersionRepository.GetListAsync()).FirstOrDefault();
+                if (version != null)
+                    return Ok(version);
+                throw new BadRequestException("Database is empty!");
             }
             catch (Exception ex)
             {

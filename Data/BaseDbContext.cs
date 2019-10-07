@@ -25,10 +25,7 @@ namespace Evoflare.API.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            var appSettings = ConfigurationManager.AppSettings;
-            var dbType = appSettings.DatabaseType;
-
-            if (dbType == DatabaseType.POSTGRES)
+            if (this.Database.IsNpgsql())
             {
                 // postgres workaround
                 foreach (var pb in modelBuilder.Model

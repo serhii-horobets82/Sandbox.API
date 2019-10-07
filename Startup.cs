@@ -62,7 +62,7 @@ namespace Evoflare.API
                 .AddCustomSwagger()
                 .AddHttpContextAccessor()
                 // Add JSON Web Token factory
-                .AddSingleton<IJwtFactory, JwtFactory>()
+                .AddTransient<IJwtFactory, JwtFactory>()
                 // Add useful interface for accessing the ActionContext outside a controller.
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
                 .AddScoped<IActivityLogService, ActivityLogService>()
