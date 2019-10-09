@@ -1,17 +1,20 @@
 namespace Evoflare.API
 {
-    using System;
     using System.IO;
     using System.Reflection;
-    using Evoflare.API.Options;
+    using System.Threading;
+    using System;
     using Boxed.AspNetCore;
+    using Evoflare.API.Core;
+    using Evoflare.API.Options;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Serilog;
-    using System.Threading;
+    using Microsoft.IdentityModel.Tokens;
     using Serilog.Core;
+    using Serilog.Events;
+    using Serilog;
 
     public sealed class Program
     {
@@ -39,11 +42,11 @@ namespace Evoflare.API
             {
                 Log.Information("Starting application");
 
+                ApplicationStart:
+                    webHost.RunAsync(cancelTokenSource.Token).GetAwaiter().GetResult();
 
-            ApplicationStart:
-                webHost.RunAsync(cancelTokenSource.Token). GetAwaiter().GetResult();
-
-                if(restartFlag) {
+                if (restartFlag)
+                {
                     Log.Information("Restart application");
                     cancelTokenSource = new CancellationTokenSource();
                     webHost = CreateWebHostBuilder(args).Build();
@@ -66,62 +69,74 @@ namespace Evoflare.API
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             new WebHostBuilder()
-                .UseIf(
-                    x => string.IsNullOrEmpty(x.GetSetting(WebHostDefaults.ContentRootKey)),
-                    x => x.UseContentRoot(Directory.GetCurrentDirectory()))
-                .UseIf(
-                    args != null,
-                    x => x.UseConfiguration(new ConfigurationBuilder().AddCommandLine(args).Build()))
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                    AddConfiguration(config, hostingContext.HostingEnvironment, args))
-                .UseSerilog()
-                .UseDefaultServiceProvider((context, options) =>
-                    options.ValidateScopes = context.HostingEnvironment.IsDevelopment())
-                .UseKestrel(
-                    (builderContext, options) =>
+            .UseIf(
+                x => string.IsNullOrEmpty(x.GetSetting(WebHostDefaults.ContentRootKey)),
+                x => x.UseContentRoot(Directory.GetCurrentDirectory()))
+            .UseIf(
+                args != null,
+                x => x.UseConfiguration(new ConfigurationBuilder().AddCommandLine(args).Build()))
+            .ConfigureAppConfiguration((hostingContext, config) =>
+                AddConfiguration(config, hostingContext.HostingEnvironment, args))
+            //.UseSerilog()
+            .ConfigureLogging((hostingContext, logging) =>
+                logging.AddSerilog(hostingContext, e =>
+                {
+                    var context = e.Properties["SourceContext"].ToString();
+                    if (e.Exception != null && (e.Exception.GetType() == typeof(SecurityTokenValidationException) ||
+                            e.Exception.Message == "Bad security stamp."))
                     {
-                        // Do not add the Server HTTP header.
-                        options.AddServerHeader = false;
+                        return false;
+                    }
 
-                        // Configure Kestrel from appsettings.json.
-                        options.Configure(builderContext.Configuration.GetSection(nameof(ApplicationOptions.Kestrel)));
-                        ConfigureKestrelServerLimits(builderContext, options);
-                    })
-                // Used for IIS and IIS Express for in-process hosting. Use UseIISIntegration for out-of-process hosting.
-                .UseIIS()
-                .UseStartup<Startup>();
+                    return e.Level >= LogEventLevel.Error;
+                }))
+            .UseDefaultServiceProvider((context, options) =>
+                options.ValidateScopes = context.HostingEnvironment.IsDevelopment())
+            .UseKestrel(
+                (builderContext, options) =>
+                {
+                    // Do not add the Server HTTP header.
+                    options.AddServerHeader = false;
+
+                    // Configure Kestrel from appsettings.json.
+                    options.Configure(builderContext.Configuration.GetSection(nameof(ApplicationOptions.Kestrel)));
+                    ConfigureKestrelServerLimits(builderContext, options);
+                })
+            // Used for IIS and IIS Express for in-process hosting. Use UseIISIntegration for out-of-process hosting.
+            .UseIIS()
+            .UseStartup<Startup>();
 
         private static IConfigurationBuilder AddConfiguration(
-            IConfigurationBuilder configurationBuilder,
-            IHostingEnvironment hostingEnvironment,
-            string[] args) =>
+                IConfigurationBuilder configurationBuilder,
+                IHostingEnvironment hostingEnvironment,
+                string[] args) =>
             configurationBuilder
-                // Add configuration from the appsettings.json file.
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                // This reads the configuration keys from the secret store. This allows you to store connection strings
-                // and other sensitive settings, so you don't have to check them into your source control provider.
-                // Only use this in Development, it is not intended for Production use. See
-                // http://docs.asp.net/en/latest/security/app-secrets.html
-                .AddIf(
-                    hostingEnvironment.IsDevelopment(),
-                    x => x.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true))
-                // Add configuration specific to the Development, Staging or Production environments. This config can
-                // be stored on the machine being deployed to or if you are using Azure, in the cloud. These settings
-                // override the ones in all of the above config files. See
-                // http://docs.asp.net/en/latest/security/app-secrets.html
-                .AddEnvironmentVariables()
-                // Add command line options. These take the highest priority.
-                .AddIf(
-                    args != null,
-                    x => x.AddCommandLine(args));
+            // Add configuration from the appsettings.json file.
+            .AddJsonFile("appsettings.json", optional : true, reloadOnChange : true)
+            .AddJsonFile("appsettings.local.json", optional : true, reloadOnChange : true)
+            .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", optional : true, reloadOnChange : true)
+            // This reads the configuration keys from the secret store. This allows you to store connection strings
+            // and other sensitive settings, so you don't have to check them into your source control provider.
+            // Only use this in Development, it is not intended for Production use. See
+            // http://docs.asp.net/en/latest/security/app-secrets.html
+            .AddIf(
+                hostingEnvironment.IsDevelopment(),
+                x => x.AddUserSecrets(Assembly.GetExecutingAssembly(), optional : true))
+            // Add configuration specific to the Development, Staging or Production environments. This config can
+            // be stored on the machine being deployed to or if you are using Azure, in the cloud. These settings
+            // override the ones in all of the above config files. See
+            // http://docs.asp.net/en/latest/security/app-secrets.html
+            .AddEnvironmentVariables()
+            // Add command line options. These take the highest priority.
+            .AddIf(
+                args != null,
+                x => x.AddCommandLine(args));
 
         private static Logger BuildLogger(IWebHost webHost) =>
             new LoggerConfiguration()
-                .ReadFrom.Configuration(webHost.Services.GetRequiredService<IConfiguration>())
-                .Enrich.WithProperty("Application", GetAssemblyProductName())
-                .CreateLogger();
+            .ReadFrom.Configuration(webHost.Services.GetRequiredService<IConfiguration>())
+            .Enrich.WithProperty("Application", GetAssemblyProductName())
+            .CreateLogger();
 
         private static string GetAssemblyProductName() =>
             Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product;

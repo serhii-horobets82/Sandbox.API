@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Newtonsoft.Json;
 
 namespace Evoflare.API.Core
 {
@@ -56,10 +58,17 @@ namespace Evoflare.API.Core
         }
 
         public string Message { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, IEnumerable<string>> ValidationErrors { get; set; }
         // For use in development environments.
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string ExceptionMessage { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string ExceptionStackTrace { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string InnerExceptionMessage { get; set; }
     }
 }

@@ -22,17 +22,21 @@ namespace Evoflare.API.Data
         private readonly IHttpContextAccessor contextAccessor;
         private readonly IServiceProvider serviceProvider;
 
+        private readonly GlobalSettings globalSettings;
+
         public DbContextFactory(
             IConfiguration configuration,
             IConnectionStringBuilder connectionStringBuilder,
             IHttpContextAccessor contextAccessor,
-            IServiceProvider serviceProvider
+            IServiceProvider serviceProvider,
+            GlobalSettings globalSettings
         )
         {
             this.configuration = configuration;
             this.connectionStringBuilder = connectionStringBuilder;
             this.contextAccessor = contextAccessor;
             this.serviceProvider = serviceProvider;
+            this.globalSettings = globalSettings;
         }
 
         public EvoflareDbContext Create()
@@ -48,7 +52,7 @@ namespace Evoflare.API.Data
         public EvoflareDbContext CreateCustom()
         {
             var instance = contextAccessor.GetCurrentDbInstance();
-            var builder = configuration.BuildDbContext<EvoflareDbContext>(instance);
+            var builder = configuration.BuildDbContext<EvoflareDbContext>(instance, globalSettings);
             return new EvoflareDbContext(builder.Options);
         }
     }

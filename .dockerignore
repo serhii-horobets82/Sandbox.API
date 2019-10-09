@@ -1,2 +1,4 @@
-# Local settings
-appsettings.local.*
+*
+!obj/Docker/publish/*
+!obj/Docker/empty/
+!entrypoint.sh

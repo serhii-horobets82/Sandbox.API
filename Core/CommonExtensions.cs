@@ -1,13 +1,16 @@
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using Evoflare.API.Configuration;
 using Evoflare.API.Constants;
 using Evoflare.API.Data;
+using Evoflare.API.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using Serilog;
 
 namespace Evoflare.API
 {
@@ -25,7 +28,7 @@ namespace Evoflare.API
         }
 
         // Construct DbContext 
-        public static DbContextOptionsBuilder<TContext> BuildDbContext<TContext>(this IConfiguration configuration, DatabaseInstance dbInstance) where TContext : DbContext
+        public static DbContextOptionsBuilder<TContext> BuildDbContext<TContext>(this IConfiguration configuration, DatabaseInstance dbInstance, GlobalSettings globalSettings) where TContext : DbContext
         {
             var builder = new DbContextOptionsBuilder<TContext>();
 
@@ -36,6 +39,20 @@ namespace Evoflare.API
                 // then trying find by env variable name  
                 if (!string.IsNullOrEmpty(dbInstance.ConnectionStringEnvironmentName))
                     connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;
+
+                // getting default connection    
+                if (!string.IsNullOrEmpty(dbInstance.DbName))
+                {
+                    connectionString = configuration.GetConnectionString(DatabaseOptions.DefaultConnectionName);
+                }
+
+                var sqlBuilder = new SqlConnectionStringBuilder(connectionString);
+                if (!string.IsNullOrEmpty(dbInstance.DbName))
+                    sqlBuilder.InitialCatalog = dbInstance.DbName;
+                
+                connectionString = sqlBuilder.ConnectionString;
+                Log.Information($"Connection string - {connectionString}");
+
                 builder.UseSqlServer(
                     connectionString,
                     sqlServerOptions =>
@@ -50,7 +67,7 @@ namespace Evoflare.API
                 var connectionString = Environment.GetEnvironmentVariable(dbInstance.Id);
                 if (string.IsNullOrEmpty(connectionString))
                 {
-                    connectionString = configuration.GetConnectionString(dbInstance.ConnectionStringName);
+                    connectionString = configuration.GetConnectionString(dbInstance.ConnectionStringEnvironmentName);
                     // then trying find by env variable name  
                     if (!string.IsNullOrEmpty(dbInstance.ConnectionStringEnvironmentName))
                         connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;

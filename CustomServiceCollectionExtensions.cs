@@ -70,9 +70,19 @@ namespace Evoflare.API
             return services;
         }
 
+        public static GlobalSettings AddGlobalSettingsServices(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var globalSettings = new GlobalSettings();
+            ConfigurationBinder.Bind(configuration.GetSection("GlobalSettings"), globalSettings);
+            services.AddSingleton(s => globalSettings);
+            return globalSettings;
+        }
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services,
             IConfiguration configuration)
         {
+            var globalSettings = services.AddGlobalSettingsServices(configuration);
+            
             var appSettings = configuration.GetSection<AppSettings>();
             var secretKey = Encoding.ASCII.GetBytes(appSettings.Secret);
 

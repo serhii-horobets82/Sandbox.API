@@ -1,5 +1,6 @@
 using System.Reflection;
 using Evoflare.API.Auth;
+using Evoflare.API.Core;
 using Evoflare.API.Services;
 
 namespace Evoflare.API
@@ -8,6 +9,7 @@ namespace Evoflare.API
     using Boxed.AspNetCore;
     using Constants;
     using CorrelationId;
+    using Evoflare.API.Configuration;
     using Evoflare.API.Data;
     using Evoflare.API.Hubs;
     using Microsoft.AspNetCore.Builder;
@@ -22,7 +24,7 @@ namespace Evoflare.API
     /// <summary>
     /// The main start-up class for the application.
     /// </summary>
-    public class Startup : IStartup
+    public class Startup
     {
         private readonly IConfiguration configuration;
         private readonly IHostingEnvironment hostingEnvironment;
@@ -108,7 +110,11 @@ namespace Evoflare.API
         /// Configures the application and HTTP request pipeline. Configure is called after ConfigureServices is
         /// called by the ASP.NET runtime.
         /// </summary>
-        public void Configure(IApplicationBuilder application)
+        public void Configure(
+            IApplicationBuilder application,
+            IHostingEnvironment env,
+            IApplicationLifetime appLifetime,
+            GlobalSettings globalSettings)
         {
             application
                 // Pass a GUID in a X-Correlation-ID HTTP header to set the HttpContext.TraceIdentifier.
@@ -134,7 +140,8 @@ namespace Evoflare.API
                 .UseSignalR(route =>
                 {
                     route.MapHub<NotificationHub>("/hubs/notification-hub");
-                });
+                })
+                .UseSerilog(env, appLifetime, globalSettings);
         }
     }
 }
