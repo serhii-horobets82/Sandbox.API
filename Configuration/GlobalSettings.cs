@@ -8,10 +8,10 @@ namespace Evoflare.API.Configuration
         public virtual string ProjectName { get; set; }
         public virtual string LogDirectory { get; set; }
 
+        public virtual string RouterPrefix { get; set; } = "api/";
         public virtual SqlSettings SqlServer { get; set; } = new SqlSettings();
         public virtual SqlSettings PostgreSql { get; set; } = new SqlSettings();
         public virtual MailSettings Mail { get; set; } = new MailSettings();
-
         public virtual SentrySettings Sentry { get; set; } = new SentrySettings();
     }
 

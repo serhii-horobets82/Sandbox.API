@@ -1,25 +1,25 @@
+using System;
 using System.Reflection;
+using Boxed.AspNetCore;
+using CorrelationId;
 using Evoflare.API.Auth;
+using Evoflare.API.Configuration;
+using Evoflare.API.Constants;
 using Evoflare.API.Core;
+using Evoflare.API.Data;
+using Evoflare.API.Hubs;
 using Evoflare.API.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Evoflare.API
 {
-    using System;
-    using Boxed.AspNetCore;
-    using Constants;
-    using CorrelationId;
-    using Evoflare.API.Configuration;
-    using Evoflare.API.Data;
-    using Evoflare.API.Hubs;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.AspNetCore.Mvc.Routing;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// The main start-up class for the application.
@@ -90,7 +90,7 @@ namespace Evoflare.API
                 .AddJsonFormatters()
                 .AddCustomJsonOptions(this.hostingEnvironment)
                 .AddCustomCors()
-                .AddCustomMvcOptions(this.hostingEnvironment)
+                .AddCustomMvcOptions()
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;

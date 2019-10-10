@@ -48,10 +48,6 @@ namespace Evoflare.API.Controllers
             }
         }
 
-        [HttpGet("env")]
-        public IActionResult GetEnvVariables()
-        {
-            return Ok(System.Environment.GetEnvironmentVariables());
-        }
+       
     }
 }

@@ -3,10 +3,14 @@ namespace Evoflare.API
     using System.Linq;
     using Boxed.AspNetCore;
     using Evoflare.API.Constants;
+    using Evoflare.API.Core;
+    using Evoflare.API.Data;
     using Evoflare.API.Filters;
     using Evoflare.API.Options;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Formatters;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
@@ -74,8 +78,7 @@ namespace Evoflare.API
                 });
 
         public static IMvcCoreBuilder AddCustomMvcOptions(
-                this IMvcCoreBuilder builder,
-                IHostingEnvironment hostingEnvironment) =>
+                this IMvcCoreBuilder builder) =>
             builder.AddMvcOptions(
                 options =>
                 {
@@ -118,6 +121,8 @@ namespace Evoflare.API
 
                     // Returns a 406 Not Acceptable if the MIME type in the Accept HTTP header is not valid.
                     options.ReturnHttpNotAcceptable = true;
+
+                    options.Conventions.Insert(0, new RouteConvention(ConfigurationManager.GlobalSettings.RouterPrefix));
                 });
     }
 }

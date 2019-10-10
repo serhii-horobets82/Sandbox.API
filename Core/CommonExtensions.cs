@@ -31,7 +31,7 @@ namespace Evoflare.API
         public static DbContextOptionsBuilder<TContext> BuildDbContext<TContext>(this IConfiguration configuration, DatabaseInstance dbInstance, GlobalSettings globalSettings) where TContext : DbContext
         {
             var builder = new DbContextOptionsBuilder<TContext>();
-
+            Log.Debug($"BuildDbContext [id={dbInstance.Id}, name={dbInstance.Name}, type={dbInstance.Type}, dbName={dbInstance.DbName}, сonnectionStringName={dbInstance.ConnectionStringName}]");
             // MS SQL 
             if (dbInstance.Type == DatabaseType.MSSQL)
             {
@@ -41,17 +41,22 @@ namespace Evoflare.API
                     connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;
 
                 // getting default connection    
-                if (!string.IsNullOrEmpty(dbInstance.DbName))
+                if (string.IsNullOrEmpty(connectionString))
                 {
                     connectionString = configuration.GetConnectionString(DatabaseOptions.DefaultConnectionName);
                 }
 
+                connectionString = connectionString.Trim('"');
+
+                if (string.IsNullOrEmpty(connectionString))
+                    throw new ArgumentException($"Connection string for SQL Server not found, instanceId={dbInstance.Id}");
+                
                 var sqlBuilder = new SqlConnectionStringBuilder(connectionString);
                 if (!string.IsNullOrEmpty(dbInstance.DbName))
                     sqlBuilder.InitialCatalog = dbInstance.DbName;
-                
+
                 connectionString = sqlBuilder.ConnectionString;
-                Log.Information($"Connection string - {connectionString}");
+                Log.Debug($"MSSQL ConnectionString [{connectionString}]");
 
                 builder.UseSqlServer(
                     connectionString,
@@ -73,7 +78,7 @@ namespace Evoflare.API
                         connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;
                 }
                 if (string.IsNullOrEmpty(connectionString))
-                    throw new ArgumentException("Can't build connection string");
+                    throw new ArgumentException($"Connection string for POSTGRES not found, instanceId={dbInstance.Id}");
 
                 // Parse as database URL
                 if (connectionString.StartsWith("postgres://"))
@@ -94,7 +99,7 @@ namespace Evoflare.API
                             TrustServerCertificate = !isLocal
                     }.ToString();
                 }
-
+                Log.Debug($"POSTGRES ConnectionString [{connectionString}]");
                 builder.UseNpgsql(
                     connectionString,
                     pgOptions =>
