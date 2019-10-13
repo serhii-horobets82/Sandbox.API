@@ -21,3 +21,7 @@ docker build -t evoflare-api $DIR/.
 # TODO remove
 docker image tag evoflare-api evoflare.docker:50000/api
 docker push evoflare.docker:50000/api
+
+# docker hub
+docker tag evoflare.docker:50000/api evoflare/api
+docker push evoflare/api

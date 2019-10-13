@@ -1,0 +1,10 @@
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+
+LABEL com.evoflare.product="evoflare"
+
+WORKDIR /app
+COPY obj/Docker/publish/Api .
+
+ENV ASPNETCORE_URLS http://*:$PORT
+
+CMD ASPNETCORE_ENVIRONMENT=Docker ASPNETCORE_URLS=http://*:$PORT dotnet Evoflare.API.dll

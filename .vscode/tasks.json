@@ -227,17 +227,17 @@
       "label": "heroku: Create app",
       "type": "shell",
       "command": [
+        "dotnet restore Evoflare.API.csproj;",
+        "dotnet clean Evoflare.API.csproj -c Release -o obj/Docker/publish/Api;",
+        "dotnet publish Evoflare.API.csproj -c Publish -o obj/Docker/publish/Api;",
         "heroku apps:destroy ${input:herokuAppName} --confirm ${input:herokuAppName};",
         "heroku create ${input:herokuAppName};",
         "heroku addons:create heroku-postgresql:hobby-dev -a ${input:herokuAppName} --name db-${input:herokuAppName};",
         "heroku config:set ASPNETCORE_ENVIRONMENT=Docker ASPNETCORE_URLS=http://*:$PORT -a ${input:herokuAppName};",
-        "heroku container:push web --recursive -a ${input:herokuAppName} --context-path ..\\;",
+        "heroku container:push web --recursive -a ${input:herokuAppName};",
         "heroku container:release web -a ${input:herokuAppName};",
         "heroku logs -a ${input:herokuAppName} --tail"
       ],
-      "options": {
-        "cwd": "${workspaceRoot}/Docker"
-      },
       "presentation": {
         "reveal": "always",
         "panel": "shared",
@@ -255,6 +255,25 @@
       "options": {
         "cwd": "${workspaceRoot}/Docker"
       },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "heroku"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "heroku: Deploy new",
+      "type": "shell",
+      "command": [
+        "dotnet restore Evoflare.API.csproj;",
+        "dotnet clean Evoflare.API.csproj -c Release -o ${workspaceRoot}/obj/Docker/publish/Api;",
+        "dotnet publish Evoflare.API.csproj -c Publish -o ${workspaceRoot}/obj/Docker/publish/Api;",
+        "heroku container:push web --recursive -a ${input:herokuApp};",
+        "heroku container:release web -a ${input:herokuApp};",
+        "heroku open -a ${input:herokuApp};",
+        "heroku logs --tail -a ${input:herokuApp};"
+      ],
       "presentation": {
         "reveal": "always",
         "panel": "shared",

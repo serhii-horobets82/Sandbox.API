@@ -31,7 +31,7 @@ namespace Evoflare.API
         public static DbContextOptionsBuilder<TContext> BuildDbContext<TContext>(this IConfiguration configuration, DatabaseInstance dbInstance, GlobalSettings globalSettings) where TContext : DbContext
         {
             var builder = new DbContextOptionsBuilder<TContext>();
-            Log.Debug($"BuildDbContext [id={dbInstance.Id}, name={dbInstance.Name}, type={dbInstance.Type}, dbName={dbInstance.DbName}, сonnectionStringName={dbInstance.ConnectionStringName}]");
+            Log.Debug($"Start BuildDbContext [id={dbInstance.Id}, name={dbInstance.Name}, type={dbInstance.Type}, dbName={dbInstance.DbName}, connectionStringName={dbInstance.ConnectionStringName}]");
             // MS SQL 
             if (dbInstance.Type == DatabaseType.MSSQL)
             {
@@ -40,7 +40,7 @@ namespace Evoflare.API
                 if (!string.IsNullOrEmpty(dbInstance.ConnectionStringEnvironmentName))
                     connectionString = Environment.GetEnvironmentVariable(dbInstance.ConnectionStringEnvironmentName) ?? connectionString;
 
-                // getting default connection    
+                // getting default connection     
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     connectionString = configuration.GetConnectionString(DatabaseOptions.DefaultConnectionName);
