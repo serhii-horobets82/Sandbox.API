@@ -6,6 +6,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gosu \
         curl \
+        dos2unix \
         libcurl3 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -14,6 +15,7 @@ WORKDIR /app
 EXPOSE 5000
 COPY obj/Docker/publish/Api .
 COPY entrypoint.sh /
+RUN dos2unix /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 HEALTHCHECK CMD curl -f http://localhost:5000/alive || exit 1
