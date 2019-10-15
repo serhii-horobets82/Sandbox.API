@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Evoflare.API.Configuration;
 using Microsoft.Extensions.Configuration;
 
@@ -11,7 +12,9 @@ namespace Evoflare.API.Data
             Configuration = configuration;
             AppSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
             GlobalSettings = configuration.GetSection("GlobalSettings").Get<GlobalSettings>();
-            DatabaseInstances = configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>();
+            DatabaseInstances = configuration.GetSection("DatabaseInstances").Get<List<DatabaseInstance>>()?.GroupBy(i => i.Id)?.Select(i => i.FirstOrDefault())?.ToList();
+            if (DatabaseInstances == null)
+                DatabaseInstances = new List<DatabaseInstance>();
             // Add primary DB 
             DatabaseInstances.Insert(0,
                 new DatabaseInstance

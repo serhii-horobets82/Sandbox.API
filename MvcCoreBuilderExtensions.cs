@@ -34,9 +34,15 @@ namespace Evoflare.API
                         //.AllowAnyOrigin()
                         .WithOrigins(
                             "http://localhost:8080",
+                            "http://intel.evoflare.com:8080",
+                            "http://hp.evoflare.com:8080",
+                            "http://whirlpool.evoflare.com:8080",
                             "https://evoflare.azurewebsites.net",
                             "http://evoflare.azurewebsites.net",
                             "https://evoflare-web.herokuapp.com",
+                            "https://intel-evoflare.herokuapp.com",
+                            "https://hp-evoflare.herokuapp.com",
+                            "https://whirlpool-evoflare.herokuapp.com",
                             "https://evoflare-web-dev.herokuapp.com",
                             "https://evoflare-web-dev01.herokuapp.com",
                             "https://evoflare-web-dev02.herokuapp.com",

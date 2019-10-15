@@ -181,7 +181,7 @@ namespace Evoflare.API.Data
                 }*/
 
                 //SeedEmployeeEvaluation(applicationContext);
-                SeedCertificationExam(applicationContext);
+                    
 
                 SeedCompetenceArea(applicationContext);
                 SeedCompetence(applicationContext);

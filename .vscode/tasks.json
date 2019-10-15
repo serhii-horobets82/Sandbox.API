@@ -11,7 +11,7 @@
       "id": "herokuAppName",
       "type": "promptString",
       "description": "Name of application",
-      "default": "evoflare-app"
+      "default": "api-base-evoflare"
     },
     {
       "id": "herokuApp",
@@ -23,7 +23,8 @@
         "evoflare-api-dev01",
         "evoflare-api-dev02",
         "evoflare-app",
-        "api-evoflare"
+        "api-evoflare",
+        "api-base-evoflare"
       ],
       "default": "evoflare-api-dev"
     },

@@ -132,7 +132,7 @@ namespace Evoflare.API
                 return dbInstances.First();
             else
             {
-                return dbInstances?.FirstOrDefault(i => i.Id == serverId);
+                return dbInstances?.FirstOrDefault(i => i.Id == serverId)??dbInstances.First();
             }
         }
 
